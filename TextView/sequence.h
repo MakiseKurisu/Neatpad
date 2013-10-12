@@ -19,6 +19,15 @@ typedef unsigned long      size_w;
 
 const size_w MAX_SEQUENCE_LENGTH = ((size_w) (-1) / sizeof(seqchar));
 
+struct _span;
+typedef struct _span span;
+struct _ref;
+typedef struct _ref ref;
+struct _buffer_control;
+typedef struct _buffer_control buffer_control;
+enum _action;
+typedef enum _action action;
+
 //
 //    sequence class!
 //
@@ -26,12 +35,7 @@ class sequence
 {
 public:
     // forward declare the nested helper-classes
-    class            span;
     class            span_range;
-    class            buffer_control;
-    class            iterator;
-    class            ref;
-    enum            action;
 
 public:
 
@@ -165,13 +169,13 @@ private:
 
 
 //
-//    sequence::action
+//    action
 //
 //    enumeration of the type of 'edit actions' our sequence supports.
 //    only important when we try to 'optimize' repeated operations on the
 //    sequence by coallescing them into a single span.
 //
-enum sequence::action
+enum _action
 {
     action_invalid,
     action_insert,
@@ -180,32 +184,12 @@ enum sequence::action
 };
 
 //
-//    sequence::span
+//    span
 //
 //    private class to the sequence
 //
-class sequence::span
+struct _span
 {
-    friend class sequence;
-    friend class span_range;
-
-public:
-    // constructor
-    span(size_w off, size_w len, int buf, span *nx = 0, span *pr = 0)
-        :
-        next(nx),
-        prev(pr),
-        offset(off),
-        length(len),
-        buffer(buf)
-    {
-        static int count = -2;
-        id = count++;
-    }
-
-
-private:
-
     span   *next;
     span   *prev;    // double-link-list 
 
@@ -367,53 +351,28 @@ private:
 };
 
 //
-//    sequence::ref
+//    ref
 //
 //    temporary 'reference' to the sequence, used for
 //  non-const array access with sequence::operator[]
 //
-class sequence::ref
+struct _ref
 {
-public:
-    ref(sequence *s, size_w i)
-        :
-        seq(s),
-        index(i)
-    {
-    }
-
-    operator seqchar() const
-    {
-        return seq->peek(index);
-    }
-
-    ref & operator= (seqchar rhs)
-    {
-        seq->poke(index, rhs);
-        return *this;
-    }
-
-private:
-    size_w        index;
-    sequence *    seq;
+    size_w      index;
+    sequence    *seq;
 };
 
 //
 //    buffer_control
 //
-class sequence::buffer_control
+struct _buffer_control
 {
-public:
-    seqchar    *buffer;
-    size_w     length;
-    size_w     maxsize;
-    int         id;
+    seqchar *buffer;
+    size_w  length;
+    size_w  maxsize;
+    int     id;
 };
 
-class sequence::iterator
-{
-public:
 
-};
 
 #endif

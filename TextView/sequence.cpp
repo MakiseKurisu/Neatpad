@@ -48,6 +48,28 @@ void debug(const char *fmt, ...)
 #define odebug
 #endif
 
+span * new_span(size_w off = 0, size_w len = 0, int buf = 0, span *nx = 0, span *pr = 0)
+{
+    static int count = -2;
+
+    span *lps = new span;
+    lps->next = nx;
+    lps->prev = pr;
+    lps->offset = off;
+    lps->length = len;
+    lps->buffer = buf;
+    lps->id = count++;
+
+    return lps;
+}
+
+ref * new_ref(sequence * seq, size_w index)
+{
+    ref * stref = new ref;
+    stref->seq = seq;
+    stref->index = index;
+    return stref;
+}
 
 sequence::sequence()
 {
@@ -58,8 +80,8 @@ sequence::sequence()
     group_id = 0;
     group_refcount = 0;
 
-    head = new span(0, 0, 0);
-    tail = new span(0, 0, 0);
+    head = new_span(0, 0, 0);
+    tail = new_span(0, 0, 0);
     head->next = tail;
     tail->prev = head;
 
@@ -105,7 +127,7 @@ bool sequence::init(const seqchar *buffer, size_t length)
     memcpy(bc->buffer, buffer, length * sizeof(seqchar));
     bc->length = length;
 
-    span *sptr = new span(0, length, bc->id, tail, head);
+    span *sptr = new_span(0, length, bc->id, tail, head);
     head->next = sptr;
     tail->prev = sptr;
 
@@ -202,7 +224,7 @@ void sequence::debug2()
 //
 //    Allocate a buffer and add it to our 'buffer control' list
 //
-sequence::buffer_control* sequence::alloc_buffer(size_t maxsize)
+buffer_control* sequence::alloc_buffer(size_t maxsize)
 {
     buffer_control *bc;
 
@@ -225,7 +247,7 @@ sequence::buffer_control* sequence::alloc_buffer(size_t maxsize)
     return bc;
 }
 
-sequence::buffer_control* sequence::alloc_modifybuffer(size_t maxsize)
+buffer_control* sequence::alloc_modifybuffer(size_t maxsize)
 {
     buffer_control *bc;
 
@@ -278,7 +300,7 @@ bool sequence::import_buffer(const seqchar *buf, size_t len, size_t *buffer_offs
 //    index        - character-position index
 //    *spanindex  - index of span within sequence
 //
-sequence::span* sequence::spanfromindex(size_w index, size_w *spanindex = 0) const
+span* sequence::spanfromindex(size_w index, size_w *spanindex = 0) const
 {
     span * sptr;
     size_w curidx = 0;
@@ -601,7 +623,7 @@ bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, ac
         oldspans->spanboundary(sptr->prev, sptr);
 
         // allocate new span in the modify buffer
-        newspans.append(new span(
+        newspans.append(new_span(
             modbuf_offset,
             length,
             modifybuffer_id)
@@ -621,21 +643,21 @@ bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, ac
         oldspans->append(sptr);
 
         //    span for the existing data before the insertion
-        newspans.append(new span(
+        newspans.append(new_span(
             sptr->offset,
             insoffset,
             sptr->buffer)
             );
 
         // make a span for the inserted data
-        newspans.append(new span(
+        newspans.append(new_span(
             modbuf_offset,
             length,
             modifybuffer_id)
             );
 
         // span for the existing data after the insertion
-        newspans.append(new span(
+        newspans.append(new_span(
             sptr->offset + insoffset,
             sptr->length - insoffset,
             sptr->buffer)
@@ -799,7 +821,7 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
     if (remoffset != 0)
     {
         // split the span - keep the first "half"
-        newspans.append(new span(sptr->offset, remoffset, sptr->buffer));
+        newspans.append(new_span(sptr->offset, remoffset, sptr->buffer));
         frag1 = newspans.first;
 
         // have we split a single span into two?
@@ -807,7 +829,7 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
         if (remoffset + removelen < sptr->length)
         {
             // make a second span for the second half of the split
-            newspans.append(new span(
+            newspans.append(new_span(
                 sptr->offset + remoffset + removelen,
                 sptr->length - remoffset - removelen,
                 sptr->buffer)
@@ -831,7 +853,7 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
         if (removelen < sptr->length)
         {
             // split the span, keeping the last "half"
-            newspans.append(new span(
+            newspans.append(new_span(
                 sptr->offset + removelen,
                 sptr->length - removelen,
                 sptr->buffer)
@@ -1101,9 +1123,9 @@ seqchar sequence::operator[] (size_w index) const
 //
 //    read/write array access
 //
-sequence::ref sequence::operator[] (size_w index)
+ref sequence::operator[] (size_w index)
 {
-    return ref(this, index);
+    return *new_ref(this, index);
 }
 
 //
