@@ -14,7 +14,7 @@
 //
 //	Painting procedure for TextView objects
 //
-LRESULT WINAPI TextView::OnPaint()
+LRESULT WINAPI TextViewPaint(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
     HDC			hdc;
     PAINTSTRUCT ps;
@@ -24,18 +24,18 @@ LRESULT WINAPI TextView::OnPaint()
     HANDLE		hOldFont;
     HFONT		hFont;
 
-    hdc = BeginPaint(m_hWnd, &ps);
+    hdc = BeginPaint(hwnd, &ps);
 
     hFont = (HFONT) GetStockObject(ANSI_FIXED_FONT);
     hOldFont = SelectObject(hdc, hFont);
 
-    GetClientRect(m_hWnd, &rect);
+    GetClientRect(hwnd, &rect);
 
     ExtTextOut(hdc, 10, 10, ETO_OPAQUE, &rect, text, lstrlen(text), 0);
 
     SelectObject(hdc, hOldFont);
 
-    EndPaint(m_hWnd, &ps);
+    EndPaint(hwnd, &ps);
 
     return 0;
 }
@@ -45,35 +45,14 @@ LRESULT WINAPI TextView::OnPaint()
 //
 LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    TextView *ptv = (TextView *) GetWindowLong(hwnd, 0);
-
     switch (msg)
     {
-        // First message received by any window - make a new TextView object
-        // and store pointer to it in our extra-window-bytes
-    case WM_NCCREATE:
-
-        if ((ptv = new TextView(hwnd)) == 0)
-            return FALSE;
-
-        SetWindowLong(hwnd, 0, (LONG) ptv);
-        return TRUE;
-
-        // Last message received by any window - delete the TextView object
-    case WM_NCDESTROY:
-
-        delete ptv;
-        return 0;
-
         // Draw contents of TextView whenever window needs updating
     case WM_PAINT:
-        return ptv->OnPaint();
-
+        return TextViewPaint(hwnd, wParam, lParam);
     default:
-        break;
+        return DefWindowProc(hwnd, msg, wParam, lParam);
     }
-
-    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 //
