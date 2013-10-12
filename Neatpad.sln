@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neatpad", "Neatpad\Neatpad.
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextView", "TextView\TextView.vcxproj", "{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F3B07C64-7B61-4410-A4C6-0C898A9B613C} = {F3B07C64-7B61-4410-A4C6-0C898A9B613C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UspLib", "UspLib\UspLib.vcxproj", "{F3B07C64-7B61-4410-A4C6-0C898A9B613C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +28,10 @@ Global
 		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}.Debug|Win32.Build.0 = Debug|Win32
 		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}.Release|Win32.ActiveCfg = Release|Win32
 		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}.Release|Win32.Build.0 = Release|Win32
+		{F3B07C64-7B61-4410-A4C6-0C898A9B613C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F3B07C64-7B61-4410-A4C6-0C898A9B613C}.Debug|Win32.Build.0 = Debug|Win32
+		{F3B07C64-7B61-4410-A4C6-0C898A9B613C}.Release|Win32.ActiveCfg = Release|Win32
+		{F3B07C64-7B61-4410-A4C6-0C898A9B613C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

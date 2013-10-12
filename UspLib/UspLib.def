@@ -1,0 +1,18 @@
+NAME    UspLib.dll
+EXPORTS
+    UspAnalyze
+    UspFree
+    UspAllocate
+    UspApplyAttributes
+    UspApplySelection
+    UspTextOut
+    UspSnapXToOffset
+    UspXToOffset
+    UspOffsetToX
+    UspSetSelColor
+    UspInitFont
+    UspFreeFont
+    UspGetSize
+    UspGetLogAttr
+    UspBuildAttr
+    
