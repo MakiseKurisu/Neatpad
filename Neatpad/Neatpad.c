@@ -1,10 +1,10 @@
 //
-//	Neatpad - Simple Text Editor application 
+//    Neatpad - Simple Text Editor application 
 //
-//	www.catch22.net
-//	Written by J Brown 2004
+//    www.catch22.net
+//    Written by J Brown 2004
 //
-//	Freeware
+//    Freeware
 //
 #define _CRT_SECURE_NO_DEPRECATE
 #define _WIN32_WINNT 0x501
@@ -26,26 +26,26 @@
 #pragma comment(lib, "uxtheme.lib")
 #pragma comment(lib, "TextView.lib")
 
-TCHAR		g_szAppName [] = APP_TITLE;
-HWND		g_hwndMain;
-HWND		g_hwndTextView;
-HWND		g_hwndStatusbar;
-HWND		g_hwndSearchDlg;
-HFONT		g_hFont;
+TCHAR        g_szAppName [] = APP_TITLE;
+HWND        g_hwndMain;
+HWND        g_hwndTextView;
+HWND        g_hwndStatusbar;
+HWND        g_hwndSearchDlg;
+HFONT        g_hFont;
 
-TCHAR		g_szFileName[MAX_PATH];
-TCHAR		g_szFileTitle[MAX_PATH];
-BOOL		g_fFileChanged = FALSE;
+TCHAR        g_szFileName[MAX_PATH];
+TCHAR        g_szFileTitle[MAX_PATH];
+BOOL        g_fFileChanged = FALSE;
 
-TCHAR		*g_szEditMode [] = { TEXT("READ"), TEXT("INS"), TEXT("OVR") };
+TCHAR        *g_szEditMode [] = { TEXT("READ"), TEXT("INS"), TEXT("OVR") };
 
 // support 'satellite' resource modules
-HINSTANCE	g_hResourceModule;
+HINSTANCE    g_hResourceModule;
 
 //
-//	Set the main window filename
+//    Set the main window filename
 //
-void SetWindowFileName(HWND hwnd, TCHAR *szFileName, BOOL fModified)
+void SetWindowFileName(HWND hwnd, LPTSTR szFileName, BOOL fModified)
 {
     TCHAR ach[MAX_PATH + sizeof(g_szAppName) +4];
     TCHAR mod[4] = TEXT("");
@@ -58,15 +58,15 @@ void SetWindowFileName(HWND hwnd, TCHAR *szFileName, BOOL fModified)
 }
 
 //
-//	About dialog-proc
+//    About dialog-proc
 //
 LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    HICON	hIcon;
-    HFONT	hFont;
-    RECT	rect;
-    HWND	hwndUrl;
-    HWND	hwndStatic;
+    HICON    hIcon;
+    HFONT    hFont;
+    RECT    rect;
+    HWND    hwndUrl;
+    HWND    hwndStatic;
 
     switch (msg)
     {
@@ -77,22 +77,22 @@ LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         CenterWindow(hwnd);
 
         //
-        //	Set the dialog-icon 
+        //    Set the dialog-icon 
         //
         hIcon = (HICON) LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 48, 48, 0);
         SendDlgItemMessage(hwnd, IDC_HEADER2, STM_SETIMAGE, IMAGE_ICON, (WPARAM) hIcon);
 
         //
-        //	Get the current font for the dialog and create a BOLD version,
-        //	set this as the AppName static-label's font
+        //    Get the current font for the dialog and create a BOLD version,
+        //    set this as the AppName static-label's font
         //
         hFont = CreateBoldFontFromHwnd(hwnd);
         SendDlgItemMessage(hwnd, IDC_ABOUT_APPNAME, WM_SETFONT, (WPARAM) hFont, 0);
 
         //
-        //	Locate the existing static-control which displays our homepage
-        //	Create a SysLink control right over the top of it (assuming current
-        //	version of Windows supports it)
+        //    Locate the existing static-control which displays our homepage
+        //    Create a SysLink control right over the top of it (assuming current
+        //    version of Windows supports it)
         //
         hwndStatic = GetDlgItem(hwnd, IDC_ABOUT_URL);
         GetClientRect(hwndStatic, &rect);
@@ -141,7 +141,7 @@ LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 //
-//	Display the About dialog-box
+//    Display the About dialog-box
 //
 void ShowAboutDlg(HWND hwndParent)
 {
@@ -152,7 +152,7 @@ void ShowAboutDlg(HWND hwndParent)
 
 
 //
-//	WM_NOTIFY handler for the TextView notification messages
+//    WM_NOTIFY handler for the TextView notification messages
 //
 UINT TextViewNotifyHandler(HWND hwnd, NMHDR *nmhdr)
 {
@@ -199,12 +199,12 @@ UINT TextViewNotifyHandler(HWND hwnd, NMHDR *nmhdr)
 }
 
 //
-//	Generic WM_NOTIFY handler for all other messages
+//    Generic WM_NOTIFY handler for all other messages
 //
 UINT NotifyHandler(HWND hwnd, NMHDR *nmhdr)
 {
     NMMOUSE *nmmouse;
-    UINT	 nMode;
+    UINT     nMode;
 
     switch (nmhdr->code)
     {
@@ -234,7 +234,7 @@ UINT NotifyHandler(HWND hwnd, NMHDR *nmhdr)
 }
 
 //
-//	WM_COMMAND message handler for main window
+//    WM_COMMAND message handler for main window
 //
 UINT CommandHandler(HWND hwnd, UINT nCtrlId, UINT nCtrlCode, HWND hwndFrom)
 {
@@ -288,7 +288,7 @@ UINT CommandHandler(HWND hwnd, UINT nCtrlId, UINT nCtrlCode, HWND hwndFrom)
         PostMessage(hwnd, WM_CLOSE, 0, 0);
         return 0;
 
-    case IDM_EDIT_UNDO:	case WM_UNDO:
+    case IDM_EDIT_UNDO:    case WM_UNDO:
         SendMessage(g_hwndTextView, WM_UNDO, 0, 0);
         return 0;
 
@@ -368,7 +368,7 @@ UINT CommandHandler(HWND hwnd, UINT nCtrlId, UINT nCtrlCode, HWND hwndFrom)
 }
 
 //
-//	Main window procedure
+//    Main window procedure
 //
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -421,14 +421,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
 
         //case WM_NCCALCSIZE:
-        //	return NcCalcSize(hwnd, wParam, lParam);
+        //    return NcCalcSize(hwnd, wParam, lParam);
 
     case WM_INITMENU:
         CheckMenuCommand((HMENU) wParam, IDM_VIEW_LINENUMBERS, g_fLineNumbers);
         CheckMenuCommand((HMENU) wParam, IDM_VIEW_LONGLINES, g_fLongLines);
         CheckMenuCommand((HMENU) wParam, IDM_VIEW_SAVEEXIT, g_fSaveOnExit);
         CheckMenuCommand((HMENU) wParam, IDM_VIEW_STATUSBAR, g_fShowStatusbar);
-        //CheckMenuCommand((HMENU)wParam, IDM_VIEW_SEARCHBAR,		g_hwndSearchBar ? TRUE : FALSE);
+        //CheckMenuCommand((HMENU)wParam, IDM_VIEW_SEARCHBAR,        g_hwndSearchBar ? TRUE : FALSE);
 
         EnableMenuCommand((HMENU) wParam, IDM_EDIT_UNDO, TextView_CanUndo(g_hwndTextView));
         EnableMenuCommand((HMENU) wParam, IDM_EDIT_REDO, TextView_CanRedo(g_hwndTextView));
@@ -440,11 +440,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
 
         //case WM_USER:
-        //	wsprintf(msgstr, TEXT("%s\n\nThis file has been modified outside of Neatpad.")
-        //					 TEXT("Do you wish to reload it?"), g_szFileName);
-        //	MessageBox(hwnd, msgstr, TEXT("Neatpad"), MB_ICONQUESTION|MB_YESNO);
+        //    wsprintf(msgstr, TEXT("%s\n\nThis file has been modified outside of Neatpad.")
+        //                     TEXT("Do you wish to reload it?"), g_szFileName);
+        //    MessageBox(hwnd, msgstr, TEXT("Neatpad"), MB_ICONQUESTION|MB_YESNO);
         //
-        //	return 0;
+        //    return 0;
 
     case WM_ENABLE:
 
@@ -501,7 +501,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (g_fShowStatusbar)
         {
             DeferWindowPos(hdwp, g_hwndStatusbar, 0, 0, height - heightsb, width, heightsb, SWP_SHOWWINDOW);
-            //	MoveWindow(g_hwndStatusbar, 0, height - heightsb, width, heightsb, TRUE);
+            //    MoveWindow(g_hwndStatusbar, 0, height - heightsb, width, heightsb, TRUE);
             height -= heightsb;
         }
 
@@ -519,7 +519,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 //
-//	Register main window class
+//    Register main window class
 //
 void InitMainWnd()
 {
@@ -544,25 +544,25 @@ void InitMainWnd()
 }
 
 //
-//	Create a top-level window
+//    Create a top-level window
 //
 HWND CreateMainWnd()
 {
     return CreateWindowEx(0,
-        g_szAppName,			// window class name
-        g_szAppName,			// window caption
+        g_szAppName,            // window class name
+        g_szAppName,            // window caption
         WS_OVERLAPPEDWINDOW,//|WS_CLIPCHILDREN,
-        CW_USEDEFAULT,			// initial x position
-        CW_USEDEFAULT,			// initial y position
-        CW_USEDEFAULT,			// initial x size
-        CW_USEDEFAULT,			// initial y size
-        NULL,					// parent window handle
-        NULL,					// use window class menu
-        GetModuleHandle(0),		// program instance handle
-        NULL);					// creation parameters
+        CW_USEDEFAULT,            // initial x position
+        CW_USEDEFAULT,            // initial y position
+        CW_USEDEFAULT,            // initial x size
+        CW_USEDEFAULT,            // initial y size
+        NULL,                    // parent window handle
+        NULL,                    // use window class menu
+        GetModuleHandle(0),        // program instance handle
+        NULL);                    // creation parameters
 }
 
-TCHAR **GetArgvCommandLine(int *argc)
+LPTSTR *GetArgvCommandLine(int *argc)
 {
 #ifdef UNICODE
     return CommandLineToArgvW(GetCommandLineW(), argc);
@@ -572,7 +572,7 @@ TCHAR **GetArgvCommandLine(int *argc)
 #endif
 }
 
-TCHAR * GetArg(TCHAR *ptr, TCHAR *buf, int len)
+LPTSTR  GetArg(LPTSTR ptr, LPTSTR buf, int len)
 {
     int i = 0;
     int ch;
@@ -620,21 +620,21 @@ TCHAR * GetArg(TCHAR *ptr, TCHAR *buf, int len)
 }
 
 //
-//	Entry-point for text-editor application
+//    Entry-point for text-editor application
 //
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int iShowCmd)
 {
-    MSG			msg;
-    HACCEL		hAccel;
-    TCHAR		**argv;
-    int			argc;
-    //TCHAR		*pszCmdlineFile = 0;
-    TCHAR		arg[MAX_PATH];
+    MSG            msg;
+    HACCEL        hAccel;
+    TCHAR        **argv;
+    int            argc;
+    //TCHAR        *pszCmdlineFile = 0;
+    TCHAR        arg[MAX_PATH];
 
     //
     // get the first commandline argument
     //
-    TCHAR *pszCmdline = GetArg(GetCommandLineW(), arg, MAX_PATH);
+    LPTSTR pszCmdline = GetArg(GetCommandLineW(), arg, MAX_PATH);
     argv = GetArgvCommandLine(&argc);
 
     // check if we have any options

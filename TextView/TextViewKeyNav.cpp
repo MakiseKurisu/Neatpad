@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextViewKeyNav.cpp
+//    MODULE:        TextViewKeyNav.cpp
 //
-//	PURPOSE:	Keyboard navigation for TextView
+//    PURPOSE:    Keyboard navigation for TextView
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -16,12 +16,12 @@
 
 /*struct SCRIPT_LOGATTR
 {
-BYTE fSoftBreak	:1;
-BYTE fWhiteSpace	:1;
-BYTE fCharStop	:1;
-BYTE fWordStop	:1;
-BYTE fInvalid		:1;
-BYTE fReserved	:3;
+BYTE fSoftBreak    :1;
+BYTE fWhiteSpace    :1;
+BYTE fCharStop    :1;
+BYTE fWordStop    :1;
+BYTE fInvalid        :1;
+BYTE fReserved    :3;
 };*/
 
 
@@ -31,7 +31,7 @@ bool IsKeyPressed(UINT nVirtKey)
 }
 
 //
-//	Get the UspCache and logical attributes for specified line
+//    Get the UspCache and logical attributes for specified line
 //
 bool TextView::GetLogAttr(ULONG nLineNo, USPCACHE **puspCache, CSCRIPT_LOGATTR **plogAttr, ULONG *pnOffset)
 {
@@ -45,15 +45,15 @@ bool TextView::GetLogAttr(ULONG nLineNo, USPCACHE **puspCache, CSCRIPT_LOGATTR *
 }
 
 //
-//	Move caret up specified number of lines
+//    Move caret up specified number of lines
 //
 VOID TextView::MoveLineUp(int numLines)
 {
-    USPDATA			* uspData;
-    ULONG			  lineOffset;
+    USPDATA            * uspData;
+    ULONG              lineOffset;
 
-    int				  charPos;
-    BOOL			  trailing;
+    int                  charPos;
+    BOOL              trailing;
 
     m_nCurrentLine -= min(m_nCurrentLine, (unsigned) numLines);
 
@@ -67,15 +67,15 @@ VOID TextView::MoveLineUp(int numLines)
 }
 
 //
-//	Move caret down specified number of lines
+//    Move caret down specified number of lines
 //
 VOID TextView::MoveLineDown(int numLines)
 {
-    USPDATA			* uspData;
-    ULONG			  lineOffset;
+    USPDATA            * uspData;
+    ULONG              lineOffset;
 
-    int				  charPos;
-    BOOL			  trailing;
+    int                  charPos;
+    BOOL              trailing;
 
     m_nCurrentLine += min(m_nLineCount - m_nCurrentLine - 1, (unsigned) numLines);
 
@@ -89,14 +89,14 @@ VOID TextView::MoveLineDown(int numLines)
 }
 
 //
-//	Move to start of previous word (to the left)
+//    Move to start of previous word (to the left)
 //
 VOID TextView::MoveWordPrev()
 {
-    USPCACHE		* uspCache;
+    USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    ULONG			  lineOffset;
-    int				  charPos;
+    ULONG              lineOffset;
+    int                  charPos;
 
     // get Uniscribe data for current line
     if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
@@ -132,14 +132,14 @@ VOID TextView::MoveWordPrev()
 }
 
 //
-//	Move to start of next word
+//    Move to start of next word
 //
 VOID TextView::MoveWordNext()
 {
-    USPCACHE		* uspCache;
+    USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    ULONG			  lineOffset;
-    int				  charPos;
+    ULONG              lineOffset;
+    int                  charPos;
 
     // get Uniscribe data for current line
     if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
@@ -175,14 +175,14 @@ VOID TextView::MoveWordNext()
 }
 
 //
-//	Move to start of current word
+//    Move to start of current word
 //
 VOID TextView::MoveWordStart()
 {
-    USPCACHE		* uspCache;
+    USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    ULONG			  lineOffset;
-    int				  charPos;
+    ULONG              lineOffset;
+    int                  charPos;
 
     // get Uniscribe data for current line
     if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
@@ -197,14 +197,14 @@ VOID TextView::MoveWordStart()
 }
 
 //
-//	Move to end of current word
+//    Move to end of current word
 //
 VOID TextView::MoveWordEnd()
 {
-    USPCACHE		* uspCache;
+    USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    ULONG			  lineOffset;
-    int				  charPos;
+    ULONG              lineOffset;
+    int                  charPos;
 
     // get Uniscribe data for current line
     if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
@@ -219,14 +219,14 @@ VOID TextView::MoveWordEnd()
 }
 
 //
-//	Move to previous character
+//    Move to previous character
 //
 VOID TextView::MoveCharPrev()
 {
-    USPCACHE		* uspCache;
+    USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    ULONG			  lineOffset;
-    int				  charPos;
+    ULONG              lineOffset;
+    int                  charPos;
 
     // get Uniscribe data for current line
     if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
@@ -258,14 +258,14 @@ VOID TextView::MoveCharPrev()
 }
 
 //
-//	Move to next character
+//    Move to next character
 //
 VOID TextView::MoveCharNext()
 {
-    USPCACHE		* uspCache;
+    USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    ULONG			  lineOffset;
-    int				  charPos;
+    ULONG              lineOffset;
+    int                  charPos;
 
     // get Uniscribe data for specified line
     if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
@@ -294,14 +294,14 @@ VOID TextView::MoveCharNext()
 }
 
 //
-//	Move to start of specified line
+//    Move to start of specified line
 //
 VOID TextView::MoveLineStart(ULONG lineNo)
 {
-    ULONG			  lineOffset;
-    USPCACHE		* uspCache;
+    ULONG              lineOffset;
+    USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    int				  charPos;
+    int                  charPos;
 
     // get Uniscribe data for current line
     if (!GetLogAttr(lineNo, &uspCache, &logAttr, &lineOffset))
@@ -324,7 +324,7 @@ VOID TextView::MoveLineStart(ULONG lineNo)
 }
 
 //
-//	Move to end of specified line
+//    Move to end of specified line
 //
 VOID TextView::MoveLineEnd(ULONG lineNo)
 {
@@ -337,7 +337,7 @@ VOID TextView::MoveLineEnd(ULONG lineNo)
 }
 
 //
-//	Move to start of file
+//    Move to start of file
 //
 VOID TextView::MoveFileStart()
 {
@@ -345,7 +345,7 @@ VOID TextView::MoveFileStart()
 }
 
 //
-//	Move to end of file
+//    Move to end of file
 //
 VOID TextView::MoveFileEnd()
 {
@@ -354,7 +354,7 @@ VOID TextView::MoveFileEnd()
 
 
 //
-//	Process keyboard-navigation keys
+//    Process keyboard-navigation keys
 //
 LONG TextView::OnKeyDown(UINT nKeyCode, UINT nFlags)
 {
@@ -363,8 +363,8 @@ LONG TextView::OnKeyDown(UINT nKeyCode, UINT nFlags)
     BOOL fAdvancing = FALSE;
 
     //
-    //	Process the key-press. Cursor movement is different depending
-    //	on if <ctrl> is held down or not, so act accordingly
+    //    Process the key-press. Cursor movement is different depending
+    //    on if <ctrl> is held down or not, so act accordingly
     //
     switch (nKeyCode)
     {
@@ -439,46 +439,46 @@ LONG TextView::OnKeyDown(UINT nKeyCode, UINT nFlags)
 
     case VK_LEFT:
 
-        if (fCtrlDown)	MoveWordPrev();
-        else			MoveCharPrev();
+        if (fCtrlDown)    MoveWordPrev();
+        else            MoveCharPrev();
 
         fAdvancing = FALSE;
         break;
 
     case VK_RIGHT:
 
-        if (fCtrlDown)	MoveWordNext();
-        else			MoveCharNext();
+        if (fCtrlDown)    MoveWordNext();
+        else            MoveCharNext();
 
         fAdvancing = TRUE;
         break;
 
     case VK_UP:
-        if (fCtrlDown)	Scroll(0, -1);
-        else			MoveLineUp(1);
+        if (fCtrlDown)    Scroll(0, -1);
+        else            MoveLineUp(1);
         break;
 
     case VK_DOWN:
-        if (fCtrlDown)	Scroll(0, 1);
-        else			MoveLineDown(1);
+        if (fCtrlDown)    Scroll(0, 1);
+        else            MoveLineDown(1);
         break;
 
     case VK_PRIOR:
-        if (!fCtrlDown)	MoveLineUp(m_nWindowLines);
+        if (!fCtrlDown)    MoveLineUp(m_nWindowLines);
         break;
 
     case VK_NEXT:
-        if (!fCtrlDown)	MoveLineDown(m_nWindowLines);
+        if (!fCtrlDown)    MoveLineDown(m_nWindowLines);
         break;
 
     case VK_HOME:
-        if (fCtrlDown)	MoveFileStart();
-        else			MoveLineStart(m_nCurrentLine);
+        if (fCtrlDown)    MoveFileStart();
+        else            MoveLineStart(m_nCurrentLine);
         break;
 
     case VK_END:
-        if (fCtrlDown)	MoveFileEnd();
-        else			MoveLineEnd(m_nCurrentLine);
+        if (fCtrlDown)    MoveFileEnd();
+        else            MoveLineEnd(m_nCurrentLine);
         break;
 
     default:

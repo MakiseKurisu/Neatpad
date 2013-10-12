@@ -1,17 +1,17 @@
 //
-//	UspMouse.c
+//    UspMouse.c
 //
-//	Contains routines useful for converting between 
-//	mouse-coordinates and character-positions, designed
+//    Contains routines useful for converting between 
+//    mouse-coordinates and character-positions, designed
 //  to emulate the functionality provided by the
-//	ScriptStringXtoCP and ScriptStringCPToX
-//	
-//	UspSnapXToOffset
-//	UspXToOffset
-//	UspOffsetToX
-//	
-//	Written by J Brown 2006 Freeware
-//	www.catch22.net
+//    ScriptStringXtoCP and ScriptStringCPToX
+//    
+//    UspSnapXToOffset
+//    UspXToOffset
+//    UspOffsetToX
+//    
+//    Written by J Brown 2006 Freeware
+//    www.catch22.net
 //
 #define _WIN32_WINNT 0x501
 
@@ -33,30 +33,30 @@
 ITEM_RUN *GetItemRun(USPDATA *uspData, int visualIdx);
 
 //
-//	Translate the specified screen-x-coordinate (usually the mouse position)
-//	into a character-offset within the specified line. Calling this function
+//    Translate the specified screen-x-coordinate (usually the mouse position)
+//    into a character-offset within the specified line. Calling this function
 //  is preferable to using UspXToOffset and UspOffsetToX separately as it
 //  gives more natural results for mouse-placement.
 //
-//	The adjusted x-coordinate is also returned after it has been snapped to
-//	the nearest cluster boundary, in *snappedX. 
+//    The adjusted x-coordinate is also returned after it has been snapped to
+//    the nearest cluster boundary, in *snappedX. 
 //
-//	The script direction is returned (right/left) in *fRTL
+//    The script direction is returned (right/left) in *fRTL
 //
 BOOL WINAPI UspSnapXToOffset(
-    USPDATA	  * uspData,
-    int			xpos,
-    int       * snappedX,		// out, optional
-    int       * charPos,		// out
-    BOOL	  * fRTL			// out, optional
+    USPDATA      * uspData,
+    int            xpos,
+    int       * snappedX,        // out, optional
+    int       * charPos,        // out
+    BOOL      * fRTL            // out, optional
     )
 {
     int i, cp, trailing, runx = 0;
     int runCount = uspData->itemRunCount;
 
-    if (charPos)		*charPos = 0;
-    if (snappedX)	*snappedX = 0;
-    if (fRTL)		*fRTL = 0;
+    if (charPos)        *charPos = 0;
+    if (snappedX)    *snappedX = 0;
+    if (fRTL)        *fRTL = 0;
 
     if (xpos < 0)
         xpos = 0;
@@ -70,7 +70,7 @@ BOOL WINAPI UspSnapXToOffset(
     }
 
     //if(runCount > 0 && uspData->itemRunList[runCount-1].eol)
-    //	runCount--;
+    //    runCount--;
 
     //
     // process each "run" or span of text in visual order
@@ -140,18 +140,18 @@ BOOL WINAPI UspSnapXToOffset(
 }
 
 //
-//	Translate the specified screen-x-coordinate (usually the mouse position)
-//	into a character-offset within the specified line. This is function
-//	duplicates the behaviour of ScriptStringXToCP
+//    Translate the specified screen-x-coordinate (usually the mouse position)
+//    into a character-offset within the specified line. This is function
+//    duplicates the behaviour of ScriptStringXToCP
 //
-//	The script direction is also returned (right/left) in *fRTL
+//    The script direction is also returned (right/left) in *fRTL
 //
 BOOL WINAPI UspXToOffset(
-    USPDATA	  * uspData,
-    int			xpos,
-    int       * charPos,		// out
-    BOOL	  * trailing,		// out
-    BOOL	  * fRTL			// out, optional
+    USPDATA      * uspData,
+    int            xpos,
+    int       * charPos,        // out
+    BOOL      * trailing,        // out
+    BOOL      * fRTL            // out, optional
     )
 {
     int i, runx = 0;
@@ -209,15 +209,15 @@ BOOL WINAPI UspXToOffset(
 }
 
 //
-//	Translate the specified character-position to a pixel-based
-//	coordinate, relative to the start of the string
-//	Duplicates the behaviour of ScriptStringCPToX
+//    Translate the specified character-position to a pixel-based
+//    coordinate, relative to the start of the string
+//    Duplicates the behaviour of ScriptStringCPToX
 //
 BOOL WINAPI UspOffsetToX(
-    USPDATA		* uspData,
-    int			  charPos,
-    BOOL		  trailing,		// out
-    int			* px			// out
+    USPDATA        * uspData,
+    int              charPos,
+    BOOL          trailing,        // out
+    int            * px            // out
     )
 {
     int i;

@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextViewFont.cpp
+//    MODULE:        TextViewFont.cpp
 //
-//	PURPOSE:	Font support for the TextView control
+//    PURPOSE:    Font support for the TextView control
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -15,14 +15,14 @@
 #include "TextViewInternal.h"
 
 //
-//	TextView::
+//    TextView::
 //
 int TextView::NeatTextYOffset(USPFONT *font)
 {
     return m_nMaxAscent + m_nHeightAbove - font->tm.tmAscent;
 }
 
-int TextView::TextWidth(HDC hdc, TCHAR *buf, int len)
+int TextView::TextWidth(HDC hdc, LPTSTR buf, int len)
 {
     SIZE sz;
     if (len == -1)
@@ -32,7 +32,7 @@ int TextView::TextWidth(HDC hdc, TCHAR *buf, int len)
 }
 
 //
-//	Update the lineheight based on current font settings
+//    Update the lineheight based on current font settings
 //
 VOID TextView::RecalcLineHeight()
 {
@@ -62,7 +62,7 @@ VOID TextView::RecalcLineHeight()
 }
 
 //
-//	Set a font for the TextView
+//    Set a font for the TextView
 //
 LONG TextView::SetFont(HFONT hFont, int idx)
 {
@@ -89,7 +89,7 @@ LONG TextView::SetFont(HFONT hFont, int idx)
 }
 
 //
-//	Add a secondary font to the TextView
+//    Add a secondary font to the TextView
 //
 LONG TextView::AddFont(HFONT hFont)
 {
@@ -102,7 +102,7 @@ LONG TextView::AddFont(HFONT hFont)
 }
 
 //
-//	WM_SETFONT handler: set a new default font
+//    WM_SETFONT handler: set a new default font
 //
 LONG TextView::OnSetFont(HFONT hFont)
 {
@@ -114,7 +114,7 @@ LONG TextView::OnSetFont(HFONT hFont)
 }
 
 //
-//	Set spacing (in pixels) above and below each line - 
+//    Set spacing (in pixels) above and below each line - 
 //  this is in addition to the external-leading of a font
 //
 LONG TextView::SetLineSpacing(int nAbove, int nBelow)

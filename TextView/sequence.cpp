@@ -114,7 +114,7 @@ bool sequence::init(const seqchar *buffer, size_t length)
 }
 
 //
-//	Initialize from an on-disk file
+//    Initialize from an on-disk file
 //
 bool sequence::open(TCHAR *filename, bool readonly)
 {
@@ -122,11 +122,11 @@ bool sequence::open(TCHAR *filename, bool readonly)
 }
 
 //
-//	Initialize from an on-disk file
+//    Initialize from an on-disk file
 //
 //bool sequence::save(TCHAR *filename)
 //{
-//	return false;
+//    return false;
 //}
 
 template <class type>
@@ -200,7 +200,7 @@ void sequence::debug2()
 }
 
 //
-//	Allocate a buffer and add it to our 'buffer control' list
+//    Allocate a buffer and add it to our 'buffer control' list
 //
 sequence::buffer_control* sequence::alloc_buffer(size_t maxsize)
 {
@@ -218,7 +218,7 @@ sequence::buffer_control* sequence::alloc_buffer(size_t maxsize)
 
     bc->length = 0;
     bc->maxsize = maxsize;
-    bc->id = buffer_list.size();		// assign the id
+    bc->id = buffer_list.size();        // assign the id
 
     buffer_list.push_back(bc);
 
@@ -239,7 +239,7 @@ sequence::buffer_control* sequence::alloc_modifybuffer(size_t maxsize)
 }
 
 //
-//	Import the specified range of data into the sequence so we have our own private copy
+//    Import the specified range of data into the sequence so we have our own private copy
 //
 bool sequence::import_buffer(const seqchar *buf, size_t len, size_t *buffer_offset)
 {
@@ -271,12 +271,12 @@ bool sequence::import_buffer(const seqchar *buf, size_t len, size_t *buffer_offs
 
 
 //
-//	sequence::spanfromindex
+//    sequence::spanfromindex
 //
-//	search the spanlist for the span which encompasses the specified index position
+//    search the spanlist for the span which encompasses the specified index position
 //
-//	index		- character-position index
-//	*spanindex  - index of span within sequence
+//    index        - character-position index
+//    *spanindex  - index of span within sequence
 //
 sequence::span* sequence::spanfromindex(size_w index, size_w *spanindex = 0) const
 {
@@ -407,10 +407,10 @@ void sequence::restore_spanrange(span_range *range, bool undo_or_redo)
 }
 
 //
-//	sequence::undoredo
+//    sequence::undoredo
 //
-//	private routine used to undo/redo spanrange events to/from 
-//	the sequence - handles 'grouped' events
+//    private routine used to undo/redo spanrange events to/from 
+//    the sequence - handles 'grouped' events
 //
 bool sequence::undoredo(eventstack &source, eventstack &dest)
 {
@@ -442,7 +442,7 @@ bool sequence::undoredo(eventstack &source, eventstack &dest)
 }
 
 // 
-//	UNDO the last action
+//    UNDO the last action
 //
 bool sequence::undo()
 {
@@ -451,7 +451,7 @@ bool sequence::undo()
 }
 
 //
-//	REDO the last UNDO
+//    REDO the last UNDO
 //
 bool sequence::redo()
 {
@@ -460,7 +460,7 @@ bool sequence::redo()
 }
 
 //
-//	Will calling sequence::undo change the sequence?
+//    Will calling sequence::undo change the sequence?
 //
 bool sequence::canundo() const
 {
@@ -468,7 +468,7 @@ bool sequence::canundo() const
 }
 
 //
-//	Will calling sequence::redo change the sequence?
+//    Will calling sequence::redo change the sequence?
 //
 bool sequence::canredo() const
 {
@@ -476,8 +476,8 @@ bool sequence::canredo() const
 }
 
 //
-//	Group repeated actions on the sequence (insert/erase etc)
-//	into a single 'undoable' action
+//    Group repeated actions on the sequence (insert/erase etc)
+//    into a single 'undoable' action
 //
 void sequence::group()
 {
@@ -491,7 +491,7 @@ void sequence::group()
 }
 
 //
-//	Close the grouping
+//    Close the grouping
 //
 void sequence::ungroup()
 {
@@ -500,7 +500,7 @@ void sequence::ungroup()
 }
 
 //
-//	Return logical length of the sequence
+//    Return logical length of the sequence
 //
 size_w sequence::size() const
 {
@@ -508,9 +508,9 @@ size_w sequence::size() const
 }
 
 //
-//	sequence::initundo
+//    sequence::initundo
 //
-//	create a new (empty) span range and save the current sequence state
+//    create a new (empty) span range and save the current sequence state
 //
 sequence::span_range* sequence::initundo(size_w index, size_w length, action act)
 {
@@ -554,15 +554,15 @@ bool sequence::can_optimize(action act, size_w index)
 }
 
 //
-//	sequence::insert_worker
+//    sequence::insert_worker
 //
 bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, action act)
 {
-    span *		sptr;
-    size_w		spanindex;
-    size_t		modbuf_offset;
-    span_range	newspans;
-    size_w		insoffset;
+    span *        sptr;
+    size_w        spanindex;
+    size_t        modbuf_offset;
+    span_range    newspans;
+    size_w        insoffset;
 
     if (index > sequence_length)
         return false;
@@ -614,13 +614,13 @@ bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, ac
     else
     {
         //
-        //	Create a new undo event and add the span
+        //    Create a new undo event and add the span
         //  that we will be "splitting" in half
         //
         span_range *oldspans = initundo(index, length, act);
         oldspans->append(sptr);
 
-        //	span for the existing data before the insertion
+        //    span for the existing data before the insertion
         newspans.append(new span(
             sptr->offset,
             insoffset,
@@ -650,10 +650,10 @@ bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, ac
 }
 
 //
-//	sequence::insert
+//    sequence::insert
 //
-//	Insert a buffer into the sequence at the specified position.
-//	Consecutive insertions are optimized into a single event
+//    Insert a buffer into the sequence at the specified position.
+//    Consecutive insertions are optimized into a single event
 //
 bool sequence::insert(size_w index, const seqchar *buf, size_w length)
 {
@@ -669,9 +669,9 @@ bool sequence::insert(size_w index, const seqchar *buf, size_w length)
 }
 
 //
-//	sequence::insert
+//    sequence::insert
 //
-//	Insert specified character-value into sequence
+//    Insert specified character-value into sequence
 //
 bool sequence::insert(size_w index, const seqchar val)
 {
@@ -679,9 +679,9 @@ bool sequence::insert(size_w index, const seqchar val)
 }
 
 //
-//	sequence::deletefromsequence
+//    sequence::deletefromsequence
 //
-//	Remove + delete the specified *span* from the sequence
+//    Remove + delete the specified *span* from the sequence
 //
 void sequence::deletefromsequence(span **psptr)
 {
@@ -695,18 +695,18 @@ void sequence::deletefromsequence(span **psptr)
 }
 
 //
-//	sequence::erase_worker
+//    sequence::erase_worker
 //
 bool sequence::erase_worker(size_w index, size_w length, action act)
 {
-    span		*sptr;
-    span_range	 oldspans;
-    span_range	 newspans;
-    span_range	*event;
-    size_w		 spanindex;
-    size_w		 remoffset;
-    size_w		 removelen;
-    bool		 append_spanrange;
+    span        *sptr;
+    span_range     oldspans;
+    span_range     newspans;
+    span_range    *event;
+    size_w         spanindex;
+    size_w         remoffset;
+    size_w         removelen;
+    bool         append_spanrange;
 
     debug("Erasing: idx=%d len=%d\n", index, length);
 
@@ -723,10 +723,10 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
     removelen = length;
 
     //
-    //	can we optimize?
+    //    can we optimize?
     //
-    //	special-case 1: 'forward-delete'
-    //	erase+replace operations will pass through here
+    //    special-case 1: 'forward-delete'
+    //    erase+replace operations will pass through here
     //
     if (index == spanindex && can_optimize(act, index))
     {
@@ -755,8 +755,8 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
         }
     }
     //
-    //	special-case 2: 'backward-delete'
-    //	only erase operations can pass through here
+    //    special-case 2: 'backward-delete'
+    //    only erase operations can pass through here
     //
     else if (index + length == spanindex + sptr->length && can_optimize(action_erase, index + length))
     {
@@ -791,7 +791,7 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
     }
 
     //
-    //	general-case 2+3
+    //    general-case 2+3
     //
     clearstack(redostack);
 
@@ -864,7 +864,7 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
 }
 
 //
-//	sequence::erase 
+//    sequence::erase 
 //
 //  "removes" the specified range of data from the sequence. 
 //
@@ -882,9 +882,9 @@ bool sequence::erase(size_w index, size_w len)
 }
 
 //
-//	sequence::erase
+//    sequence::erase
 //
-//	remove single character from sequence
+//    remove single character from sequence
 //
 bool sequence::erase(size_w index)
 {
@@ -892,16 +892,16 @@ bool sequence::erase(size_w index)
 }
 
 //
-//	sequence::replace
+//    sequence::replace
 //
-//	A 'replace' (or 'overwrite') is a combination of erase+inserting
+//    A 'replace' (or 'overwrite') is a combination of erase+inserting
 //  (first we erase a section of the sequence, then insert a new block
 //  in it's place). 
 //
-//	Doing this as a distinct operation (erase+insert at the 
+//    Doing this as a distinct operation (erase+insert at the 
 //  same time) is really complicated, so I just make use of the existing 
 //  sequence::erase and sequence::insert and combine them into action. We
-//	need to play with the undo stack to combine them in a 'true' sense.
+//    need to play with the undo stack to combine them in a 'true' sense.
 //
 bool sequence::replace(size_w index, const seqchar *buf, size_w length, size_w erase_length)
 {
@@ -950,9 +950,9 @@ bool sequence::replace(size_w index, const seqchar *buf, size_w length, size_w e
 }
 
 //
-//	sequence::replace
+//    sequence::replace
 //
-//	overwrite with the specified buffer
+//    overwrite with the specified buffer
 //
 bool sequence::replace(size_w index, const seqchar *buf, size_w length)
 {
@@ -960,9 +960,9 @@ bool sequence::replace(size_w index, const seqchar *buf, size_w length)
 }
 
 //
-//	sequence::replace
+//    sequence::replace
 //
-//	overwrite with a single character-value
+//    overwrite with a single character-value
 //
 bool sequence::replace(size_w index, const seqchar val)
 {
@@ -970,9 +970,9 @@ bool sequence::replace(size_w index, const seqchar val)
 }
 
 //
-//	sequence::append
+//    sequence::append
 //
-//	very simple wrapper around sequence::insert, just inserts at
+//    very simple wrapper around sequence::insert, just inserts at
 //  the end of the sequence
 //
 bool sequence::append(const seqchar *buf, size_w length)
@@ -981,9 +981,9 @@ bool sequence::append(const seqchar *buf, size_w length)
 }
 
 //
-//	sequence::append
+//    sequence::append
 //
-//	append a single character to the sequence
+//    append a single character to the sequence
 //
 bool sequence::append(const seqchar val)
 {
@@ -991,9 +991,9 @@ bool sequence::append(const seqchar val)
 }
 
 //
-//	sequence::clear
+//    sequence::clear
 //
-//	empty the entire sequence, clear undo/redo history etc
+//    empty the entire sequence, clear undo/redo history etc
 //
 bool sequence::clear()
 {
@@ -1027,11 +1027,11 @@ bool sequence::clear()
 }
 
 //
-//	sequence::render
+//    sequence::render
 //
-//	render the specified range of data (index, len) and store in 'dest'
+//    render the specified range of data (index, len) and store in 'dest'
 //
-//	Returns number of chars copied into destination
+//    Returns number of chars copied into destination
 //
 size_w sequence::render(size_w index, seqchar *dest, size_w length) const
 {
@@ -1066,9 +1066,9 @@ size_w sequence::render(size_w index, seqchar *dest, size_w length) const
 }
 
 //
-//	sequence::peek
+//    sequence::peek
 //
-//	return single element at specified position in the sequence
+//    return single element at specified position in the sequence
 //
 seqchar sequence::peek(size_w index) const
 {
@@ -1077,9 +1077,9 @@ seqchar sequence::peek(size_w index) const
 }
 
 //
-//	sequence::poke
+//    sequence::poke
 //
-//	modify single element at specified position in the sequence
+//    modify single element at specified position in the sequence
 //
 bool sequence::poke(size_w index, seqchar value)
 {
@@ -1087,9 +1087,9 @@ bool sequence::poke(size_w index, seqchar value)
 }
 
 //
-//	sequence::operator[] const
+//    sequence::operator[] const
 //
-//	readonly array access
+//    readonly array access
 //
 seqchar sequence::operator[] (size_w index) const
 {
@@ -1097,9 +1097,9 @@ seqchar sequence::operator[] (size_w index) const
 }
 
 //
-//	sequence::operator[] 
+//    sequence::operator[] 
 //
-//	read/write array access
+//    read/write array access
 //
 sequence::ref sequence::operator[] (size_w index)
 {
@@ -1107,9 +1107,9 @@ sequence::ref sequence::operator[] (size_w index)
 }
 
 //
-//	sequence::breakopt
+//    sequence::breakopt
 //
-//	Prevent subsequent operations from being optimized (coalesced) 
+//    Prevent subsequent operations from being optimized (coalesced) 
 //  with the last.
 //
 void sequence::breakopt()

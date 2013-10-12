@@ -1,11 +1,11 @@
 //
-//	Neatpad
+//    Neatpad
 //
-//	Printing.c
+//    Printing.c
 //
-//	Not currently used but might be in the future
+//    Not currently used but might be in the future
 //
-//	www.catch22.net
+//    www.catch22.net
 //
 
 #define STRICT
@@ -15,14 +15,14 @@
 
 static HANDLE g_hDevMode = NULL;
 static HANDLE g_hDevNames = NULL;
-extern HWND	  g_hwndTextView;
-static int	  g_nPrinterWidth = 0;
+extern HWND      g_hwndTextView;
+static int      g_nPrinterWidth = 0;
 
 int GetPrinterWidth(HDC hdcPrn);
 
 HDC ShowPrintDlg(HWND hwndParent)
 {
-    PRINTDLGEX	pdlgx = { sizeof(pdlgx), hwndParent, g_hDevMode, g_hDevNames };
+    PRINTDLGEX    pdlgx = { sizeof(pdlgx), hwndParent, g_hDevMode, g_hDevNames };
     pdlgx.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_NOCURRENTPAGE | PD_NOWARNING | PD_HIDEPRINTTOFILE;
     pdlgx.nStartPage = START_PAGE_GENERAL;
 

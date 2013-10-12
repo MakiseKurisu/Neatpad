@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextViewKeyInput.cpp
+//    MODULE:        TextViewKeyInput.cpp
 //
-//	PURPOSE:	Keyboard input for TextView
+//    PURPOSE:    Keyboard input for TextView
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -15,12 +15,12 @@
 #include "TextViewInternal.h"
 
 //
-//	TextView::EnterText
+//    TextView::EnterText
 //
-//	Import the specified text into the TextView at the current
-//	cursor position, replacing any text-selection in the process
+//    Import the specified text into the TextView at the current
+//    cursor position, replacing any text-selection in the process
 //
-ULONG TextView::EnterText(TCHAR *szText, ULONG nLength)
+ULONG TextView::EnterText(LPTSTR szText, ULONG nLength)
 {
     ULONG selstart = min(m_nSelectionStart, m_nSelectionEnd);
     ULONG selend = max(m_nSelectionStart, m_nSelectionEnd);
@@ -121,10 +121,10 @@ BOOL TextView::ForwardDelete()
     else
     {
         BYTE tmp[2];
-        //USPCACHE		* uspCache;
+        //USPCACHE        * uspCache;
         //CSCRIPT_LOGATTR * logAttr;
-        //ULONG			  lineOffset;
-        //ULONG			  index;
+        //ULONG              lineOffset;
+        //ULONG              index;
 
         m_pTextDoc->m_seq.render(m_nCursorOffset, tmp, 2);
 
@@ -147,9 +147,9 @@ BOOL TextView::ForwardDelete()
 
 
         //if(tmp[0] == '\r')
-        //	m_pTextDoc->erase_text(m_nCursorOffset, 2);
+        //    m_pTextDoc->erase_text(m_nCursorOffset, 2);
         //else
-        //	m_pTextDoc->erase_text(m_nCursorOffset, 1);
+        //    m_pTextDoc->erase_text(m_nCursorOffset, 1);
     }
 
     m_nSelectionStart = m_nCursorOffset;

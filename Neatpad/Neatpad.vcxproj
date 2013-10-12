@@ -98,7 +98,6 @@
     <ClCompile Include="OptionsMisc.c" />
     <ClCompile Include="Printing.c" />
     <ClCompile Include="Search.c" />
-    <ClCompile Include="ThemeUtils.c" />
     <ClCompile Include="Toolbars.c" />
   </ItemGroup>
   <ItemGroup>

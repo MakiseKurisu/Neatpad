@@ -16,18 +16,18 @@ public:
     ~TextDocument();
 
     bool  init(HANDLE hFile);
-    bool  init(TCHAR *filename);
+    bool  init(LPTSTR filename);
 
     bool  clear();
     bool EmptyDoc();
 
-    bool	Undo(ULONG *offset_start, ULONG *offset_end);
-    bool	Redo(ULONG *offset_start, ULONG *offset_end);
+    bool    Undo(ULONG *offset_start, ULONG *offset_end);
+    bool    Redo(ULONG *offset_start, ULONG *offset_end);
 
     // UTF-16 text-editing interface
-    ULONG	insert_text(ULONG offset_chars, TCHAR *text, ULONG length);
-    ULONG	replace_text(ULONG offset_chars, TCHAR *text, ULONG length, ULONG erase_len);
-    ULONG	erase_text(ULONG offset_chars, ULONG length);
+    ULONG    insert_text(ULONG offset_chars, LPTSTR text, ULONG length);
+    ULONG    replace_text(ULONG offset_chars, LPTSTR text, ULONG length, ULONG erase_len);
+    ULONG    erase_text(ULONG offset_chars, ULONG length);
 
     ULONG lineno_from_offset(ULONG offset);
     ULONG offset_from_lineno(ULONG lineno);
@@ -40,7 +40,7 @@ public:
     TextIterator iterate_line_offset(ULONG offset_chars, ULONG *lineno, ULONG *linestart = 0);
 
     ULONG getdata(ULONG offset, BYTE *buf, size_t len);
-    ULONG getline(ULONG nLineNo, TCHAR *buf, ULONG buflen, ULONG *off_chars);
+    ULONG getline(ULONG nLineNo, LPTSTR buf, ULONG buflen, ULONG *off_chars);
 
     int   getformat();
     ULONG linecount();
@@ -56,17 +56,17 @@ private:
 
     ULONG count_chars(ULONG offset_bytes, ULONG length_chars);
 
-    size_t utf16_to_rawdata(TCHAR *utf16str, size_t utf16len, BYTE *rawdata, size_t *rawlen);
-    size_t rawdata_to_utf16(BYTE *rawdata, size_t rawlen, TCHAR *utf16str, size_t *utf16len);
+    size_t utf16_to_rawdata(LPTSTR utf16str, size_t utf16len, BYTE *rawdata, size_t *rawlen);
+    size_t rawdata_to_utf16(BYTE *rawdata, size_t rawlen, LPTSTR utf16str, size_t *utf16len);
 
     int   detect_file_format(int *headersize);
-    ULONG	  gettext(ULONG offset, ULONG lenbytes, TCHAR *buf, ULONG *len);
+    ULONG      gettext(ULONG offset, ULONG lenbytes, LPTSTR buf, ULONG *len);
     int   getchar(ULONG offset, ULONG lenbytes, ULONG *pch32);
 
     // UTF-16 text-editing interface
-    ULONG	insert_raw(ULONG offset_bytes, TCHAR *text, ULONG length);
-    ULONG	replace_raw(ULONG offset_bytes, TCHAR *text, ULONG length, ULONG erase_len);
-    ULONG	erase_raw(ULONG offset_bytes, ULONG length);
+    ULONG    insert_raw(ULONG offset_bytes, LPTSTR text, ULONG length);
+    ULONG    replace_raw(ULONG offset_bytes, LPTSTR text, ULONG length, ULONG erase_len);
+    ULONG    erase_raw(ULONG offset_bytes, ULONG length);
 
 
     sequence m_seq;
@@ -78,7 +78,7 @@ private:
     ULONG *m_pLineBuf_char;
     ULONG  m_nNumLines;
 
-    int	   m_nFileFormat;
+    int       m_nFileFormat;
     int    m_nHeaderSize;
 };
 
@@ -112,7 +112,7 @@ public:
         return *this;
     }
 
-    ULONG gettext(TCHAR *buf, ULONG buflen)
+    ULONG gettext(LPTSTR buf, ULONG buflen)
     {
         if (text_doc)
         {
@@ -131,7 +131,7 @@ public:
         }
     }
 
-    /*int insert_text(TCHAR *buf, int buflen)
+    /*int insert_text(LPTSTR buf, int buflen)
     {
     if(text_doc)
     {
@@ -148,7 +148,7 @@ public:
     }
     }
 
-    int replace_text(TCHAR *buf, int buflen)
+    int replace_text(LPTSTR buf, int buflen)
     {
     if(text_doc)
     {

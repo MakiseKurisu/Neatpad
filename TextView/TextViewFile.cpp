@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextViewFile.cpp
+//    MODULE:        TextViewFile.cpp
 //
-//	PURPOSE:	TextView file input routines
+//    PURPOSE:    TextView file input routines
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -15,9 +15,9 @@
 #include "TextViewInternal.h"
 
 //
-//	
+//    
 //
-LONG TextView::OpenFile(TCHAR *szFileName)
+LONG TextView::OpenFile(LPTSTR szFileName)
 {
     ClearFile();
 

@@ -1,12 +1,12 @@
 //
-//	OpenSave.c
+//    OpenSave.c
 //
-//	Open+Save dialog support for Neatpad
+//    Open+Save dialog support for Neatpad
 //
-//	www.catch22.net
-//	Written by J Brown 2004
+//    www.catch22.net
+//    Written by J Brown 2004
 //
-//	Freeware
+//    Freeware
 //
 #define _CRT_SECURE_NO_DEPRECATE
 #define _CRT_NON_CONFORMING_SWPRINTFS
@@ -26,10 +26,10 @@ static BOOL g_fFirstTime = TRUE;
 
 typedef struct
 {
-    TCHAR	szFile[MAX_PATH];
-    HWND	hwndNotify;
-    HANDLE	hQuitEvent;
-    UINT	uMsg;
+    TCHAR    szFile[MAX_PATH];
+    HWND    hwndNotify;
+    HANDLE    hQuitEvent;
+    UINT    uMsg;
 } NOTIFY_DATA;
 
 DWORD WINAPI ChangeNotifyThread(NOTIFY_DATA *pnd)
@@ -43,7 +43,7 @@ DWORD WINAPI ChangeNotifyThread(NOTIFY_DATA *pnd)
     // get the directory name from filename
     if (GetFileAttributes(szDirectory) != FILE_ATTRIBUTE_DIRECTORY)
     {
-        TCHAR *slash = _tcsrchr(szDirectory, _T('\\'));
+        LPTSTR slash = _tcsrchr(szDirectory, _T('\\'));
         if (slash) *slash = '\0';
     }
 
@@ -69,7 +69,7 @@ DWORD WINAPI ChangeNotifyThread(NOTIFY_DATA *pnd)
     return 0;
 }
 
-BOOL NotifyFileChange(TCHAR *szPathName, HWND hwndNotify, HANDLE hQuitEvent)
+BOOL NotifyFileChange(LPTSTR szPathName, HWND hwndNotify, HANDLE hQuitEvent)
 {
     NOTIFY_DATA *pnd = malloc(sizeof(NOTIFY_DATA));
 
@@ -85,8 +85,8 @@ BOOL NotifyFileChange(TCHAR *szPathName, HWND hwndNotify, HANDLE hQuitEvent)
 
 
 //
-//	Hook procedure for the Open dialog, 
-//	used to center the dialog on 1st invokation
+//    Hook procedure for the Open dialog, 
+//    used to center the dialog on 1st invokation
 //
 UINT_PTR CALLBACK OpenHookProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -107,11 +107,11 @@ UINT_PTR CALLBACK OpenHookProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 //
-//	Show the GetOpenFileName common dialog
+//    Show the GetOpenFileName common dialog
 //
-BOOL ShowOpenFileDlg(HWND hwnd, TCHAR *pstrFileName, TCHAR *pstrTitleName)
+BOOL ShowOpenFileDlg(HWND hwnd, LPTSTR pstrFileName, LPTSTR pstrTitleName)
 {
-    TCHAR *szFilter = TEXT("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
+    LPTSTR szFilter = TEXT("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
 
     OPENFILENAME ofn = { sizeof(ofn) };
 
@@ -131,14 +131,14 @@ BOOL ShowOpenFileDlg(HWND hwnd, TCHAR *pstrFileName, TCHAR *pstrTitleName)
         OFN_ENABLESIZING |
         OFN_ALLOWMULTISELECT |
         OFN_FILEMUSTEXIST |
-        0;//OFN_ENABLEHOOK			;
+        0;//OFN_ENABLEHOOK            ;
 
     return GetOpenFileName(&ofn);
 }
 
 //
-//	Hook procedure for the SaveAs dialog,
-//	used to center the dialog on 1st invokation and manage the 'encoding' combobox
+//    Hook procedure for the SaveAs dialog,
+//    used to center the dialog on 1st invokation and manage the 'encoding' combobox
 //
 UINT_PTR CALLBACK SaveHookProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -203,11 +203,11 @@ UINT_PTR CALLBACK SaveHookProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 //
-//	Show the GetSaveFileName common dialog
+//    Show the GetSaveFileName common dialog
 //
-BOOL ShowSaveFileDlg(HWND hwnd, TCHAR *pstrFileName, TCHAR *pstrTitleName)
+BOOL ShowSaveFileDlg(HWND hwnd, LPTSTR pstrFileName, LPTSTR pstrTitleName)
 {
-    TCHAR *szFilter = TEXT("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
+    LPTSTR szFilter = TEXT("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
 
     OPENFILENAME ofn = { sizeof(ofn) };
 
@@ -233,10 +233,10 @@ BOOL ShowSaveFileDlg(HWND hwnd, TCHAR *pstrFileName, TCHAR *pstrTitleName)
     return GetSaveFileName(&ofn);
 }
 
-UINT FmtErrorMsg(HWND hwnd, DWORD dwMsgBoxType, DWORD dwError, TCHAR *szFmt, ...)
+UINT FmtErrorMsg(HWND hwnd, DWORD dwMsgBoxType, DWORD dwError, LPTSTR szFmt, ...)
 {
-    TCHAR *lpMsgBuf;
-    TCHAR *ptr;
+    LPTSTR lpMsgBuf;
+    LPTSTR ptr;
     UINT   msgboxerr;
     va_list varg;
 
@@ -262,9 +262,9 @@ UINT FmtErrorMsg(HWND hwnd, DWORD dwMsgBoxType, DWORD dwError, TCHAR *szFmt, ...
 }
 
 //
-//	Open the specified file
+//    Open the specified file
 //
-BOOL DoOpenFile(HWND hwndMain, TCHAR *szFileName, TCHAR *szFileTitle)
+BOOL DoOpenFile(HWND hwndMain, LPTSTR szFileName, LPTSTR szFileTitle)
 {
     int fmt, fmtlook [] =
     {
@@ -294,9 +294,9 @@ BOOL DoOpenFile(HWND hwndMain, TCHAR *szFileName, TCHAR *szFileTitle)
     }
 }
 
-void NeatpadOpenFile(HWND hwnd, TCHAR *szFile)
+void NeatpadOpenFile(HWND hwnd, LPTSTR szFile)
 {
-    TCHAR *name;
+    LPTSTR name;
 
     // save current file's position!
     SaveFileData(g_szFileName, hwnd);
@@ -310,7 +310,7 @@ void NeatpadOpenFile(HWND hwnd, TCHAR *szFile)
 }
 
 //
-//	How to process WM_DROPFILES
+//    How to process WM_DROPFILES
 //
 void HandleDropFiles(HWND hwnd, HDROP hDrop)
 {

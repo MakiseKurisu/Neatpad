@@ -1,20 +1,20 @@
 //
-//	UspLib.c
+//    UspLib.c
 //
-//	USPLIB is a Unicode text-display support library. It is a wrapper
-//	around the low-level Uniscribe API and provides routines
-//	used to display Unicode text with the ability to
-//	apply styles (colours/fonts etc) with a user-supplied attribute-run-list 
-//	
-//	UspAllocate
-//	UspFree
-//	UspAnalyze
+//    USPLIB is a Unicode text-display support library. It is a wrapper
+//    around the low-level Uniscribe API and provides routines
+//    used to display Unicode text with the ability to
+//    apply styles (colours/fonts etc) with a user-supplied attribute-run-list 
+//    
+//    UspAllocate
+//    UspFree
+//    UspAnalyze
 //
-//	UspApplySelection
-//	UspApplyAttributes
-//	
-//	Written by J Brown 2006 Freeware
-//	www.catch22.net
+//    UspApplySelection
+//    UspApplyAttributes
+//    
+//    Written by J Brown 2006 Freeware
+//    www.catch22.net
 //
 
 #define _WIN32_WINNT 0x501
@@ -41,7 +41,7 @@
 int  CtrlCharWidth(USPFONT *uspFont, HDC hdc, ULONG chValue);
 
 //
-//	Return an item-run based on visual-order
+//    Return an item-run based on visual-order
 //
 ITEM_RUN *GetItemRun(USPDATA *uspData, int visualIdx)
 {
@@ -50,11 +50,11 @@ ITEM_RUN *GetItemRun(USPDATA *uspData, int visualIdx)
 }
 
 //
-//	Locate tabs in the original character array, and then modify the
-//	corresponding glyph-width (which will be zero) to a value reflecting
-//	the size of the tab in pixels. This is all that is required to support
-//	tabs, the mouse+drawing routines just treat them as regular glyphs
-//	after this.
+//    Locate tabs in the original character array, and then modify the
+//    corresponding glyph-width (which will be zero) to a value reflecting
+//    the size of the tab in pixels. This is all that is required to support
+//    tabs, the mouse+drawing routines just treat them as regular glyphs
+//    after this.
 //
 static
 BOOL ExpandTabs(USPDATA *uspData, WCHAR *wstr, int wlen, SCRIPT_TABDEF *tabdef)
@@ -136,20 +136,20 @@ BOOL ExpandTabs(USPDATA *uspData, WCHAR *wstr, int wlen, SCRIPT_TABDEF *tabdef)
 }
 
 //
-//	Non-complex scripts can be merged into a single item
+//    Non-complex scripts can be merged into a single item
 //
 static
 int MergeSimpleScripts(SCRIPT_ITEM *itemList, int itemCount)
 {
     // global script-table, used for merging non-complex runs together :)
     SCRIPT_PROPERTIES **propList;
-    int					propCount;
-    int					i;
+    int                    propCount;
+    int                    i;
 
     // get pointer to the global script table
     ScriptGetProperties(&propList, &propCount);
 
-    //	coalesce item-runs that are based on simple-scripts
+    //    coalesce item-runs that are based on simple-scripts
     for (i = 0; i < itemCount - 1; i++)
     {
         // use each item-run's SCRIPT_ANALYSIS::eScript member to lookup the
@@ -169,50 +169,50 @@ int MergeSimpleScripts(SCRIPT_ITEM *itemList, int itemCount)
     return itemCount;
 }
 
-//	
-//	Wrapper around ScriptItemize. Merges the results of ScriptItemize with
+//    
+//    Wrapper around ScriptItemize. Merges the results of ScriptItemize with
 //  "application-defined style runs". In our case, we take the ATTR[] array 
 //  of runs and inspect the font and control-character flags *only* - colours
 //  and selection flags are *not* used to split the runs.
 //
-//	Note that for scripts that do *not* have the fComplex property set, (obtained
+//    Note that for scripts that do *not* have the fComplex property set, (obtained
 //  via ScriptGetProperties) we can merge item-runs together to form a single
-//	run with SCRIPT_UNDEFINED...this makes text-display *much* faster for simple
+//    run with SCRIPT_UNDEFINED...this makes text-display *much* faster for simple
 //  scripts such as english.
 //
 static
 BOOL BuildMergedItemRunList(
-USPDATA			* uspData,
-WCHAR			* wstr,
-int				  wlen,
-ATTR			* attrList,
-SCRIPT_CONTROL	* scriptControl,
-SCRIPT_STATE	* scriptState
+USPDATA            * uspData,
+WCHAR            * wstr,
+int                  wlen,
+ATTR            * attrList,
+SCRIPT_CONTROL    * scriptControl,
+SCRIPT_STATE    * scriptState
 )
 {
     // attribute-list index+position
-    int				  a = 0;
-    int				  attrPos = 0;
-    int				  attrLen = 0;
-    ATTR			  attr = attrList[0];
+    int                  a = 0;
+    int                  attrPos = 0;
+    int                  attrLen = 0;
+    ATTR              attr = attrList[0];
 
     // item-list index+position (only needed in this function)
-    int				  i = 0;
-    int				  itemPos;
-    int				  itemLen;
-    int				  itemCount;
-    SCRIPT_ITEM		* itemList = uspData->tempItemList;
-    int				  allocLen = max(uspData->tempItemAllocLen, 16);
+    int                  i = 0;
+    int                  itemPos;
+    int                  itemLen;
+    int                  itemCount;
+    SCRIPT_ITEM        * itemList = uspData->tempItemList;
+    int                  allocLen = max(uspData->tempItemAllocLen, 16);
 
     // merged-list index+position
-    int				  m = 0;
-    int				  mergePos = 0;
-    ITEM_RUN		* mergedList = uspData->itemRunList;
-    int				  mergedAllocLen = uspData->itemRunAllocLen;
+    int                  m = 0;
+    int                  mergePos = 0;
+    ITEM_RUN        * mergedList = uspData->itemRunList;
+    int                  mergedAllocLen = uspData->itemRunAllocLen;
 
-    HRESULT			  hr;
+    HRESULT              hr;
 
-    //	Create the Uniscribe SCRIPT_ITEM list which just describes
+    //    Create the Uniscribe SCRIPT_ITEM list which just describes
     //  the spans of plain unicode text (grouped by script)
     do
     {
@@ -250,7 +250,7 @@ SCRIPT_STATE	* scriptState
     itemCount = MergeSimpleScripts(itemList, itemCount);
 
     //
-    //	Merge SCRIPT_ITEMs with the ATTR runlist to produce finer-grained 
+    //    Merge SCRIPT_ITEMs with the ATTR runlist to produce finer-grained 
     //  item-runs which describes spans of text *and* style 
     //
     while (i < itemCount)
@@ -312,7 +312,7 @@ SCRIPT_STATE	* scriptState
             }
         }
 
-        //	Detect overlapping run boundaries 
+        //    Detect overlapping run boundaries 
         if (attrPos + attrLen < itemPos + itemLen)
         {
             mergedList[m].charPos = mergePos;
@@ -351,19 +351,19 @@ SCRIPT_STATE	* scriptState
 
 static
 BOOL BuildVisualMapping(
-ITEM_RUN *	mergedRunList,
-int			mergedRunCount,
-BYTE		bidiLevels [],
-int			visualToLogicalList []
+ITEM_RUN *    mergedRunList,
+int            mergedRunCount,
+BYTE        bidiLevels [],
+int            visualToLogicalList []
 )
 {
-    int		i;
+    int        i;
 
-    //	Manually extract bidi-embedding-levels ready for ScriptLayout
+    //    Manually extract bidi-embedding-levels ready for ScriptLayout
     for (i = 0; i < mergedRunCount; i++)
         bidiLevels[i] = (BYTE) mergedRunList[i].analysis.s.uBidiLevel;
 
-    //	Build a visual-to-logical mapping order
+    //    Build a visual-to-logical mapping order
     ScriptLayout(
         mergedRunCount,
         bidiLevels,
@@ -376,10 +376,10 @@ int			visualToLogicalList []
 
 /*
 //
-//	Reverse logical-cluster array, and the clusters within the array
-//	For RTL runs, this changes the logical-cluster list to visual-order
+//    Reverse logical-cluster array, and the clusters within the array
+//    For RTL runs, this changes the logical-cluster list to visual-order
 //
-//	Unused but left just in-case I need it again
+//    Unused but left just in-case I need it again
 //
 static
 void ReverseClusterRun(WORD *sourceList, WORD *destList, int runLen)
@@ -402,17 +402,17 @@ lasti = i;
 }*/
 
 //
-//	Call ScriptShape and ScriptPlace to return glyph information
-//	for the specified run of text. 
+//    Call ScriptShape and ScriptPlace to return glyph information
+//    for the specified run of text. 
 //
 static
 BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *wrunstr)
 {
-    ABC			abc;
-    HRESULT		hr;
-    USPFONT   *	uspFont = 0;
-    HANDLE		holdFont = 0;
-    int			reallocSize = 0;
+    ABC            abc;
+    HRESULT        hr;
+    USPFONT   *    uspFont = 0;
+    HANDLE        holdFont = 0;
+    int            reallocSize = 0;
 
     // select the appropriate font
     uspFont = &uspData->uspFontList[itemRun->font];
@@ -442,7 +442,7 @@ BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *w
         }
 
         //
-        //	Convert the unicode-text into an array of glyphs
+        //    Convert the unicode-text into an array of glyphs
         //
         hr = ScriptShape(
             hdc,
@@ -452,7 +452,7 @@ BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *w
             uspData->glyphAllocLen - uspData->glyphCount,
             &itemRun->analysis,
             uspData->glyphList + itemRun->glyphPos,
-            uspData->clusterList + itemRun->charPos,		// already allocated in UspAnalyze
+            uspData->clusterList + itemRun->charPos,        // already allocated in UspAnalyze
             uspData->svaList + itemRun->glyphPos,
             &itemRun->glyphCount
             );
@@ -476,7 +476,7 @@ BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *w
 
 
     //
-    //	Generate glyph advance-widths for this run
+    //    Generate glyph advance-widths for this run
     //
     ScriptPlace(
         hdc,
@@ -491,7 +491,7 @@ BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *w
         );
 
     // 
-    //	Control-characters require special handling
+    //    Control-characters require special handling
     //
     if (itemRun->ctrl && itemRun->chcode != '\t')
     {
@@ -513,13 +513,13 @@ BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *w
 }
 
 //
-//	Remember the selection-state of an ITEM_RUN:
+//    Remember the selection-state of an ITEM_RUN:
 //
-//	0 - no characters selected
+//    0 - no characters selected
 //  1 - all characters selected
 //  2 - some characters selected
 //
-//	This is a useful optimization used for drawing - under some
+//    This is a useful optimization used for drawing - under some
 //  circumstances, an ITEM_RUN can be skipped if it's neighbouring
 //  runs share the same selection-state
 //
@@ -535,15 +535,15 @@ void IdentifyRunSelections(USPDATA *uspData, ITEM_RUN *itemRun)
         numsel++;
 
     // set the selection state accordingly
-    if (numsel == 0)					itemRun->selstate = 0;
-    else if (numsel == itemRun->len)	itemRun->selstate = 1;
-    else							itemRun->selstate = 2;
+    if (numsel == 0)                    itemRun->selstate = 0;
+    else if (numsel == itemRun->len)    itemRun->selstate = 1;
+    else                            itemRun->selstate = 2;
 }
 
 //
-//	Update the USPDATA with a new attribute-run-list.
+//    Update the USPDATA with a new attribute-run-list.
 //
-//	The font-information stored in ATTR::font is ignored, as are
+//    The font-information stored in ATTR::font is ignored, as are
 //  the ::ctrl and ::eol flags
 //
 VOID WINAPI UspApplyAttributes(USPDATA *uspData, ATTR *attrRunList)
@@ -551,8 +551,8 @@ VOID WINAPI UspApplyAttributes(USPDATA *uspData, ATTR *attrRunList)
     int i, a, c = 0;
 
     //
-    //	'Flatten' the user-supplied attribute-run-list to an array
-    //	of single ATTR structures, each 1-unit long.
+    //    'Flatten' the user-supplied attribute-run-list to an array
+    //    of single ATTR structures, each 1-unit long.
     //
     for (a = 0, i = 0; i < uspData->stringLen; i++)
     {
@@ -566,7 +566,7 @@ VOID WINAPI UspApplyAttributes(USPDATA *uspData, ATTR *attrRunList)
         }
     }
 
-    //	Identify the selection state of each run (none,all,partial)
+    //    Identify the selection state of each run (none,all,partial)
     for (i = 0; i < uspData->itemRunCount; i++)
     {
         IdentifyRunSelections(uspData, &uspData->itemRunList[i]);
@@ -574,8 +574,8 @@ VOID WINAPI UspApplyAttributes(USPDATA *uspData, ATTR *attrRunList)
 }
 
 //
-//	Update USPDATA with new selection information - only modify
-//	the ATTR::sel values within our internal attribute-list
+//    Update USPDATA with new selection information - only modify
+//    the ATTR::sel values within our internal attribute-list
 //  (i.e. leave all other text styles untouched)
 //
 VOID WINAPI UspApplySelection(USPDATA *uspData, int selStart, int selEnd)
@@ -601,37 +601,37 @@ VOID WINAPI UspApplySelection(USPDATA *uspData, int selStart, int selEnd)
 }
 
 //
-//	Initialize the USPDATA line-state with a new text-string,
+//    Initialize the USPDATA line-state with a new text-string,
 //  and an optional attribute-run-list. We reuse any previously
 //  allocated arrays in the USPDATA structure, minimizing heap-access
 //
-//	*attrRunList can be NULL, in which case the line of text is initialized
-//	with the default Windows text-colours and with font#0.
-//	Otherwise, attrRunList is expected to describe a range of text the
-//	same length as the text-input buffer.
+//    *attrRunList can be NULL, in which case the line of text is initialized
+//    with the default Windows text-colours and with font#0.
+//    Otherwise, attrRunList is expected to describe a range of text the
+//    same length as the text-input buffer.
 //
-//	*uspFontList can also be NULL, in which case the currently selected font
-//	is used to shape the text. This same font *must* be reselected into
-//	the device context when UspTextOut is called.
+//    *uspFontList can also be NULL, in which case the currently selected font
+//    is used to shape the text. This same font *must* be reselected into
+//    the device context when UspTextOut is called.
 //
-//	Any change to the fonts in uspFontList requires UspAnalyze to be called again.
+//    Any change to the fonts in uspFontList requires UspAnalyze to be called again.
 //
 BOOL WINAPI UspAnalyze(
-    USPDATA			* uspData,
-    HDC				  hdc,
-    WCHAR			* wstr,
-    int				  wlen,
-    ATTR			* attrRunList,
-    UINT			  flags,
-    USPFONT			* uspFontList,
-    SCRIPT_CONTROL	* scriptControl,
-    SCRIPT_STATE	* scriptState,
+    USPDATA            * uspData,
+    HDC                  hdc,
+    WCHAR            * wstr,
+    int                  wlen,
+    ATTR            * attrRunList,
+    UINT              flags,
+    USPFONT            * uspFontList,
+    SCRIPT_CONTROL    * scriptControl,
+    SCRIPT_STATE    * scriptState,
     SCRIPT_TABDEF   * scriptTabdef
     )
 {
-    ATTR	defAttr;
-    int		itemRunAllocLen;
-    int		i;
+    ATTR    defAttr;
+    int        itemRunAllocLen;
+    int        i;
 
     if (uspData == 0)
         return FALSE;
@@ -675,7 +675,7 @@ BOOL WINAPI UspAnalyze(
     }
 
     //
-    //	Build a list of runs by calling ScriptItemize and merging
+    //    Build a list of runs by calling ScriptItemize and merging
     //  those spans with the attribute-list. When BuildMergedItemRunList
     //  returns, the itemRunList array has been stored in uspData
     //
@@ -691,14 +691,14 @@ BOOL WINAPI UspAnalyze(
         return FALSE;
     }
 
-    //	reallocate BIDI-arrays if item-run-list changed size
+    //    reallocate BIDI-arrays if item-run-list changed size
     if (itemRunAllocLen < uspData->itemRunAllocLen)
     {
         uspData->bidiLevels = realloc(uspData->bidiLevels, uspData->itemRunAllocLen * sizeof(BYTE));
         uspData->visualToLogicalList = realloc(uspData->visualToLogicalList, uspData->itemRunAllocLen * sizeof(int));
     }
 
-    //	Analyze the resulting runlist and build the BIDI-level array	
+    //    Analyze the resulting runlist and build the BIDI-level array    
     if (!BuildVisualMapping(uspData->itemRunList,
         uspData->itemRunCount,
         uspData->bidiLevels,
@@ -733,7 +733,7 @@ BOOL WINAPI UspAnalyze(
     // Perform shaping + generate glyph data
     for (i = 0; i < uspData->itemRunCount; i++)
     {
-        ITEM_RUN *itemRun = GetItemRun(uspData, i);//;//&uspData->itemRunList[i];	//
+        ITEM_RUN *itemRun = GetItemRun(uspData, i);//;//&uspData->itemRunList[i];    //
 
         ShapeAndPlaceItemRun(
             uspData,
@@ -766,8 +766,8 @@ BOOL WINAPI UspAnalyze(
 
 
     //
-    //	Keep a flattened copy of the attribute-run-list, but 
-    //	with one element per character rather than larger runs.
+    //    Keep a flattened copy of the attribute-run-list, but 
+    //    with one element per character rather than larger runs.
     //
     UspApplyAttributes(uspData, attrRunList);
 
@@ -775,7 +775,7 @@ BOOL WINAPI UspAnalyze(
 }
 
 //
-//	Create the control structure
+//    Create the control structure
 //
 USPDATA * WINAPI UspAllocate()
 {
@@ -794,7 +794,7 @@ USPDATA * WINAPI UspAllocate()
 }
 
 //
-//	Free everything
+//    Free everything
 //
 VOID WINAPI UspFree(USPDATA *uspData)
 {
@@ -852,14 +852,14 @@ SCRIPT_LOGATTR * WINAPI UspGetLogAttr(USPDATA *uspData)
 }
 
 BOOL WINAPI UspBuildAttr(
-    ATTR	  *	attr,
+    ATTR      *    attr,
     COLORREF    colfg,
     COLORREF    colbg,
-    int			len,
-    int			font,
-    int			sel,
-    int			ctrl,
-    int			eol
+    int            len,
+    int            font,
+    int            sel,
+    int            ctrl,
+    int            eol
     )
 {
     if (attr == 0)

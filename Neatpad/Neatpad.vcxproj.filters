@@ -84,9 +84,6 @@
     <ClCompile Include="Search.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThemeUtils.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Toolbars.c">
       <Filter>Source Files</Filter>
     </ClCompile>

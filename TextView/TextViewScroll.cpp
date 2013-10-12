@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextView.cpp
+//    MODULE:        TextView.cpp
 //
-//	PURPOSE:	Implementation of the TextView control
+//    PURPOSE:    Implementation of the TextView control
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -17,7 +17,7 @@
 bool IsKeyPressed(UINT nVirtKey);
 
 //
-//	Set scrollbar positions and range
+//    Set scrollbar positions and range
 //
 VOID TextView::SetupScrollbars()
 {
@@ -26,22 +26,22 @@ VOID TextView::SetupScrollbars()
     si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_DISABLENOSCROLL;
 
     //
-    //	Vertical scrollbar
+    //    Vertical scrollbar
     //
-    si.nPos = m_nVScrollPos;		// scrollbar thumb position
-    si.nPage = m_nWindowLines;		// number of lines in a page
+    si.nPos = m_nVScrollPos;        // scrollbar thumb position
+    si.nPage = m_nWindowLines;        // number of lines in a page
     si.nMin = 0;
-    si.nMax = m_nLineCount - 1;	// total number of lines in file
+    si.nMax = m_nLineCount - 1;    // total number of lines in file
 
     SetScrollInfo(m_hWnd, SB_VERT, &si, TRUE);
 
     //
-    //	Horizontal scrollbar
+    //    Horizontal scrollbar
     //
-    si.nPos = m_nHScrollPos;		// scrollbar thumb position
-    si.nPage = m_nWindowColumns;	// number of lines in a page
+    si.nPos = m_nHScrollPos;        // scrollbar thumb position
+    si.nPage = m_nWindowColumns;    // number of lines in a page
     si.nMin = 0;
-    si.nMax = m_nLongestLine - 1;	// total number of lines in file
+    si.nMax = m_nLongestLine - 1;    // total number of lines in file
 
     SetScrollInfo(m_hWnd, SB_HORZ, &si, TRUE);
 
@@ -53,7 +53,7 @@ VOID TextView::SetupScrollbars()
 }
 
 //
-//	Ensure that we never scroll off the end of the file
+//    Ensure that we never scroll off the end of the file
 //
 bool TextView::PinToBottomCorner()
 {
@@ -75,7 +75,7 @@ bool TextView::PinToBottomCorner()
 }
 
 //
-//	The window has changed size - update the scrollbars
+//    The window has changed size - update the scrollbars
 //
 LONG TextView::OnSize(UINT nFlags, int width, int height)
 {
@@ -96,11 +96,11 @@ LONG TextView::OnSize(UINT nFlags, int width, int height)
 }
 
 //
-//	ScrollRgn
+//    ScrollRgn
 //
-//	Scrolls the viewport in specified direction. If fReturnUpdateRgn is true, 
-//	then a HRGN is returned which holds the client-region that must be redrawn 
-//	manually. This region must be deleted by the caller using DeleteObject.
+//    Scrolls the viewport in specified direction. If fReturnUpdateRgn is true, 
+//    then a HRGN is returned which holds the client-region that must be redrawn 
+//    manually. This region must be deleted by the caller using DeleteObject.
 //
 //  Otherwise ScrollRgn returns NULL and updates the entire window 
 //
@@ -158,10 +158,10 @@ HRGN TextView::ScrollRgn(int dx, int dy, bool fReturnUpdateRgn)
         // do the scroll!
         ScrollWindowEx(
             m_hWnd,
-            -dx * m_nFontWidth,					// scale up to pixel coords
+            -dx * m_nFontWidth,                    // scale up to pixel coords
             -dy * m_nLineHeight,
-            NULL,								// scroll entire window
-            &clip,								// clip the non-scrolling part
+            NULL,                                // scroll entire window
+            &clip,                                // clip the non-scrolling part
             0,
             0,
             SW_INVALIDATE
@@ -202,7 +202,7 @@ HRGN TextView::ScrollRgn(int dx, int dy, bool fReturnUpdateRgn)
 }
 
 //
-//	Scroll viewport in specified direction
+//    Scroll viewport in specified direction
 //
 VOID TextView::Scroll(int dx, int dy)
 {
@@ -212,7 +212,7 @@ VOID TextView::Scroll(int dx, int dy)
 }
 
 //
-//	Ensure that the specified file-location is visible within
+//    Ensure that the specified file-location is visible within
 //  the window-viewport, Scrolling the viewport as necessary
 //
 VOID TextView::ScrollToPosition(int xpos, ULONG lineno)
@@ -271,7 +271,7 @@ LONG GetTrackPos32(HWND hwnd, int nBar)
 }
 
 //
-//	Vertical scrollbar support
+//    Vertical scrollbar support
 //
 LONG TextView::OnVScroll(UINT nSBCode, UINT nPos)
 {
@@ -325,7 +325,7 @@ LONG TextView::OnVScroll(UINT nSBCode, UINT nPos)
 }
 
 //
-//	Horizontal scrollbar support
+//    Horizontal scrollbar support
 //
 LONG TextView::OnHScroll(UINT nSBCode, UINT nPos)
 {
@@ -378,7 +378,7 @@ LONG TextView::OnHScroll(UINT nSBCode, UINT nPos)
 
 LONG TextView::OnMouseWheel(int nDelta)
 {
-#ifndef	SPI_GETWHEELSCROLLLINES	
+#ifndef    SPI_GETWHEELSCROLLLINES    
 #define SPI_GETWHEELSCROLLLINES   104
 #endif
 

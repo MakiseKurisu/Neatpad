@@ -1,7 +1,7 @@
 //
-//	Helper routines for Neatpad
+//    Helper routines for Neatpad
 //
-//	www.catch22.net
+//    www.catch22.net
 //
 
 #define STRICT
@@ -67,13 +67,13 @@ BOOL EnableDlgItem(HWND hDlg, UINT nCommandId, BOOL fEnable)
 }
 
 //
-//	Ensure that the specified window is on a visible monitor
+//    Ensure that the specified window is on a visible monitor
 //
 void ForceVisibleDisplay(HWND hwnd)
 {
-    RECT		rect;
-    HMODULE		hUser32;
-    MFR_PROC	pMonitorFromRect;
+    RECT        rect;
+    HMODULE        hUser32;
+    MFR_PROC    pMonitorFromRect;
 
     GetWindowRect(hwnd, &rect);
 
@@ -95,17 +95,17 @@ void ForceVisibleDisplay(HWND hwnd)
 }
 
 //
-//	Save window-position for the specified file
+//    Save window-position for the specified file
 //
-BOOL SaveFileData(TCHAR *szPath, HWND hwnd)
+BOOL SaveFileData(LPTSTR szPath, HWND hwnd)
 {
     WINDOWPLACEMENT wp = { sizeof(wp) };
 
-    TCHAR		szStream[MAX_PATH];
-    HANDLE		hFile;
-    DWORD		len;
-    BOOL		restoretime = FALSE;
-    FILETIME	ctm, atm, wtm;
+    TCHAR        szStream[MAX_PATH];
+    HANDLE        hFile;
+    DWORD        len;
+    BOOL        restoretime = FALSE;
+    FILETIME    ctm, atm, wtm;
 
     if (szPath == 0 || szPath[0] == 0)
         return FALSE;
@@ -116,8 +116,8 @@ BOOL SaveFileData(TCHAR *szPath, HWND hwnd)
         return FALSE;
 
     //
-    //	Get the file time-stamp. Try the stream first - if that doesn't exist 
-    //	get the time from the 'base' file
+    //    Get the file time-stamp. Try the stream first - if that doesn't exist 
+    //    get the time from the 'base' file
     //
     if ((hFile = CreateFile(szStream, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0)) != INVALID_HANDLE_VALUE ||
         (hFile = CreateFile(szPath, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0)) != INVALID_HANDLE_VALUE)
@@ -129,7 +129,7 @@ BOOL SaveFileData(TCHAR *szPath, HWND hwnd)
     }
 
     //
-    //	Now open the stream for writing
+    //    Now open the stream for writing
     //
     if ((hFile = CreateFile(szStream, GENERIC_WRITE, 0, 0, OPEN_ALWAYS, 0, 0)) == INVALID_HANDLE_VALUE)
         return FALSE;
@@ -137,7 +137,7 @@ BOOL SaveFileData(TCHAR *szPath, HWND hwnd)
     WriteFile(hFile, &wp, sizeof(wp), &len, 0);
 
     //
-    //	Restore timestamp if necessary
+    //    Restore timestamp if necessary
     //
     if (restoretime == TRUE)
         SetFileTime(hFile, &ctm, &atm, &wtm);
@@ -148,15 +148,15 @@ BOOL SaveFileData(TCHAR *szPath, HWND hwnd)
 }
 
 //
-//	Restore the last window-position for the specified file
+//    Restore the last window-position for the specified file
 //
-BOOL LoadFileData(TCHAR *szPath, HWND hwnd)
+BOOL LoadFileData(LPTSTR szPath, HWND hwnd)
 {
     WINDOWPLACEMENT wp = { sizeof(wp) };
 
-    TCHAR		szStream[MAX_PATH];
-    HANDLE		hFile;
-    DWORD		len;
+    TCHAR        szStream[MAX_PATH];
+    HANDLE        hFile;
+    DWORD        len;
 
     if (szPath == 0 || szPath[0] == 0)
         return FALSE;
@@ -164,7 +164,7 @@ BOOL LoadFileData(TCHAR *szPath, HWND hwnd)
     wsprintf(szStream, WINPOS_FILESPEC, szPath);
 
     //
-    //	Can only set the window-position if the alternate-data-stream exists
+    //    Can only set the window-position if the alternate-data-stream exists
     //
     if ((hFile = CreateFile(szStream, GENERIC_READ, 0, 0, OPEN_EXISTING, 0, 0)) == INVALID_HANDLE_VALUE)
         return FALSE;
@@ -173,7 +173,7 @@ BOOL LoadFileData(TCHAR *szPath, HWND hwnd)
         return FALSE;
 
     //
-    //	Only set the window-position if we read a valid WINDOWPLACEMENT structure!!
+    //    Only set the window-position if we read a valid WINDOWPLACEMENT structure!!
     //
     if (len == sizeof(wp) && wp.length == sizeof(wp))
     {
@@ -187,10 +187,10 @@ BOOL LoadFileData(TCHAR *szPath, HWND hwnd)
 }
 
 //
-//	Resolve a ShellLink (i.e. c:\path\shortcut.lnk) to a real path
-//	Refactored from MFC source
+//    Resolve a ShellLink (i.e. c:\path\shortcut.lnk) to a real path
+//    Refactored from MFC source
 //
-BOOL ResolveShortcut(TCHAR *pszShortcut, TCHAR *pszFilePath, int nPathLen)
+BOOL ResolveShortcut(LPTSTR pszShortcut, LPTSTR pszFilePath, int nPathLen)
 {
     IShellLink * psl;
     SHFILEINFO   info = { 0 };
@@ -236,7 +236,7 @@ BOOL ResolveShortcut(TCHAR *pszShortcut, TCHAR *pszFilePath, int nPathLen)
 
 
 //
-//	Convert 'points' to logical-units suitable for CreateFont
+//    Convert 'points' to logical-units suitable for CreateFont
 //
 int PointsToLogical(int nPointSize)
 {
@@ -248,9 +248,9 @@ int PointsToLogical(int nPointSize)
 }
 
 //
-//	Simple wrapper around CreateFont
+//    Simple wrapper around CreateFont
 //
-HFONT EasyCreateFont(int nPointSize, BOOL fBold, DWORD dwQuality, TCHAR *szFace)
+HFONT EasyCreateFont(int nPointSize, BOOL fBold, DWORD dwQuality, LPTSTR szFace)
 {
     return CreateFont(PointsToLogical(nPointSize),
         0, 0, 0,
@@ -262,12 +262,12 @@ HFONT EasyCreateFont(int nPointSize, BOOL fBold, DWORD dwQuality, TCHAR *szFace)
 }
 
 //
-//	Return a BOLD version of whatever font the 
-//	specified window is using
+//    Return a BOLD version of whatever font the 
+//    specified window is using
 //
 HFONT CreateBoldFontFromHwnd(HWND hwnd)
 {
-    HFONT	hFont;
+    HFONT    hFont;
     LOGFONT logfont;
 
     // get the font information
@@ -290,8 +290,8 @@ int RectHeight(RECT *rect)
 }
 
 //
-//	Center the specified window relative to it's parent
-//	
+//    Center the specified window relative to it's parent
+//    
 void CenterWindow(HWND hwnd)
 {
     HWND hwndParent = GetParent(hwnd);
@@ -310,7 +310,7 @@ void CenterWindow(HWND hwnd)
 
 
 //
-//	Copied from uxtheme.h
+//    Copied from uxtheme.h
 //  If you have this new header, then delete these and
 //  #include <uxtheme.h> instead!
 //
@@ -322,7 +322,7 @@ void CenterWindow(HWND hwnd)
 // 
 
 //
-//	Try to call EnableThemeDialogTexture, if uxtheme.dll is present
+//    Try to call EnableThemeDialogTexture, if uxtheme.dll is present
 //
 BOOL EnableDialogTheme(HWND hwnd)
 {
@@ -357,11 +357,11 @@ BOOL EnableDialogTheme(HWND hwnd)
 
 
 //
-//	WM_NCCALCSIZE handler for top-level windows. Prevents the
+//    WM_NCCALCSIZE handler for top-level windows. Prevents the
 //  flickering observed during a 'top-left' window resize by adjusting
 //  the source+dest BitBlt rectangles
 //
-//	hwnd - must have WS_CLIPCHILDREN turned OFF
+//    hwnd - must have WS_CLIPCHILDREN turned OFF
 //
 /*UINT NcCalcSize(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {

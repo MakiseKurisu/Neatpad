@@ -1,8 +1,8 @@
 //
-//	Neatpad
-//	OptionsDisplay.c
+//    Neatpad
+//    OptionsDisplay.c
 //
-//	www.catch22.net
+//    www.catch22.net
 //
 
 #define STRICT
@@ -16,7 +16,7 @@
 #include "resource.h"
 
 //
-//	Dialogbox procedure for the FONT pane
+//    Dialogbox procedure for the FONT pane
 //
 BOOL CALLBACK DisplayOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

@@ -1,13 +1,13 @@
 //
-//	UNICODE.C
+//    UNICODE.C
 //
-//	Unicode conversion routines
+//    Unicode conversion routines
 //
-//	www.catch22.net
-//	Written by J Brown 2006
+//    www.catch22.net
+//    Written by J Brown 2006
 //
-//	Freeware
-//	
+//    Freeware
+//    
 
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
@@ -16,18 +16,18 @@
 #include "Unicode.h"
 
 //
-//	utf8_to_utf32
+//    utf8_to_utf32
 //
-//	Converts a single codepoint in the specified UTF-8 stream of text
-//	into a UTF-32 value
+//    Converts a single codepoint in the specified UTF-8 stream of text
+//    into a UTF-32 value
 //
-//	Illegal sequences are converted to the unicode replacement character
-//	
-//	utf8str		- [in]   buffer containing UTF-8 text
-//	utf8len		- [in]   number of code-units (bytes) available in buffer
-//	pch32		- [out]  single UTF-32 value
+//    Illegal sequences are converted to the unicode replacement character
+//    
+//    utf8str        - [in]   buffer containing UTF-8 text
+//    utf8len        - [in]   number of code-units (bytes) available in buffer
+//    pch32        - [out]  single UTF-32 value
 //
-//	Returns number of bytes processed from utf8str
+//    Returns number of bytes processed from utf8str
 //
 size_t utf8_to_utf32(UTF8 *utf8str, size_t utf8len, UTF32 *pch32)
 {
@@ -126,15 +126,15 @@ size_t utf8_to_utf32(UTF8 *utf8str, size_t utf8len, UTF32 *pch32)
 }
 
 //
-//	utf32_to_utf8
+//    utf32_to_utf8
 //
-//	Converts the specified UTF-32 value to UTF-8
+//    Converts the specified UTF-32 value to UTF-8
 //
-//	ch32		- [in]		single utf-32 value
-//	utf8str		- [out]		buffer to receive UTF-8 text
-//	utf8len		- [in]		size of utf8 buffer in bytes
-//	
-//	Returns number of bytes stored in utf8str
+//    ch32        - [in]        single utf-32 value
+//    utf8str        - [out]        buffer to receive UTF-8 text
+//    utf8len        - [in]        size of utf8 buffer in bytes
+//    
+//    Returns number of bytes stored in utf8str
 //
 size_t utf32_to_utf8(UTF8 *utf8str, size_t utf8len, UTF32 ch32)
 {
@@ -190,21 +190,21 @@ size_t utf32_to_utf8(UTF8 *utf8str, size_t utf8len, UTF32 ch32)
 }
 
 //
-//	utf8_to_utf16
+//    utf8_to_utf16
 //
-//	Convert the specified UTF-8 stream of text to UTF-16
+//    Convert the specified UTF-8 stream of text to UTF-16
 //
-//	1. The maximum number possible of whole UTF-16 characters are stored in wstr
-//	2. Illegal sequences are converted to the unicode replacement character
-//	3. Returns the number of bytes processeed from utf8str
+//    1. The maximum number possible of whole UTF-16 characters are stored in wstr
+//    2. Illegal sequences are converted to the unicode replacement character
+//    3. Returns the number of bytes processeed from utf8str
 //
-//	utf8str		- [in]		buffer containing utf-8 text
-//	utf8len		- [in]		number of code-units (bytes) in buffer
-//	utf16str	- [out]		receives resulting utf-16 text
-//	utf16len	- [in/out]	on input, specifies the size (in UTF16s) of utf16str
-//							on output, holds actual number of UTF16s stored in utf16str
+//    utf8str        - [in]        buffer containing utf-8 text
+//    utf8len        - [in]        number of code-units (bytes) in buffer
+//    utf16str    - [out]        receives resulting utf-16 text
+//    utf16len    - [in/out]    on input, specifies the size (in UTF16s) of utf16str
+//                            on output, holds actual number of UTF16s stored in utf16str
 //
-//	Returns the number of bytes processed from utf8str
+//    Returns the number of bytes processed from utf8str
 //
 size_t utf8_to_utf16(UTF8 *utf8str, size_t utf8len, UTF16 *utf16str, size_t *utf16len)
 {
@@ -234,28 +234,28 @@ size_t utf8_to_utf16(UTF8 *utf8str, size_t utf8len, UTF16 *utf16str, size_t *utf
 }
 
 //
-//	utf16_to_utf8
+//    utf16_to_utf8
 //
-//	Convert the specified UTF-16 stream of text to UTF-8
+//    Convert the specified UTF-16 stream of text to UTF-8
 //
-//	1. As many whole codepoints as possible are stored in utf8str 
-//	2. Illegal sequences are converted to the unicode replacement character
+//    1. As many whole codepoints as possible are stored in utf8str 
+//    2. Illegal sequences are converted to the unicode replacement character
 //
-//	utf16str		- [in]		buffer containing utf-16 text
-//	utf16len		- [in]		number of code-units (UTF16s) in buffer
-//	utf8str			- [out]		receives resulting utf-8 text
-//	utf8len			- [in/out]	on input, specifies the size (in bytes) of utf8str
-//								on output, holds actual number of bytes stored in utf8str
+//    utf16str        - [in]        buffer containing utf-16 text
+//    utf16len        - [in]        number of code-units (UTF16s) in buffer
+//    utf8str            - [out]        receives resulting utf-8 text
+//    utf8len            - [in/out]    on input, specifies the size (in bytes) of utf8str
+//                                on output, holds actual number of bytes stored in utf8str
 //
-//	Returns the number of characters (UTF16s) processed from utf16str
+//    Returns the number of characters (UTF16s) processed from utf16str
 //
 size_t utf16_to_utf8(UTF16 *utf16str, size_t utf16len, UTF8 *utf8str, size_t *utf8len)
 {
     UTF16 * utf16start = utf16str;
     UTF8  * utf8start = utf8str;
     size_t  len;
-    UTF32	ch32;
-    size_t	ch32len;
+    UTF32    ch32;
+    size_t    ch32len;
 
     while (utf16len > 0 && *utf8len > 0)
     {
@@ -276,17 +276,17 @@ size_t utf16_to_utf8(UTF16 *utf16str, size_t utf16len, UTF8 *utf8str, size_t *ut
 }
 
 //
-//	ascii_to_utf16
+//    ascii_to_utf16
 //
-//	Converts plain ASCII string to UTF-16
+//    Converts plain ASCII string to UTF-16
 //
-//	asciistr	- [in]     buffer containing ASCII characters
-//	asciilen	- [in]     number of characters in buffer
-//	utf16str	- [out]    receives the resulting UTF-16 text
-//	utf16len	- [in/out] on input, specifies length of utf16 buffer,
-//						   on output, holds number of chars stored in utf16str
+//    asciistr    - [in]     buffer containing ASCII characters
+//    asciilen    - [in]     number of characters in buffer
+//    utf16str    - [out]    receives the resulting UTF-16 text
+//    utf16len    - [in/out] on input, specifies length of utf16 buffer,
+//                           on output, holds number of chars stored in utf16str
 //
-//	Returns number of characters processed from asciistr
+//    Returns number of characters processed from asciistr
 //
 size_t ascii_to_utf16(UTF8 *asciistr, size_t asciilen, UTF16 *utf16str, size_t *utf16len)
 {
@@ -298,17 +298,17 @@ size_t ascii_to_utf16(UTF8 *asciistr, size_t asciilen, UTF16 *utf16str, size_t *
 }
 
 //
-//	utf16_to_ascii
+//    utf16_to_ascii
 //
-//	Converts UTF-16 to plain ASCII (lossy)
+//    Converts UTF-16 to plain ASCII (lossy)
 //
-//	utf16str	- [in]     buffer containing UTF16 characters
-//	utf16len	- [in]     number of WCHARs in buffer
-//	asciistr	- [out]    receives the resulting UTF-16 text
-//	asciilen	- [in/out] on input, specifies length of ascii buffer,
-//						   on output, holds number of chars stored in asciistr
+//    utf16str    - [in]     buffer containing UTF16 characters
+//    utf16len    - [in]     number of WCHARs in buffer
+//    asciistr    - [out]    receives the resulting UTF-16 text
+//    asciilen    - [in/out] on input, specifies length of ascii buffer,
+//                           on output, holds number of chars stored in asciistr
 //
-//	Returns number of characters processed from utf16str
+//    Returns number of characters processed from utf16str
 //
 size_t utf16_to_ascii(UTF16 *utf16str, size_t utf16len, UTF8 *asciistr, size_t *asciilen)
 {
@@ -320,17 +320,17 @@ size_t utf16_to_ascii(UTF16 *utf16str, size_t utf16len, UTF8 *asciistr, size_t *
 }
 
 //
-//	copy_utf16
+//    copy_utf16
 //
-//	Copies UTF-16 string from src to dest
+//    Copies UTF-16 string from src to dest
 //
-//	src			- [in]		buffer containing utf-16 text
-//	srclen		- [in]		number of code-units in src
-//	dest		- [out]		receives resulting string
-//	destlen		- [in/out]	on input, specifies length of dest buffer
-//							on output, holds number of UTF16s stored in dest
+//    src            - [in]        buffer containing utf-16 text
+//    srclen        - [in]        number of code-units in src
+//    dest        - [out]        receives resulting string
+//    destlen        - [in/out]    on input, specifies length of dest buffer
+//                            on output, holds number of UTF16s stored in dest
 //
-//	returns number of WCHARs processed from src
+//    returns number of WCHARs processed from src
 //
 size_t copy_utf16(UTF16 *src, size_t srclen, UTF16 *dest, size_t *destlen)
 {
@@ -342,18 +342,18 @@ size_t copy_utf16(UTF16 *src, size_t srclen, UTF16 *dest, size_t *destlen)
 }
 
 //
-//	swap_utf16
+//    swap_utf16
 //
-//	Copies UTF-16 string from src to dest, performing endianess swap
-//	for each code-unit
+//    Copies UTF-16 string from src to dest, performing endianess swap
+//    for each code-unit
 //
-//	src			- [in]		buffer containing utf-16 text
-//	srclen		- [in]		number of code-units in src
-//	dest		- [out]		receives resulting word-swapped string
-//	destlen		- [in/out]	on input, specifies length of dest buffer
-//							on output, holds number of UTF16s stored in dest
+//    src            - [in]        buffer containing utf-16 text
+//    srclen        - [in]        number of code-units in src
+//    dest        - [out]        receives resulting word-swapped string
+//    destlen        - [in/out]    on input, specifies length of dest buffer
+//                            on output, holds number of UTF16s stored in dest
 //
-//	Returns number of WCHARs processed from src
+//    Returns number of WCHARs processed from src
 //
 size_t swap_utf16(UTF16 *src, size_t srclen, UTF16 *dest, size_t *destlen)
 {
@@ -368,17 +368,17 @@ size_t swap_utf16(UTF16 *src, size_t srclen, UTF16 *dest, size_t *destlen)
 }
 
 //
-//	utf32_to_utf16
+//    utf32_to_utf16
 //
-//	Converts the specified UTF-32 stream of text to UTF-16
+//    Converts the specified UTF-32 stream of text to UTF-16
 //
-//	utf32str	- [in]		buffer containing utf-32 text
-//	utf32len	- [in]		number of characters (UTF32s) in utf32str
-//	utf16str	- [out]		receives resulting utf-16 text
-//	utf16len	- [in/out]	on input, specifies the size (in UTF16s) of utf16str
-//							on output, holds actual number of UTF16 values stored in utf16str
+//    utf32str    - [in]        buffer containing utf-32 text
+//    utf32len    - [in]        number of characters (UTF32s) in utf32str
+//    utf16str    - [out]        receives resulting utf-16 text
+//    utf16len    - [in/out]    on input, specifies the size (in UTF16s) of utf16str
+//                            on output, holds actual number of UTF16 values stored in utf16str
 //
-//	returns number of UTF32s processed from utf32str
+//    returns number of UTF32s processed from utf32str
 //
 size_t utf32_to_utf16(UTF32 *utf32str, size_t utf32len, UTF16 *utf16str, size_t *utf16len)
 {
@@ -440,17 +440,17 @@ size_t utf32_to_utf16(UTF32 *utf32str, size_t utf32len, UTF16 *utf16str, size_t 
 }
 
 //
-//	utf16_to_utf32
+//    utf16_to_utf32
 //
-//	Converts the specified UTF-16 stream of text to UTF-32
+//    Converts the specified UTF-16 stream of text to UTF-32
 //
-//	utf16str	- [in]		buffer containing utf-16 text
-//	utf16len	- [in]		number of code-units (UTF16s) in utf16str
-//	utf32str	- [out]		receives resulting utf-32 text
-//	utf32len	- [in/out]	on input, specifies the size (in UTF32s) of utf32str
-//							on output, holds actual number of UTF32 values stored in utf32str
+//    utf16str    - [in]        buffer containing utf-16 text
+//    utf16len    - [in]        number of code-units (UTF16s) in utf16str
+//    utf32str    - [out]        receives resulting utf-32 text
+//    utf32len    - [in/out]    on input, specifies the size (in UTF32s) of utf32str
+//                            on output, holds actual number of UTF32 values stored in utf32str
 //
-//	returns number of UTF16s processed from utf16str
+//    returns number of UTF16s processed from utf16str
 //
 size_t utf16_to_utf32(UTF16 *utf16str, size_t utf16len, UTF32 *utf32str, size_t *utf32len)
 {
@@ -495,17 +495,17 @@ size_t utf16_to_utf32(UTF16 *utf16str, size_t utf16len, UTF32 *utf32str, size_t 
 }
 
 //
-//	utf16be_to_utf32
+//    utf16be_to_utf32
 //
-//	Converts the specified big-endian UTF-16 stream of text to UTF-32
+//    Converts the specified big-endian UTF-16 stream of text to UTF-32
 //
-//	utf16str	- [in]		buffer containing utf-16 big-endian text
-//	utf16len	- [in]		number of code-units (UTF16s) in utf16str
-//	utf32str	- [out]		receives resulting utf-32 text
-//	utf32len	- [in/out]	on input, specifies the size (in UTF32s) of utf32str
-//							on output, holds actual number of UTF32 values stored in utf32str
+//    utf16str    - [in]        buffer containing utf-16 big-endian text
+//    utf16len    - [in]        number of code-units (UTF16s) in utf16str
+//    utf32str    - [out]        receives resulting utf-32 text
+//    utf32len    - [in/out]    on input, specifies the size (in UTF32s) of utf32str
+//                            on output, holds actual number of UTF32 values stored in utf32str
 //
-//	returns number of UTF16s processed from utf16str
+//    returns number of UTF16s processed from utf16str
 //
 size_t utf16be_to_utf32(UTF16 *utf16str, size_t utf16len, UTF32 *utf32str, size_t *utf32len)
 {

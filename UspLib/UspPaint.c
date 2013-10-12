@@ -1,15 +1,15 @@
 //
-//	UspPaint.c
+//    UspPaint.c
 //
-//	Contains routines used for the display of styled Unicode text
-//	
-//	UspTextOut
-//	UspInitFont
-//	UspFreeFont
-//	UspSetSelColor
-//	
-//	Written by J Brown 2006 Freeware
-//	www.catch22.net
+//    Contains routines used for the display of styled Unicode text
+//    
+//    UspTextOut
+//    UspInitFont
+//    UspFreeFont
+//    UspSetSelColor
+//    
+//    Written by J Brown 2006 Freeware
+//    www.catch22.net
 //
 
 #define _WIN32_WINNT 0x501
@@ -34,20 +34,20 @@
 ITEM_RUN *GetItemRun(USPDATA *uspData, int visualIdx);
 
 // UspCtrl.c
-void	InitCtrlChar(HDC hdc, USPFONT *uspFont);
-void	PaintCtrlCharRun(USPDATA *uspData, USPFONT *uspFont, ITEM_RUN *itemRun, HDC hdc, int xpos, int ypos);
+void    InitCtrlChar(HDC hdc, USPFONT *uspFont);
+void    PaintCtrlCharRun(USPDATA *uspData, USPFONT *uspFont, ITEM_RUN *itemRun, HDC hdc, int xpos, int ypos);
 
 //
-//	Locate the glyph-index positions for the specified logical character positions
+//    Locate the glyph-index positions for the specified logical character positions
 //
 static
 void GetGlyphClusterIndices(
-ITEM_RUN	* itemRun,
-WORD		* clusterList,
-int			  clusterIdx1,
-int			  clusterIdx2,
-int			* glyphIdx1,
-int			* glyphIdx2
+ITEM_RUN    * itemRun,
+WORD        * clusterList,
+int              clusterIdx1,
+int              clusterIdx2,
+int            * glyphIdx1,
+int            * glyphIdx2
 )
 {
     // RTL scripts
@@ -65,8 +65,8 @@ int			* glyphIdx2
 }
 
 //
-//	Draw a rectangle in a single colour. Depending on the run-direction (left/right),
-//	the rectangle's position may need to be mirrored within the run before output
+//    Draw a rectangle in a single colour. Depending on the run-direction (left/right),
+//    the rectangle's position may need to be mirrored within the run before output
 //
 static
 void PaintRectBG(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, int xpos, RECT *rect, ATTR *attr)
@@ -96,17 +96,17 @@ void PaintRectBG(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, int xpos, RECT *r
 }
 
 //
-//	Paint a single run's background
+//    Paint a single run's background
 //
 static
 void PaintItemRunBackground(
-USPDATA		* uspData,
-ITEM_RUN	* itemRun,
-HDC			  hdc,
-int			  xpos,
-int			  ypos,
-int			  lineHeight,
-RECT		* bounds
+USPDATA        * uspData,
+ITEM_RUN    * itemRun,
+HDC              hdc,
+int              xpos,
+int              ypos,
+int              lineHeight,
+RECT        * bounds
 )
 {
     int i, lasti;
@@ -172,27 +172,27 @@ RECT		* bounds
 }
 
 //
-//	Paint the entire line's background
+//    Paint the entire line's background
 //
 static
 void PaintBackground(
 USPDATA   * uspData,
-HDC			hdc,
-int			xpos,
-int			ypos,
-int			lineHeight,
-RECT	  * bounds
+HDC            hdc,
+int            xpos,
+int            ypos,
+int            lineHeight,
+RECT      * bounds
 )
 {
-    int			i;
-    ITEM_RUN *	itemRun;
+    int            i;
+    ITEM_RUN *    itemRun;
 
     //
-    //	Loop over each item-run in turn
+    //    Loop over each item-run in turn
     //
     for (i = 0; i < uspData->itemRunCount; i++)
     {
-        //	Generate glyph data for this run
+        //    Generate glyph data for this run
         if ((itemRun = GetItemRun(uspData, i)) == 0)
             break;
 
@@ -219,26 +219,26 @@ RECT	  * bounds
 }
 
 //
-//	PaintItemRunForeground
+//    PaintItemRunForeground
 //
-//	Output a whole ITEM_RUN of text. Use clusterList and attrList 
-//	to break the glyphs into whole-cluster runs before calling ScriptTextOut
+//    Output a whole ITEM_RUN of text. Use clusterList and attrList 
+//    to break the glyphs into whole-cluster runs before calling ScriptTextOut
 //
-//	We don't attempt to interpolate colours over each cluster. If there
-//	is more than one ATTR per cluster then tough - only one gets used and
-//	whole clusters (even if they contain multiple glyphs) get painted in
-//	a single colour
+//    We don't attempt to interpolate colours over each cluster. If there
+//    is more than one ATTR per cluster then tough - only one gets used and
+//    whole clusters (even if they contain multiple glyphs) get painted in
+//    a single colour
 //
 static
 void PaintItemRunForeground(
-USPDATA		* uspData,
-USPFONT		* uspFont,
-ITEM_RUN	* itemRun,
-HDC			  hdc,
-int			  xpos,
-int			  ypos,
-RECT		* bounds,
-BOOL		  forcesel
+USPDATA        * uspData,
+USPFONT        * uspFont,
+ITEM_RUN    * itemRun,
+HDC              hdc,
+int              xpos,
+int              ypos,
+RECT        * bounds,
+BOOL          forcesel
 )
 {
     HRESULT hr;
@@ -247,15 +247,15 @@ BOOL		  forcesel
     int  glyphIdx1;
     int  glyphIdx2;
     int  runWidth;
-    int	 runDir = 1;
+    int     runDir = 1;
     UINT oldMode;
 
     // make pointers to the run's various glyph buffers
-    ATTR	* attrList = uspData->attrList + itemRun->charPos;
-    WORD	* clusterList = uspData->clusterList + itemRun->charPos;
-    WORD	* glyphList = uspData->glyphList + itemRun->glyphPos;
-    int		* widthList = uspData->widthList + itemRun->glyphPos;
-    GOFFSET	* offsetList = uspData->offsetList + itemRun->glyphPos;
+    ATTR    * attrList = uspData->attrList + itemRun->charPos;
+    WORD    * clusterList = uspData->clusterList + itemRun->charPos;
+    WORD    * glyphList = uspData->glyphList + itemRun->glyphPos;
+    int        * widthList = uspData->widthList + itemRun->glyphPos;
+    GOFFSET    * offsetList = uspData->offsetList + itemRun->glyphPos;
 
     // right-left runs can be drawn backwards for simplicity
     if (itemRun->analysis.fRTL)
@@ -288,7 +288,7 @@ BOOL		  forcesel
             SetTextColor(hdc, forcesel ? uspData->selFG : attrList[lasti].fg);
 
             //
-            //	Finally output the run of glyphs
+            //    Finally output the run of glyphs
             //
             hr = ScriptTextOut(
                 hdc,
@@ -352,29 +352,29 @@ BOOL CanSkip(USPDATA *uspData, int i, BOOL forcesel)
 }
 
 //
-//	Paint the entire line of text
+//    Paint the entire line of text
 //
 static
 int PaintForeground(
 USPDATA   * uspData,
-HDC			hdc,
-int			xpos,
-int			ypos,
-RECT	  * bounds,
-BOOL		forcesel
+HDC            hdc,
+int            xpos,
+int            ypos,
+RECT      * bounds,
+BOOL        forcesel
 )
 {
-    int			i;
-    int			yoff;
+    int            i;
+    int            yoff;
     ITEM_RUN  * itemRun;
-    USPFONT	  * uspFont;
+    USPFONT      * uspFont;
 
     //
-    //	Loop over each item-run in turn
+    //    Loop over each item-run in turn
     //
     for (i = 0; i < uspData->itemRunCount; i++)
     {
-        //	Generate glyph data for this run
+        //    Generate glyph data for this run
         if ((itemRun = GetItemRun(uspData, i)) == 0)
             break;
 
@@ -431,24 +431,24 @@ BOOL		forcesel
 }
 
 //
-//	UspAttrTextOut
+//    UspAttrTextOut
 //
-//	Display a line of text previously analyzed with UspAnalyze. The stored
-//	ATTR[] visual-attribute list is used to stylize the text as it is drawn.
+//    Display a line of text previously analyzed with UspAnalyze. The stored
+//    ATTR[] visual-attribute list is used to stylize the text as it is drawn.
 //  
-//	Coloured text-display using Uniscribe is very complicated. 
+//    Coloured text-display using Uniscribe is very complicated. 
 //  Three passes are required if high-quality text output is the goal.
 //
-//	Returns: adjusted x-coordinate 
+//    Returns: adjusted x-coordinate 
 //
 int WINAPI UspTextOut(
-    USPDATA  *	uspData,
-    HDC			hdc,
-    int			xpos,
-    int			ypos,
-    int			lineHeight,
-    int			lineAdjustY,
-    RECT	 *	bounds
+    USPDATA  *    uspData,
+    HDC            hdc,
+    int            xpos,
+    int            ypos,
+    int            lineHeight,
+    int            lineAdjustY,
+    RECT     *    bounds
     )
 {
     HRGN hrgn, hrgnClip;
@@ -460,26 +460,26 @@ int WINAPI UspTextOut(
     GetClipRgn(hdc, hrgnClip);
 
     //
-    //	1. draw all background colours, including selection-highlights;
-    //	   selected areas are added to the HDC clipping region which prevents
-    //	   step#2 (below) from drawing over them
+    //    1. draw all background colours, including selection-highlights;
+    //       selected areas are added to the HDC clipping region which prevents
+    //       step#2 (below) from drawing over them
     //
     SetBkMode(hdc, OPAQUE);
     PaintBackground(uspData, hdc, xpos, ypos, lineHeight, bounds);
 
     //
     //  2. draw the text normally. Selected areas are left untouched
-    //	   because of the clipping-region created in step#1
+    //       because of the clipping-region created in step#1
     //
     SetBkMode(hdc, TRANSPARENT);
     PaintForeground(uspData, hdc, xpos, ypos + lineAdjustY, bounds, FALSE);
 
     //
     //  3. redraw the text using a single text-selection-colour (i.e. white)
-    //	   in the same position, directly over the top of the text drawn in step#2
+    //       in the same position, directly over the top of the text drawn in step#2
     //
-    //	   Before we do this, the HDC clipping-region is inverted, 
-    //	   so only selection areas are modified this time 
+    //       Before we do this, the HDC clipping-region is inverted, 
+    //       so only selection areas are modified this time 
     //
     hrgn = CreateRectRgnIndirect(bounds);
     ExtSelectClipRgn(hdc, hrgn, RGN_XOR);
@@ -497,12 +497,12 @@ int WINAPI UspTextOut(
 }
 
 //
-//	Set the colours used for drawing text-selection
+//    Set the colours used for drawing text-selection
 //
 void WINAPI UspSetSelColor(
-    USPDATA		* uspData,
-    COLORREF	  fg,
-    COLORREF	  bg
+    USPDATA        * uspData,
+    COLORREF      fg,
+    COLORREF      bg
     )
 {
     uspData->selFG = fg;
@@ -510,16 +510,16 @@ void WINAPI UspSetSelColor(
 }
 
 //
-//	Used to initialize a font. 
+//    Used to initialize a font. 
 //
-//	Caller must call UspFreeFont when he is finished, and manually 
-//	do a DeleteObject on the HFONT. That is, caller is responsible for
-//	managing the lifetime of the HFONT
+//    Caller must call UspFreeFont when he is finished, and manually 
+//    do a DeleteObject on the HFONT. That is, caller is responsible for
+//    managing the lifetime of the HFONT
 //
 void WINAPI UspInitFont(
-    USPFONT		* uspFont,
-    HDC			  hdc,
-    HFONT		  hFont
+    USPFONT        * uspFont,
+    HDC              hdc,
+    HFONT          hFont
     )
 {
     ZeroMemory(uspFont, sizeof(USPFONT));
@@ -536,12 +536,12 @@ void WINAPI UspInitFont(
 }
 
 //
-//	Free the font resources
+//    Free the font resources
 //
 void WINAPI UspFreeFont(
-    USPFONT		* uspFont
+    USPFONT        * uspFont
     )
 {
-    //	DeleteObject(uspFont->hFont);
+    //    DeleteObject(uspFont->hFont);
     ScriptFreeCache(&uspFont->scriptCache);
 }

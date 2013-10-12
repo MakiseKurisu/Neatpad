@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextViewParser.cpp
+//    MODULE:        TextViewParser.cpp
 //
-//	PURPOSE:	Parser for the Syntax-Description-Language
+//    PURPOSE:    Parser for the Syntax-Description-Language
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -16,27 +16,27 @@
 
 struct Rule
 {
-    TCHAR		ruleName[32];
-    COLORREF	fg;
-    COLORREF	bg;
+    TCHAR        ruleName[32];
+    COLORREF    fg;
+    COLORREF    bg;
 };
 
 enum TEST { testNone, testEqual, testNotEqual, testInRange, testOutRange };
 
 struct State
 {
-    TCHAR		arg1;
-    TCHAR		arg2;
-    TEST		test;
-    int			next;
+    TCHAR        arg1;
+    TCHAR        arg2;
+    TEST        test;
+    int            next;
 };
 
-bool Init(TCHAR *buf, int len)
+bool Init(LPTSTR buf, int len)
 {
     return true;
 }
 
-void Machine(TCHAR *str, int len, int initialState)
+void Machine(LPTSTR str, int len, int initialState)
 {
     State machine [] =
     {

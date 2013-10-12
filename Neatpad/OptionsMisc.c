@@ -1,14 +1,14 @@
 //
-//	Neatpad
-//	OptionsMisc.c
+//    Neatpad
+//    OptionsMisc.c
 //
-//	Use the following registry key to replace 'notepad' with 'neatpad'
+//    Use the following registry key to replace 'notepad' with 'neatpad'
 //
-//		"HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Notepad"
-//		REG_SZ "Debugger"="C:\path\Neatpad.exe"
+//        "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\Notepad"
+//        REG_SZ "Debugger"="C:\path\Neatpad.exe"
 //
 //
-//	www.catch22.net
+//    www.catch22.net
 //
 
 #define STRICT
@@ -21,7 +21,7 @@
 #include "Neatpad.h"
 #include "resource.h"
 
-BOOL ElevateToAdmin(HWND hwnd, BOOL fChecked1, BOOL fChecked2)//TCHAR *szParams)
+BOOL ElevateToAdmin(HWND hwnd, BOOL fChecked1, BOOL fChecked2)//LPTSTR szParams)
 {
     //// http://codefromthe70s.org/vistatutorial.asp
     SHELLEXECUTEINFO sei = { sizeof(sei) };
@@ -73,7 +73,7 @@ void ApplyAdminSettings(HWND hwnd)
 }
 
 //
-//	Dialogbox procedure for the FONT pane
+//    Dialogbox procedure for the FONT pane
 //
 BOOL CALLBACK MiscOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

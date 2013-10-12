@@ -1,8 +1,8 @@
 //
-//	Neatpad
-//	Options.c
+//    Neatpad
+//    Options.c
 //
-//	www.catch22.net
+//    www.catch22.net
 //
 
 #define STRICT
@@ -40,7 +40,7 @@ BOOL  g_fLineNumbers;
 BOOL  g_fLongLines;
 BOOL  g_fSelMargin;
 BOOL  g_fSaveOnExit;
-int	  g_nLongLineLimit;
+int      g_nLongLineLimit;
 BOOL  g_nHLCurLine;
 BOOL  g_fShowStatusbar;
 BOOL  g_fAddToExplorer = 0;
@@ -96,7 +96,7 @@ BOOL WriteSettingStr(HKEY hkey, TCHAR szKeyName [], TCHAR szString [])
 }
 
 //
-//	Add or remove Neatpad from the Explorer context-menu
+//    Add or remove Neatpad from the Explorer context-menu
 //
 BOOL SetExplorerContextMenu(BOOL fAddToMenu)
 {
@@ -125,14 +125,14 @@ BOOL SetExplorerContextMenu(BOOL fAddToMenu)
 }
 
 //
-//	Replace/Restore Notepad (with Neatpad) as the default text editor, by
+//    Replace/Restore Notepad (with Neatpad) as the default text editor, by
 //  manipulating the Image-File-Execution-Options debugger setting for NOTEPAD.EXE
 //
 BOOL SetImageFileExecutionOptions(BOOL fReplaceWithCurrentApp)
 {
-    HKEY	hKey;
+    HKEY    hKey;
     HRESULT hr;
-    TCHAR	szPath[MAX_PATH];
+    TCHAR    szPath[MAX_PATH];
 
     // create an 'ImageFileExecutionOptions' entry for the standard Notepad app
     hr = RegCreateKeyEx(HKEY_LOCAL_MACHINE, IMAGEFILE_XOPT, 0, 0, 0, KEY_WRITE, 0, &hKey, 0);
@@ -311,9 +311,9 @@ void ApplyRegSettings()
     }
 
     //
-    //	System-wide options require Administrator access. On Vista we
-    //	need to elevate using the UAC prompt. Only do this if the settings have actually
-    //	changed
+    //    System-wide options require Administrator access. On Vista we
+    //    need to elevate using the UAC prompt. Only do this if the settings have actually
+    //    changed
     //
     //SetExplorerContextMenu(g_fAddToExplorerContextMenu);
     //SetImageFileExecutionOptions(g_fReplaceNotepad);

@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextView.cpp
+//    MODULE:        TextView.cpp
 //
-//	PURPOSE:	Implementation of the TextView control
+//    PURPOSE:    Implementation of the TextView control
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 #define _WIN32_WINNT 0x501
 #define STRICT
@@ -33,7 +33,7 @@
 #pragma comment(lib, "UspLib.lib")
 
 //
-//	Constructor for TextView class
+//    Constructor for TextView class
 //
 TextView::TextView(HWND hwnd)
 {
@@ -82,7 +82,7 @@ TextView::TextView(HWND hwnd)
 
     // Default display colours
     m_rgbColourList[TXC_FOREGROUND] = SYSCOL(COLOR_WINDOWTEXT);
-    m_rgbColourList[TXC_BACKGROUND] = SYSCOL(COLOR_WINDOW);			// RGB(34,54,106)
+    m_rgbColourList[TXC_BACKGROUND] = SYSCOL(COLOR_WINDOW);            // RGB(34,54,106)
     m_rgbColourList[TXC_HIGHLIGHTTEXT] = SYSCOL(COLOR_HIGHLIGHTTEXT);
     m_rgbColourList[TXC_HIGHLIGHT] = SYSCOL(COLOR_HIGHLIGHT);
     m_rgbColourList[TXC_HIGHLIGHTTEXT2] = SYSCOL(COLOR_WINDOWTEXT);//INACTIVECAPTIONTEXT);
@@ -122,8 +122,8 @@ TextView::TextView(HWND hwnd)
     m_hMarginCursor = CreateCursor(GetModuleHandle(0), 21, 5, 32, 32, XORMask, ANDMask);
 
     //
-    //	The TextView state must be fully initialized before we
-    //	start calling member-functions
+    //    The TextView state must be fully initialized before we
+    //    start calling member-functions
     //
 
     memset(m_uspFontList, 0, sizeof(m_uspFontList));
@@ -136,7 +136,7 @@ TextView::TextView(HWND hwnd)
 }
 
 //
-//	Destructor for TextView class
+//    Destructor for TextView class
 //
 TextView::~TextView()
 {
@@ -328,7 +328,7 @@ ULONG TextView::SelectAll()
 }
 
 //
-//	Public memberfunction 
+//    Public memberfunction 
 //
 LONG WINAPI TextView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -434,7 +434,7 @@ LONG WINAPI TextView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 
         //
     case TXM_OPENFILE:
-        return OpenFile((TCHAR *) lParam);
+        return OpenFile((LPTSTR ) lParam);
 
     case TXM_CLEAR:
         return ClearFile();
@@ -503,11 +503,11 @@ LONG WINAPI TextView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 //
-//	Win32 TextView window procedure stub
+//    Win32 TextView window procedure stub
 //
 LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    TextView *ptv = (TextView *) GetWindowLongPtr(hwnd, 0);
+    TextView *ptv = (TextView *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
     switch (msg)
     {
@@ -518,7 +518,7 @@ LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         if ((ptv = new TextView(hwnd)) == 0)
             return FALSE;
 
-        SetWindowLongPtr(hwnd, 0, (LONG) ptv);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG) ptv);
         return TRUE;
 
         // Last message received by any window - delete the TextView object
@@ -537,11 +537,11 @@ LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 }
 
 //
-//	Register the TextView window class
+//    Register the TextView window class
 //
 BOOL InitTextView()
 {
-    WNDCLASSEX	wcx;
+    WNDCLASSEX    wcx;
 
     //Window class for the main application parent window
     wcx.cbSize = sizeof(wcx);
@@ -552,7 +552,7 @@ BOOL InitTextView()
     wcx.hInstance = GetModuleHandle(0);
     wcx.hIcon = 0;
     wcx.hCursor = LoadCursor(NULL, IDC_IBEAM);
-    wcx.hbrBackground = (HBRUSH) 0;		//NO FLICKERING FOR US!!
+    wcx.hbrBackground = (HBRUSH) 0;        //NO FLICKERING FOR US!!
     wcx.lpszMenuName = 0;
     wcx.lpszClassName = TEXTVIEW_CLASS;
     wcx.hIconSm = 0;
@@ -561,12 +561,12 @@ BOOL InitTextView()
 }
 
 //
-//	Create a TextView control!
+//    Create a TextView control!
 //
 HWND CreateTextView(HWND hwndParent)
 {
     return CreateWindowEx(WS_EX_CLIENTEDGE,
-        //		L"EDIT", L"",
+        //        L"EDIT", L"",
         TEXTVIEW_CLASS, TEXT(""),
         WS_VSCROLL | WS_HSCROLL | WS_CHILD | WS_VISIBLE,
         0, 0, 0, 0,
@@ -576,3 +576,15 @@ HWND CreateTextView(HWND hwndParent)
         0);
 }
 
+BOOL WINAPI DllMain(
+    _In_    HINSTANCE hinstDLL,
+    _In_    DWORD fdwReason,
+    _In_    LPVOID lpvReserved
+    )
+{
+    if (fdwReason == DLL_PROCESS_ATTACH)
+    {
+        DisableThreadLibraryCalls(hinstDLL);
+    }
+    return TRUE;
+}

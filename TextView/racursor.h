@@ -1,5 +1,5 @@
 //
-//	Right-arrow cursor raw bytes
+//    Right-arrow cursor raw bytes
 //
 
 #pragma once

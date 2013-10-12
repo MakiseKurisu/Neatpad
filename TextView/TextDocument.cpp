@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextDocument.cpp
+//    MODULE:        TextDocument.cpp
 //
-//	PURPOSE:	Basic implementation of a text data-sequence class
+//    PURPOSE:    Basic implementation of a text data-sequence class
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -26,11 +26,11 @@ struct _BOM_LOOKUP BOMLOOK [] =
 };
 
 //
-//	TextDocument constructor
+//    TextDocument constructor
 //
 TextDocument::TextDocument()
 {
-    //	buffer			= 0;
+    //    buffer            = 0;
 
     m_nDocLength_bytes = 0;
     m_nDocLength_chars = 0;
@@ -44,7 +44,7 @@ TextDocument::TextDocument()
 }
 
 //
-//	TextDocument destructor
+//    TextDocument destructor
 //
 TextDocument::~TextDocument()
 {
@@ -52,9 +52,9 @@ TextDocument::~TextDocument()
 }
 
 //
-//	Initialize the TextDocument with the specified file
+//    Initialize the TextDocument with the specified file
 //
-bool TextDocument::init(TCHAR *filename)
+bool TextDocument::init(LPTSTR filename)
 {
     HANDLE hFile;
 
@@ -67,7 +67,7 @@ bool TextDocument::init(TCHAR *filename)
 }
 
 //
-//	Initialize using a file-handle
+//    Initialize using a file-handle
 //
 bool TextDocument::init(HANDLE hFile)
 {
@@ -98,9 +98,9 @@ bool TextDocument::init(HANDLE hFile)
     return true;
 }
 
-//	Initialize the TextDocument with the specified file
+//    Initialize the TextDocument with the specified file
 //
-/*bool TextDocument::save(TCHAR *filename)
+/*bool TextDocument::save(LPTSTR filename)
 {
 HANDLE hFile;
 
@@ -117,18 +117,18 @@ return true;
 
 
 //
-//	Parse the file lo
+//    Parse the file lo
 //
 //
-//	From the unicode.org FAQ:
+//    From the unicode.org FAQ:
 //
-//	00 00 FE FF			UTF-32, big-endian 
-//	FF FE 00 00			UTF-32, little-endian 
-//	FE FF				UTF-16, big-endian 
-//	FF FE				UTF-16, little-endian 
-//	EF BB BF			UTF-8 
+//    00 00 FE FF            UTF-32, big-endian 
+//    FF FE 00 00            UTF-32, little-endian 
+//    FE FF                UTF-16, big-endian 
+//    FF FE                UTF-16, little-endian 
+//    EF BB BF            UTF-8 
 //
-//	Match the first x bytes of the file against the
+//    Match the first x bytes of the file against the
 //  Byte-Order-Mark (BOM) lookup table
 //
 int TextDocument::detect_file_format(int *m_nHeaderSize)
@@ -147,12 +147,12 @@ int TextDocument::detect_file_format(int *m_nHeaderSize)
     }
 
     *m_nHeaderSize = 0;
-    return NCP_ASCII;	// default to ASCII
+    return NCP_ASCII;    // default to ASCII
 }
 
 
 //
-//	Empty the data-TextDocument
+//    Empty the data-TextDocument
 //
 bool TextDocument::clear()
 {
@@ -193,12 +193,12 @@ bool TextDocument::EmptyDoc()
 
 
 //
-//	Return a UTF-32 character value
+//    Return a UTF-32 character value
 //
 int TextDocument::getchar(ULONG offset, ULONG lenbytes, ULONG *pch32)
 {
-    //	BYTE	*rawdata   = (BYTE *)(buffer + offset + m_nHeaderSize);
-    BYTE	rawdata[16];
+    //    BYTE    *rawdata   = (BYTE *)(buffer + offset + m_nHeaderSize);
+    BYTE    rawdata[16];
 
     lenbytes = min(16, lenbytes);
     m_seq.render(offset + m_nHeaderSize, rawdata, lenbytes);
@@ -238,28 +238,28 @@ int TextDocument::getchar(ULONG offset, ULONG lenbytes, ULONG *pch32)
 }
 
 //
-//	Fetch a buffer of UTF-16 text from the specified byte offset - 
+//    Fetch a buffer of UTF-16 text from the specified byte offset - 
 //  returns the number of characters stored in buf
 //
-//	Depending on how Neatpad was compiled (UNICODE vs ANSI) this function
+//    Depending on how Neatpad was compiled (UNICODE vs ANSI) this function
 //  will always return text in the "native" format - i.e. Unicode or Ansi -
 //  so the necessary conversions will take place here.
 //
 //  TODO: make sure the CR/LF is always fetched in one go
 //        make sure utf-16 surrogates kept together
-//		  make sure that combining chars kept together
-//		  make sure that bidirectional text kep together (will be *hard*) 
+//          make sure that combining chars kept together
+//          make sure that bidirectional text kep together (will be *hard*) 
 //
-//	offset   - BYTE offset within underlying data sequence
-//	lenbytes - max number of bytes to process (i.e. to limit to a line)
-//  buf		 - UTF16/ASCII output buffer
-//	plen	 - [in] - length of buffer, [out] - number of code-units stored
+//    offset   - BYTE offset within underlying data sequence
+//    lenbytes - max number of bytes to process (i.e. to limit to a line)
+//  buf         - UTF16/ASCII output buffer
+//    plen     - [in] - length of buffer, [out] - number of code-units stored
 //
-//	returns  - number of bytes processed
+//    returns  - number of bytes processed
 //
-ULONG TextDocument::gettext(ULONG offset, ULONG lenbytes, TCHAR *buf, ULONG *buflen)
+ULONG TextDocument::gettext(ULONG offset, ULONG lenbytes, LPTSTR buf, ULONG *buflen)
 {
-    //	BYTE	*rawdata = (BYTE *)(buffer + offset + m_nHeaderSize);
+    //    BYTE    *rawdata = (BYTE *)(buffer + offset + m_nHeaderSize);
 
     ULONG chars_copied = 0;
     ULONG bytes_processed = 0;
@@ -298,7 +298,7 @@ ULONG TextDocument::gettext(ULONG offset, ULONG lenbytes, TCHAR *buf, ULONG *buf
     //int   charbuflen = *buflen;
 
     //while(remaining)
-    /*	{
+    /*    {
             lenbytes = min(lenbytes, sizeof(rawdata));
             m_seq.render(offset + m_nHeaderSize, rawdata, lenbytes);
 
@@ -351,9 +351,9 @@ ULONG TextDocument::gettext(ULONG offset, ULONG lenbytes, TCHAR *buf, ULONG *buf
 
             #endif
 
-            //	remaining -= lenbytes;
-            //	buf       += lenbytes;
-            //	offset    += lenbytes;
+            //    remaining -= lenbytes;
+            //    buf       += lenbytes;
+            //    offset    += lenbytes;
             }*/
 }
 
@@ -365,11 +365,11 @@ ULONG TextDocument::getdata(ULONG offset, BYTE *buf, size_t len)
 }
 
 //
-//	Initialize the line-buffer
+//    Initialize the line-buffer
 //
-//	With Unicode a newline sequence is defined as any of the following:
+//    With Unicode a newline sequence is defined as any of the following:
 //
-//	\u000A | \u000B | \u000C | \u000D | \u0085 | \u2028 | \u2029 | \u000D\u000A
+//    \u000A | \u000B | \u000C | \u000D | \u0085 | \u2028 | \u2029 | \u000D\u000A
 //
 bool TextDocument::init_linebuffer()
 {
@@ -460,7 +460,7 @@ bool TextDocument::init_linebuffer()
 
 
 //
-//	Return the number of lines
+//    Return the number of lines
 //
 ULONG TextDocument::linecount()
 {
@@ -468,14 +468,14 @@ ULONG TextDocument::linecount()
 }
 
 //
-//	Return the length of longest line
+//    Return the length of longest line
 //
 ULONG TextDocument::longestline(int tabwidth)
 {
     //ULONG i;
     ULONG longest = 0;
     ULONG xpos = 0;
-    //	char *bufptr = (char *)(buffer + m_nHeaderSize);
+    //    char *bufptr = (char *)(buffer + m_nHeaderSize);
     /*
         for(i = 0; i < length_bytes; i++)
         {
@@ -507,7 +507,7 @@ ULONG TextDocument::longestline(int tabwidth)
 }
 
 //
-//	Return information about specified line
+//    Return information about specified line
 //
 bool TextDocument::lineinfo_from_lineno(ULONG lineno, ULONG *lineoff_chars, ULONG *linelen_chars, ULONG *lineoff_bytes, ULONG *linelen_bytes)
 {
@@ -528,7 +528,7 @@ bool TextDocument::lineinfo_from_lineno(ULONG lineno, ULONG *lineoff_chars, ULON
 }
 
 //
-//	Perform a reverse lookup - file-offset to line number
+//    Perform a reverse lookup - file-offset to line number
 //
 bool TextDocument::lineinfo_from_offset(ULONG offset_chars, ULONG *lineno, ULONG *lineoff_chars, ULONG *linelen_chars, ULONG *lineoff_bytes, ULONG *linelen_bytes)
 {
@@ -538,11 +538,11 @@ bool TextDocument::lineinfo_from_offset(ULONG offset_chars, ULONG *lineno, ULONG
 
     if (m_nNumLines == 0)
     {
-        if (lineno)			*lineno = 0;
-        if (lineoff_chars)	*lineoff_chars = 0;
-        if (linelen_chars)	*linelen_chars = 0;
-        if (lineoff_bytes)	*lineoff_bytes = 0;
-        if (linelen_bytes)	*linelen_bytes = 0;
+        if (lineno)            *lineno = 0;
+        if (lineoff_chars)    *lineoff_chars = 0;
+        if (linelen_chars)    *linelen_chars = 0;
+        if (lineoff_bytes)    *lineoff_bytes = 0;
+        if (linelen_bytes)    *linelen_bytes = 0;
 
         return false;
     }
@@ -565,11 +565,11 @@ bool TextDocument::lineinfo_from_offset(ULONG offset_chars, ULONG *lineno, ULONG
         }
     }
 
-    if (lineno)			*lineno = line;
-    if (lineoff_bytes)	*lineoff_bytes = m_pLineBuf_byte[line];
-    if (linelen_bytes)	*linelen_bytes = m_pLineBuf_byte[line + 1] - m_pLineBuf_byte[line];
-    if (lineoff_chars)	*lineoff_chars = m_pLineBuf_char[line];
-    if (linelen_chars)	*linelen_chars = m_pLineBuf_char[line + 1] - m_pLineBuf_char[line];
+    if (lineno)            *lineno = line;
+    if (lineoff_bytes)    *lineoff_bytes = m_pLineBuf_byte[line];
+    if (linelen_bytes)    *linelen_bytes = m_pLineBuf_byte[line + 1] - m_pLineBuf_byte[line];
+    if (lineoff_chars)    *lineoff_chars = m_pLineBuf_char[line];
+    if (linelen_chars)    *linelen_chars = m_pLineBuf_char[line + 1] - m_pLineBuf_char[line];
 
     return true;
 }
@@ -590,7 +590,7 @@ TextIterator TextDocument::iterate(ULONG offset_chars)
     ULONG len_bytes = m_nDocLength_bytes - off_bytes;
 
     //if(!lineinfo_from_offset(offset_chars, 0, linelen, &offset_bytes, &length_bytes))
-    //	return TextIterator();
+    //    return TextIterator();
 
     return TextIterator(off_bytes, len_bytes, this);
 }
@@ -636,9 +636,9 @@ ULONG TextDocument::offset_from_lineno(ULONG lineno)
 }
 
 //
-//	Retrieve an entire line of text
-//	
-ULONG TextDocument::getline(ULONG nLineNo, TCHAR *buf, ULONG buflen, ULONG *off_chars)
+//    Retrieve an entire line of text
+//    
+ULONG TextDocument::getline(ULONG nLineNo, LPTSTR buf, ULONG buflen, ULONG *off_chars)
 {
     ULONG offset_bytes;
     ULONG length_bytes;
@@ -658,15 +658,15 @@ ULONG TextDocument::getline(ULONG nLineNo, TCHAR *buf, ULONG buflen, ULONG *off_
 }
 
 //
-//	Convert the RAW buffer in underlying file-format to UTF-16
+//    Convert the RAW buffer in underlying file-format to UTF-16
 //
-//	
-//	utf16len	- [in/out]	on input holds size of utf16str buffer, 
-//							on output holds number of utf16 characters stored
+//    
+//    utf16len    - [in/out]    on input holds size of utf16str buffer, 
+//                            on output holds number of utf16 characters stored
 //
-//	returns bytes processed from rawdata
+//    returns bytes processed from rawdata
 //
-size_t TextDocument::rawdata_to_utf16(BYTE *rawdata, size_t rawlen, TCHAR *utf16str, size_t *utf16len)
+size_t TextDocument::rawdata_to_utf16(BYTE *rawdata, size_t rawlen, LPTSTR utf16str, size_t *utf16len)
 {
     switch (m_nFileFormat)
     {
@@ -695,13 +695,13 @@ size_t TextDocument::rawdata_to_utf16(BYTE *rawdata, size_t rawlen, TCHAR *utf16
 }
 
 //
-//	Converts specified UTF16 string to the underlying RAW format of the text-document
-//	(i.e. UTF-16 -> UTF-8
-//		  UTF-16 -> UTF-32 etc)
+//    Converts specified UTF16 string to the underlying RAW format of the text-document
+//    (i.e. UTF-16 -> UTF-8
+//          UTF-16 -> UTF-32 etc)
 //
-//	returns number of WCHARs processed from utf16str
+//    returns number of WCHARs processed from utf16str
 //
-size_t TextDocument::utf16_to_rawdata(TCHAR *utf16str, size_t utf16len, BYTE *rawdata, size_t *rawlen)
+size_t TextDocument::utf16_to_rawdata(LPTSTR utf16str, size_t utf16len, BYTE *rawdata, size_t *rawlen)
 {
     switch (m_nFileFormat)
     {
@@ -736,11 +736,11 @@ size_t TextDocument::utf16_to_rawdata(TCHAR *utf16str, size_t utf16len, BYTE *ra
 }
 
 //
-//	Insert UTF-16 text at specified BYTE offset
+//    Insert UTF-16 text at specified BYTE offset
 //
-//	returns number of BYTEs stored
+//    returns number of BYTEs stored
 //
-ULONG TextDocument::insert_raw(ULONG offset_bytes, TCHAR *text, ULONG length)
+ULONG TextDocument::insert_raw(ULONG offset_bytes, LPTSTR text, ULONG length)
 {
     BYTE  buf[0x100];
     ULONG buflen;
@@ -767,7 +767,7 @@ ULONG TextDocument::insert_raw(ULONG offset_bytes, TCHAR *text, ULONG length)
     return rawlen;
 }
 
-ULONG TextDocument::replace_raw(ULONG offset_bytes, TCHAR *text, ULONG length, ULONG erase_chars)
+ULONG TextDocument::replace_raw(ULONG offset_bytes, LPTSTR text, ULONG length, ULONG erase_chars)
 {
     BYTE  buf[0x100];
     ULONG buflen;
@@ -799,7 +799,7 @@ ULONG TextDocument::replace_raw(ULONG offset_bytes, TCHAR *text, ULONG length, U
 }
 
 //
-//	Erase is a little different. Need to work out how many
+//    Erase is a little different. Need to work out how many
 //  bytes the specified number of UTF16 characters takes up
 //
 ULONG TextDocument::erase_raw(ULONG offset_bytes, ULONG length)
@@ -839,8 +839,8 @@ ULONG TextDocument::erase_raw(ULONG offset_bytes, ULONG length)
 }
 
 //
-//	return number of bytes comprising 'length_chars' characters
-//	in the underlying raw file
+//    return number of bytes comprising 'length_chars' characters
+//    in the underlying raw file
 //
 ULONG TextDocument::count_chars(ULONG offset_bytes, ULONG length_chars)
 {
@@ -929,25 +929,25 @@ ULONG TextDocument::charoffset_to_byteoffset(ULONG offset_chars)
 }
 
 //
-//	Insert text at specified character-offset
+//    Insert text at specified character-offset
 //
-ULONG TextDocument::insert_text(ULONG offset_chars, TCHAR *text, ULONG length)
+ULONG TextDocument::insert_text(ULONG offset_chars, LPTSTR text, ULONG length)
 {
     ULONG offset_bytes = charoffset_to_byteoffset(offset_chars);
     return insert_raw(offset_bytes, text, length);
 }
 
 //
-//	Overwrite text at specified character-offset
+//    Overwrite text at specified character-offset
 //
-ULONG TextDocument::replace_text(ULONG offset_chars, TCHAR *text, ULONG length, ULONG erase_len)
+ULONG TextDocument::replace_text(ULONG offset_chars, LPTSTR text, ULONG length, ULONG erase_len)
 {
     ULONG offset_bytes = charoffset_to_byteoffset(offset_chars);
     return replace_raw(offset_bytes, text, length, erase_len);
 }
 
 //
-//	Erase text at specified character-offset
+//    Erase text at specified character-offset
 //
 ULONG TextDocument::erase_text(ULONG offset_chars, ULONG length)
 {

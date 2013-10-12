@@ -1,9 +1,9 @@
 //
-//	MODULE:		TextViewMouse.cpp
+//    MODULE:        TextViewMouse.cpp
 //
-//	PURPOSE:	Mouse and caret support for the TextView control
+//    PURPOSE:    Mouse and caret support for the TextView control
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -18,10 +18,10 @@ int ScrollDir(int counter, int dir);
 bool IsKeyPressed(UINT nVirtKey);
 
 //
-//	WM_MOUSEACTIVATE
+//    WM_MOUSEACTIVATE
 //
-//	Grab the keyboard input focus 
-//	
+//    Grab the keyboard input focus 
+//    
 LONG TextView::OnMouseActivate(HWND hwndTop, UINT nHitTest, UINT nMessage)
 {
     SetFocus(m_hWnd);
@@ -60,9 +60,9 @@ HMENU TextView::CreateContextMenu()
 }
 
 //
-//	WM_CONTEXTMENU
+//    WM_CONTEXTMENU
 //
-//	Respond to right-click message
+//    Respond to right-click message
 //
 LONG TextView::OnContextMenu(HWND hwndParam, int x, int y)
 {
@@ -92,7 +92,7 @@ LONG TextView::OnContextMenu(HWND hwndParam, int x, int y)
 
 
 //
-//	WM_LBUTTONDOWN
+//    WM_LBUTTONDOWN
 //
 //  Position caret to nearest text character under mouse
 //
@@ -189,9 +189,9 @@ LONG TextView::OnLButtonDown(UINT nFlags, int mx, int my)
 }
 
 //
-//	WM_LBUTTONUP 
+//    WM_LBUTTONUP 
 //
-//	Release capture and cancel any mouse-scrolling
+//    Release capture and cancel any mouse-scrolling
 //
 LONG TextView::OnLButtonUp(UINT nFlags, int mx, int my)
 {
@@ -219,9 +219,9 @@ LONG TextView::OnLButtonUp(UINT nFlags, int mx, int my)
 }
 
 //
-//	WM_LBUTTONDBKCLK
+//    WM_LBUTTONDBKCLK
 //
-//	Select the word under the mouse
+//    Select the word under the mouse
 //
 LONG TextView::OnLButtonDblClick(UINT nFlags, int mx, int my)
 {
@@ -258,23 +258,23 @@ LONG TextView::OnLButtonDblClick(UINT nFlags, int mx, int my)
 }
 
 //
-//	WM_MOUSEMOVE
+//    WM_MOUSEMOVE
 //
-//	Set the selection end-point if we are dragging the mouse
+//    Set the selection end-point if we are dragging the mouse
 //
 LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
 {
     if (m_nSelectionMode)
     {
-        ULONG	nLineNo, nFileOff;
-        BOOL	fCurChanged = FALSE;
+        ULONG    nLineNo, nFileOff;
+        BOOL    fCurChanged = FALSE;
 
-        RECT	rect;
-        POINT	pt = { mx, my };
+        RECT    rect;
+        POINT    pt = { mx, my };
 
         //
-        //	First thing we must do is switch from margin-mode to normal-mode 
-        //	if the mouse strays into the main document area
+        //    First thing we must do is switch from margin-mode to normal-mode 
+        //    if the mouse strays into the main document area
         //
         if (m_nSelectionMode == SEL_MARGIN && mx > LeftMarginWidth())
         {
@@ -283,8 +283,8 @@ LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
         }
 
         //
-        //	Mouse-scrolling: detect if the mouse
-        //	is inside/outside of the TextView scrolling area
+        //    Mouse-scrolling: detect if the mouse
+        //    is inside/outside of the TextView scrolling area
         //  and stop/start a scrolling timer appropriately
         //
         GetClientRect(m_hWnd, &rect);
@@ -384,13 +384,13 @@ LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
 }
 
 //
-//	WM_TIMER handler
+//    WM_TIMER handler
 //
-//	Used to create regular scrolling 
+//    Used to create regular scrolling 
 //
 LONG TextView::OnTimer(UINT nTimerId)
 {
-    int	  dx = 0, dy = 0;	// scrolling vectors
+    int      dx = 0, dy = 0;    // scrolling vectors
     RECT  rect;
     POINT pt;
 
@@ -462,22 +462,22 @@ LONG TextView::OnTimer(UINT nTimerId)
 }
 
 //
-//	Convert mouse(client) coordinates to a file-relative offset
+//    Convert mouse(client) coordinates to a file-relative offset
 //
-//	Currently only uses the main font so will not support other
-//	fonts introduced by syntax highlighting
+//    Currently only uses the main font so will not support other
+//    fonts introduced by syntax highlighting
 //
-BOOL TextView::MouseCoordToFilePos(int		 mx,			// [in]  mouse x-coord
-    int		 my,			// [in]  mouse x-coord
-    ULONG	*pnLineNo,		// [out] line number
-    ULONG	*pnFileOffset,  // [out] zero-based file-offset (in chars)
-    int		*psnappedX		// [out] adjusted x coord of caret
+BOOL TextView::MouseCoordToFilePos(int         mx,            // [in]  mouse x-coord
+    int         my,            // [in]  mouse x-coord
+    ULONG    *pnLineNo,        // [out] line number
+    ULONG    *pnFileOffset,  // [out] zero-based file-offset (in chars)
+    int        *psnappedX        // [out] adjusted x coord of caret
     )
 {
     ULONG nLineNo;
     ULONG off_chars;
     RECT  rect;
-    int	  cp;
+    int      cp;
 
     // get scrollable area
     GetClientRect(m_hWnd, &rect);
@@ -487,10 +487,10 @@ BOOL TextView::MouseCoordToFilePos(int		 mx,			// [in]  mouse x-coord
     mx -= LeftMarginWidth();
 
     // clip mouse to edge of window
-    if (mx < 0)				mx = 0;
-    if (my < 0)				my = 0;
-    if (my >= rect.bottom)	my = rect.bottom - 1;
-    if (mx >= rect.right)	mx = rect.right - 1;
+    if (mx < 0)                mx = 0;
+    if (my < 0)                my = 0;
+    if (my >= rect.bottom)    my = rect.bottom - 1;
+    if (mx >= rect.right)    mx = rect.right - 1;
 
     // It's easy to find the line-number: just divide 'y' by the line-height
     nLineNo = (my / m_nLineHeight) + m_nVScrollPos;
@@ -515,7 +515,7 @@ BOOL TextView::MouseCoordToFilePos(int		 mx,			// [in]  mouse x-coord
     *pnLineNo = nLineNo;
     *pnFileOffset = cp + off_chars;
     *psnappedX = mx;// - m_nHScrollPos * m_nFontWidth;
-    //*psnappedX		+= LeftMarginWidth();
+    //*psnappedX        += LeftMarginWidth();
 
     return 0;
 }
@@ -549,7 +549,7 @@ LONG TextView::InvalidateLine(ULONG nLineNo, bool forceAnalysis)
     return 0;
 }
 //
-//	Redraw any line which spans the specified range of text
+//    Redraw any line which spans the specified range of text
 //
 LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
 {
@@ -571,7 +571,7 @@ LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
         return 0;
 
     //
-    //	Find the start-of-line information from specified file-offset
+    //    Find the start-of-line information from specified file-offset
     //
     lineno = m_pTextDoc->lineno_from_offset(start);
 
@@ -612,7 +612,7 @@ LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
 }
 /*
 //
-//	Wrapper around SetCaretPos, hides the caret when it goes
+//    Wrapper around SetCaretPos, hides the caret when it goes
 //  off-screen (this protects against x/y wrap around due to integer overflow)
 //
 VOID TextView::MoveCaret(int x, int y)
@@ -633,8 +633,8 @@ SetCaretPos(x, y);
 }*/
 
 //
-//	x		- x-coord relative to start of line
-//	lineno	- line-number
+//    x        - x-coord relative to start of line
+//    lineno    - line-number
 //
 VOID TextView::UpdateCaretXY(int xpos, ULONG lineno)
 {
@@ -672,15 +672,15 @@ VOID TextView::UpdateCaretXY(int xpos, ULONG lineno)
 }
 
 //
-//	Reposition the caret based on cursor-offset
-//	return the resulting x-coord and line#
+//    Reposition the caret based on cursor-offset
+//    return the resulting x-coord and line#
 //
 VOID TextView::UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx, ULONG *outlineno)
 {
-    ULONG		lineno = 0;
-    int			xpos = 0;
-    ULONG		off_chars;
-    USPDATA	  * uspData;
+    ULONG        lineno = 0;
+    int            xpos = 0;
+    ULONG        off_chars;
+    USPDATA      * uspData;
 
     // get line information from cursor-offset
     if (m_pTextDoc->lineinfo_from_offset(offset, &lineno, &off_chars, 0, 0, 0))
@@ -701,7 +701,7 @@ VOID TextView::UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx, ULONG 
         }
     }
 
-    if (outx)	  *outx = xpos;
+    if (outx)      *outx = xpos;
     if (outlineno) *outlineno = lineno;
 }
 
@@ -711,9 +711,9 @@ VOID TextView::RepositionCaret()
 }
 
 //
-//	Set the caret position based on m_nCursorOffset,
-//	typically used whilst scrolling 
-//	(i.e. not due to mouse clicks/keyboard input)
+//    Set the caret position based on m_nCursorOffset,
+//    typically used whilst scrolling 
+//    (i.e. not due to mouse clicks/keyboard input)
 //
 /*
 ULONG TextView::RepositionCaret(POINT *pt)
@@ -774,24 +774,24 @@ void TextView::UpdateLine(ULONG nLineNo)
 }
 
 //
-//	return direction to scroll (+ve, -ve or 0) based on 
+//    return direction to scroll (+ve, -ve or 0) based on 
 //  distance of mouse from window edge
 //
-//	note: counter now redundant, we scroll multiple lines at
+//    note: counter now redundant, we scroll multiple lines at
 //  a time (with a slower timer than before) to achieve
-//	variable-speed scrolling
+//    variable-speed scrolling
 //
 int ScrollDir(int counter, int distance)
 {
-    if (distance > 48)		return 5;
-    if (distance > 16)		return 2;
-    if (distance > 3)		return 1;
-    if (distance > 0)		return counter % 5 == 0 ? 1 : 0;
+    if (distance > 48)        return 5;
+    if (distance > 16)        return 2;
+    if (distance > 3)        return 1;
+    if (distance > 0)        return counter % 5 == 0 ? 1 : 0;
 
-    if (distance < -48)		return -5;
-    if (distance < -16)		return -2;
-    if (distance < -3)		return -1;
-    if (distance < 0)		return counter % 5 == 0 ? -1 : 0;
+    if (distance < -48)        return -5;
+    if (distance < -16)        return -2;
+    if (distance < -3)        return -1;
+    if (distance < 0)        return counter % 5 == 0 ? -1 : 0;
 
     return 0;
 }

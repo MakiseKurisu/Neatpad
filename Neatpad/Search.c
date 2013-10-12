@@ -1,10 +1,10 @@
 //
-//	Neatpad - Simple Text Editor application 
+//    Neatpad - Simple Text Editor application 
 //
-//	www.catch22.net
-//	Written by J Brown 2004
+//    www.catch22.net
+//    Written by J Brown 2004
 //
-//	Freeware
+//    Freeware
 //
 #define _CRT_SECURE_NO_DEPRECATE
 #define _WIN32_WINNT 0x501
@@ -91,8 +91,8 @@ void AddSearchTabs(HWND hwnd)
     ///tcitem.pszText = TEXT("Replace");
     //TabCtrl_InsertItem(hwndTab, 3, &tcitem);
 
-    //	GetClient
-    //	TabCtrl_GetItemRect(hwndTab, 0, &rect);
+    //    GetClient
+    //    TabCtrl_GetItemRect(hwndTab, 0, &rect);
 
     //for(i = MAX_FIND_PANES-1; i >= 0; i--)
     //{
@@ -112,7 +112,7 @@ void AddSearchTabs(HWND hwnd)
         MapWindowPoints(g_hwndFindPane[i], hwnd, (POINT *) &rect, 2);
         TabCtrl_AdjustRect(hwndTab, TRUE, &rect);
 
-        //	break;
+        //    break;
     }
 
     // move tab control into position
@@ -134,7 +134,7 @@ void AddSearchTabs(HWND hwnd)
         MoveWindow(g_hwndFindPane[i], rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, FALSE);
     }
 
-    //	ShowWindow(g_hwndFindPane[0], SW_SHOW);
+    //    ShowWindow(g_hwndFindPane[0], SW_SHOW);
 }
 
 BOOL CALLBACK SearchDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -211,16 +211,16 @@ BOOL CALLBACK SearchDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 //
-//	Show the find/replace/goto dialog
+//    Show the find/replace/goto dialog
 //
 HWND ShowFindDlg(HWND hwndParent, UINT nPage)
 {
-    HWND	hwndTab;
-    NMHDR	nmhdr;
+    HWND    hwndTab;
+    NMHDR    nmhdr;
 
     //
-    //	Create the dialog if it hasn't been already
-    //		
+    //    Create the dialog if it hasn't been already
+    //        
     if (g_hwndSearchDlg == 0)
     {
         g_hwndSearchDlg = CreateDialog(g_hResourceModule, MAKEINTRESOURCE(IDD_FIND), hwndParent, SearchDlgProc);
@@ -233,8 +233,8 @@ HWND ShowFindDlg(HWND hwndParent, UINT nPage)
     SetForegroundWindow(g_hwndSearchDlg);
 
     // 
-    //	Simulate the user clicking one of the TABs in order to
-    //	set the desired page
+    //    Simulate the user clicking one of the TABs in order to
+    //    set the desired page
     //
     hwndTab = GetDlgItem(g_hwndSearchDlg, IDC_TAB1);
     nmhdr.hwndFrom = hwndTab;
@@ -244,7 +244,7 @@ HWND ShowFindDlg(HWND hwndParent, UINT nPage)
     TabCtrl_SetCurSel(hwndTab, nPage);
     SendMessage(g_hwndSearchDlg, WM_NOTIFY, IDC_TAB1, (LPARAM) &nmhdr);
 
-    //	Set focus to 1st control in dialog
+    //    Set focus to 1st control in dialog
     SetFocus(GetDlgItem(g_hwndFindPane[nPage], IDC_COMBO1));
     PostMessage(g_hwndFindPane[nPage], WM_NEXTDLGCTL, IDC_COMBO1, TRUE);
 
@@ -259,7 +259,7 @@ SendMessage(hwndTB, TB_ADDBUTTONS,  1, (LPARAM) &tbb);
 }
 
 
-void AddButton(HWND hwndTB, UINT uCmdId, UINT uImageIdx, UINT uStyle, TCHAR *szText)
+void AddButton(HWND hwndTB, UINT uCmdId, UINT uImageIdx, UINT uStyle, LPTSTR szText)
 {
 //uStyle |= BTNS_SHOWTEXT;
 TBBUTTON tbb = { uImageIdx, uCmdId, TBSTATE_ENABLED, uStyle|BTNS_SHOWTEXT, 0, 0,0, (INT_PTR)szText };
@@ -277,7 +277,7 @@ CCS_NODIVIDER;
 
 HWND CreateEmptyToolbar(HWND hwndParent, int nBitmapIdx, int nBitmapWidth, int nCtrlId, DWORD dwExtraStyle)
 {
-HWND	   hwndTB;
+HWND       hwndTB;
 HIMAGELIST hImgList;
 
 hwndTB = CreateToolbarEx (hwndParent,

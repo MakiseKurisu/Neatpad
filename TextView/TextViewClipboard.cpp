@@ -1,11 +1,11 @@
 //
-//	MODULE:		TextViewClipboard.cpp
+//    MODULE:        TextViewClipboard.cpp
 //
-//	PURPOSE:	Basic clipboard support for TextView
-//				Just uses GetClipboardData/SetClipboardData until I migrate
-//				to the OLE code from my drag+drop tutorials
+//    PURPOSE:    Basic clipboard support for TextView
+//                Just uses GetClipboardData/SetClipboardData until I migrate
+//                to the OLE code from my drag+drop tutorials
 //
-//	NOTES:		www.catch22.net
+//    NOTES:        www.catch22.net
 //
 
 #define STRICT
@@ -23,7 +23,7 @@
 #endif
 
 //
-//	Paste any CF_TEXT/CF_UNICODE text from the clipboard
+//    Paste any CF_TEXT/CF_UNICODE text from the clipboard
 //
 BOOL TextView::OnPaste()
 {
@@ -35,7 +35,7 @@ BOOL TextView::OnPaste()
     if (OpenClipboard(m_hWnd))
     {
         HANDLE hMem = GetClipboardData(CF_TCHARTEXT);
-        TCHAR *szText = (TCHAR *) GlobalLock(hMem);
+        LPTSTR szText = (LPTSTR ) GlobalLock(hMem);
 
         if (szText)
         {
@@ -57,11 +57,11 @@ BOOL TextView::OnPaste()
 }
 
 //
-//	Retrieve the specified range of text and copy it to supplied buffer
-//	szDest must be big enough to hold nLength characters
-//	nLength includes the terminating NULL
+//    Retrieve the specified range of text and copy it to supplied buffer
+//    szDest must be big enough to hold nLength characters
+//    nLength includes the terminating NULL
 //
-ULONG TextView::GetText(TCHAR *szDest, ULONG nStartOffset, ULONG nLength)
+ULONG TextView::GetText(LPTSTR szDest, ULONG nStartOffset, ULONG nLength)
 {
     ULONG copied = 0;
 
@@ -78,13 +78,13 @@ ULONG TextView::GetText(TCHAR *szDest, ULONG nStartOffset, ULONG nLength)
 }
 
 //
-//	Copy the currently selected text to the clipboard as CF_TEXT/CF_UNICODE
+//    Copy the currently selected text to the clipboard as CF_TEXT/CF_UNICODE
 //
 BOOL TextView::OnCopy()
 {
-    ULONG	selstart = min(m_nSelectionStart, m_nSelectionEnd);
-    ULONG	sellen = SelectionSize();
-    BOOL	success = FALSE;
+    ULONG    selstart = min(m_nSelectionStart, m_nSelectionEnd);
+    ULONG    sellen = SelectionSize();
+    BOOL    success = FALSE;
 
     if (sellen == 0)
         return FALSE;
@@ -96,7 +96,7 @@ BOOL TextView::OnCopy()
 
         if ((hMem = GlobalAlloc(GPTR, (sellen + 1) * sizeof(TCHAR))) != 0)
         {
-            if ((ptr = (TCHAR *) GlobalLock(hMem)) != 0)
+            if ((ptr = (LPTSTR ) GlobalLock(hMem)) != 0)
             {
                 EmptyClipboard();
 
@@ -116,7 +116,7 @@ BOOL TextView::OnCopy()
 }
 
 //
-//	Remove current selection and copy to the clipboard
+//    Remove current selection and copy to the clipboard
 //
 BOOL TextView::OnCut()
 {
@@ -136,7 +136,7 @@ BOOL TextView::OnCut()
 }
 
 //
-//	Remove the current selection
+//    Remove the current selection
 //
 BOOL TextView::OnClear()
 {
