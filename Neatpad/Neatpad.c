@@ -18,7 +18,7 @@
 
 #pragma comment(lib, "TextView.lib")
 
-TCHAR		szAppName[] = APP_TITLE;
+TCHAR		szAppName [] = APP_TITLE;
 HWND		hwndMain;
 HWND		hwndTextView;
 
@@ -27,44 +27,44 @@ TCHAR szFileTitle[MAX_PATH];
 
 BOOL ShowOpenFileDlg(HWND hwnd, LPTSTR pstrFileName, LPTSTR pstrTitleName)
 {
-	TCHAR *szFilter = TEXT("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
-	
-	OPENFILENAME ofn	= { sizeof(ofn) };
+    TCHAR *szFilter = TEXT("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
 
-	ofn.hwndOwner		= hwnd;
-	ofn.hInstance		= GetModuleHandle(0);
-	ofn.lpstrFilter		= szFilter;
-	ofn.lpstrFile		= pstrFileName;
-	ofn.lpstrFileTitle	= pstrTitleName;
-	
-	ofn.nFilterIndex	= 1;
-	ofn.nMaxFile		= _MAX_PATH;
-	ofn.nMaxFileTitle	= _MAX_FNAME + _MAX_EXT; 
+    OPENFILENAME ofn = { sizeof(ofn) };
 
-	// flags to control appearance of open-file dialog
-	ofn.Flags			=	OFN_EXPLORER			| 
-							OFN_ENABLESIZING		|
-							OFN_ALLOWMULTISELECT	| 
-							OFN_FILEMUSTEXIST;
+    ofn.hwndOwner = hwnd;
+    ofn.hInstance = GetModuleHandle(0);
+    ofn.lpstrFilter = szFilter;
+    ofn.lpstrFile = pstrFileName;
+    ofn.lpstrFileTitle = pstrTitleName;
 
-	return GetOpenFileName(&ofn);
+    ofn.nFilterIndex = 1;
+    ofn.nMaxFile = _MAX_PATH;
+    ofn.nMaxFileTitle = _MAX_FNAME + _MAX_EXT;
+
+    // flags to control appearance of open-file dialog
+    ofn.Flags = OFN_EXPLORER |
+        OFN_ENABLESIZING |
+        OFN_ALLOWMULTISELECT |
+        OFN_FILEMUSTEXIST;
+
+    return GetOpenFileName(&ofn);
 }
 
 void ShowAboutDlg(HWND hwndParent)
 {
-	MessageBox( hwndParent, 
-				APP_TITLE TEXT("\r\n\r\n")  WEBSITE_STR, 
-				APP_TITLE, 
-				MB_OK | MB_ICONINFORMATION
-				);
+    MessageBox(hwndParent,
+        APP_TITLE TEXT("\r\n\r\n")  WEBSITE_STR,
+        APP_TITLE,
+        MB_OK | MB_ICONINFORMATION
+        );
 }
 
 void SetWindowFileName(HWND hwnd, LPTSTR szFileName)
 {
-	TCHAR ach[MAX_PATH + sizeof(szAppName) + 4];
+    TCHAR ach[MAX_PATH + sizeof(szAppName) +4];
 
-	wsprintf(ach, TEXT("%s - %s"), szFileName, szAppName);
-	SetWindowText(hwnd, ach);
+    wsprintf(ach, TEXT("%s - %s"), szFileName, szAppName);
+    SetWindowText(hwnd, ach);
 }
 
 //
@@ -72,57 +72,57 @@ void SetWindowFileName(HWND hwnd, LPTSTR szFileName)
 //
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static int width, height;
+    static int width, height;
 
-	switch(msg)
-	{
-	case WM_CREATE:
-		hwndTextView = CreateTextView(hwnd);
+    switch (msg)
+    {
+    case WM_CREATE:
+        hwndTextView = CreateTextView(hwnd);
 
-		// automatically create new document when we start
-		PostMessage(hwnd, WM_COMMAND, IDM_FILE_NEW, 0);
-		return 0;
+        // automatically create new document when we start
+        PostMessage(hwnd, WM_COMMAND, IDM_FILE_NEW, 0);
+        return 0;
 
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
 
-	case WM_COMMAND:
-		switch(LOWORD(wParam))
-		{
-		case IDM_FILE_NEW:
-			SetWindowFileName(hwnd, TEXT("Untitled"));
-			return 0;
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDM_FILE_NEW:
+            SetWindowFileName(hwnd, TEXT("Untitled"));
+            return 0;
 
-		case IDM_FILE_OPEN:
+        case IDM_FILE_OPEN:
 
-			// get a filename to open
-			if(ShowOpenFileDlg(hwnd, szFileName, szFileTitle))
-			{
-				SetWindowFileName(hwnd, szFileTitle);
-			}
+            // get a filename to open
+            if (ShowOpenFileDlg(hwnd, szFileName, szFileTitle))
+            {
+                SetWindowFileName(hwnd, szFileTitle);
+            }
 
-			return 0;
+            return 0;
 
-		case IDM_HELP_ABOUT:
-			ShowAboutDlg(hwnd);
-			return 0;
-		}
-		return 0;
+        case IDM_HELP_ABOUT:
+            ShowAboutDlg(hwnd);
+            return 0;
+        }
+        return 0;
 
-	case WM_CLOSE:
-		DestroyWindow(hwnd);
-		return 0;
+    case WM_CLOSE:
+        DestroyWindow(hwnd);
+        return 0;
 
-	case WM_SIZE:
-		width  = (short)LOWORD(lParam);
-		height = (short)HIWORD(lParam);
+    case WM_SIZE:
+        width = (short) LOWORD(lParam);
+        height = (short) HIWORD(lParam);
 
-		MoveWindow(hwndTextView, 0, 0, width, height, TRUE);
-		return 0;
+        MoveWindow(hwndTextView, 0, 0, width, height, TRUE);
+        return 0;
 
-	}
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 //
@@ -130,24 +130,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 //
 void InitMainWnd()
 {
-	WNDCLASSEX wcx;
-	HANDLE hInst = GetModuleHandle(0);
+    WNDCLASSEX wcx;
+    HANDLE hInst = GetModuleHandle(0);
 
-	// Window class for the main application parent window
-	wcx.cbSize			= sizeof(wcx);
-	wcx.style			= 0;
-	wcx.lpfnWndProc		= WndProc;
-	wcx.cbClsExtra		= 0;
-	wcx.cbWndExtra		= 0;
-	wcx.hInstance		= hInst;
-	wcx.hCursor			= LoadCursor (NULL, IDC_ARROW);
-	wcx.hbrBackground	= (HBRUSH)0;
-	wcx.lpszMenuName	= MAKEINTRESOURCE(IDR_MENU1);
-	wcx.lpszClassName	= szAppName;
-	wcx.hIcon			= LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_CREATEDIBSECTION);
-	wcx.hIconSm			= LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, LR_CREATEDIBSECTION);
+    // Window class for the main application parent window
+    wcx.cbSize = sizeof(wcx);
+    wcx.style = 0;
+    wcx.lpfnWndProc = WndProc;
+    wcx.cbClsExtra = 0;
+    wcx.cbWndExtra = 0;
+    wcx.hInstance = hInst;
+    wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wcx.hbrBackground = (HBRUSH) 0;
+    wcx.lpszMenuName = MAKEINTRESOURCE(IDR_MENU1);
+    wcx.lpszClassName = szAppName;
+    wcx.hIcon = LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_CREATEDIBSECTION);
+    wcx.hIconSm = LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, LR_CREATEDIBSECTION);
 
-	RegisterClassEx(&wcx);
+    RegisterClassEx(&wcx);
 }
 
 //
@@ -155,18 +155,18 @@ void InitMainWnd()
 //
 HWND CreateMainWnd()
 {
-	return CreateWindowEx(0,
-				szAppName,				// window class name
-				szAppName,				// window caption
-				WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,
-				CW_USEDEFAULT,			// initial x position
-				CW_USEDEFAULT,			// initial y position
-				560,					// initial x size
-				320,					// initial y size
-				NULL,					// parent window handle
-				NULL,					// use window class menu
-				GetModuleHandle(0),		// program instance handle
-				NULL);					// creation parameters
+    return CreateWindowEx(0,
+        szAppName,				// window class name
+        szAppName,				// window caption
+        WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+        CW_USEDEFAULT,			// initial x position
+        CW_USEDEFAULT,			// initial y position
+        560,					// initial x size
+        320,					// initial y size
+        NULL,					// parent window handle
+        NULL,					// use window class menu
+        GetModuleHandle(0),		// program instance handle
+        NULL);					// creation parameters
 }
 
 //
@@ -174,30 +174,30 @@ HWND CreateMainWnd()
 //
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int iShowCmd)
 {
-	MSG			msg;
-	HACCEL		hAccel;
+    MSG			msg;
+    HACCEL		hAccel;
 
-	// initialize window classes
-	InitMainWnd();
-	InitTextView();
+    // initialize window classes
+    InitMainWnd();
+    InitTextView();
 
-	// create the main window!
-	hwndMain = CreateMainWnd();
+    // create the main window!
+    hwndMain = CreateMainWnd();
 
-	ShowWindow(hwndMain, iShowCmd);
+    ShowWindow(hwndMain, iShowCmd);
 
-	// load keyboard accelerator table
-	hAccel = LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACCELERATOR1));
+    // load keyboard accelerator table
+    hAccel = LoadAccelerators(hInst, MAKEINTRESOURCE(IDR_ACCELERATOR1));
 
-	// message-loop
-	while(GetMessage(&msg, NULL, 0, 0) > 0)
-	{
-		if(!TranslateAccelerator(hwndMain, hAccel, &msg))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
+    // message-loop
+    while (GetMessage(&msg, NULL, 0, 0) > 0)
+    {
+        if (!TranslateAccelerator(hwndMain, hAccel, &msg))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+    }
 
-	return 0;
+    return 0;
 }

@@ -9,19 +9,19 @@
 extern "C" {
 #endif
 
-//
-//	TextView API declared here
-//
-BOOL InitTextView();
-HWND CreateTextView(HWND hwndParent);
+    //
+    //	TextView API declared here
+    //
+    BOOL InitTextView();
+    HWND CreateTextView(HWND hwndParent);
 
-//
-//	TextView Window Messages defined here
-//
+    //
+    //	TextView Window Messages defined here
+    //
 
-//
-//	TextView Macros defined here
-//
+    //
+    //	TextView Macros defined here
+    //
 #define TEXTVIEW_CLASS TEXT("TextView32")
 
 

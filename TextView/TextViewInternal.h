@@ -5,11 +5,11 @@ class TextView
 {
 public:
 
-	TextView(HWND hwnd) : m_hWnd(hwnd) {}
-	HWND	m_hWnd;
-	int x;
+    TextView(HWND hwnd) : m_hWnd(hwnd) {}
+    HWND	m_hWnd;
+    int x;
 
-	LRESULT WINAPI OnPaint();
+    LRESULT WINAPI OnPaint();
 };
 
 #endif
