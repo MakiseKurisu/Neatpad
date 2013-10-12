@@ -2,3 +2,4 @@ NAME    TextView.dll
 EXPORTS
     CreateTextView
     InitTextView
+    RealizeColour

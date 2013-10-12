@@ -71,16 +71,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Neatpad.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bitmap1.bmp" />
+    <Image Include="bitmap2.bmp" />
+    <Image Include="bitmap3.bmp" />
+    <Image Include="bitmap4.bmp" />
+    <Image Include="icon0.ico" />
     <Image Include="icon1.ico" />
+    <Image Include="icon2.ico" />
+    <Image Include="icon3.ico" />
+    <Image Include="icon4.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Neatpad.c" />
+    <ClCompile Include="NeatUtils.c" />
+    <ClCompile Include="OpenSave.c" />
+    <ClCompile Include="Options.c" />
+    <ClCompile Include="OptionsDisplay.c" />
+    <ClCompile Include="OptionsFont.c" />
+    <ClCompile Include="OptionsMisc.c" />
+    <ClCompile Include="Printing.c" />
+    <ClCompile Include="Search.c" />
+    <ClCompile Include="ThemeUtils.c" />
+    <ClCompile Include="Toolbars.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Neatpad.exe.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
