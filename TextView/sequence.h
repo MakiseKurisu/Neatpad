@@ -9,164 +9,252 @@
 //    'seqchar' can be redefined to BYTE, WCHAR, ULONG etc 
 //    depending on what kind of string you want your sequence to hold
 //
-typedef unsigned char      seqchar;
+typedef unsigned char seqchar;
 
 #ifdef SEQUENCE64
-typedef unsigned __int64  size_w;
+typedef unsigned __int64 size_w;
 #else
-typedef unsigned long      size_w;
+typedef unsigned long size_w;
 #endif
 
 const size_w MAX_SEQUENCE_LENGTH = ((size_w) (-1) / sizeof(seqchar));
 
+struct _sequence;
+typedef struct _sequence sequence;
 enum _action;
 typedef enum _action action;
 struct _span;
 typedef struct _span span;
 struct _span_range;
 typedef struct _span_range span_range;
-/*
 struct _ref;
 typedef struct _ref ref;
-*/
 struct _buffer_control;
 typedef struct _buffer_control buffer_control;
+
+typedef std::vector<span_range*> eventstack;
+void clear_eventstack_sequence(
+    sequence * lps,
+    eventstack & dest
+    );
+
+typedef std::vector<buffer_control*> bufferlist;
 
 //
 //    sequence class!
 //
-class sequence
+sequence * new_sequence();
+void delete_sequence(
+    sequence * lps
+    );
+bool init_sequence(
+    sequence * lps
+    );
+bool init_sequence(
+    sequence * lps,
+    const seqchar * buffer,
+    size_t length
+    );
+bool open_sequence(
+    sequence * lps,
+    LPCTSTR filename,
+    bool readonly
+    );
+bool save_sequence(
+    sequence * lps,
+    LPCTSTR filename
+    );
+buffer_control * alloc_buffer_sequence(
+    sequence * lps,
+    size_t maxsize
+    );
+buffer_control * alloc_modifybuffer_sequence(
+    sequence * lps,
+    size_t maxsize
+    );
+bool import_buffer_sequence(
+    sequence * lps,
+    const seqchar * buf,
+    size_t len,
+    size_t * buffer_offset
+    );
+span * spanfromindex_sequence(
+    sequence * lps,
+    size_w index,
+    size_w * spanindex = 0
+    );
+void restore_spanrange_sequence(
+    sequence * lps,
+    span_range * range,
+    bool undo_or_redo
+    );
+bool undoredo_sequence(
+    sequence * lps,
+    eventstack & source,
+    eventstack & dest
+    );
+bool undo_sequence(
+    sequence * lps
+    );
+bool redo_sequence(
+    sequence * lps
+    );
+bool canundo_sequence(
+    sequence * lps
+    );
+bool canredo_sequence(
+    sequence * lps
+    );
+void group_sequence(
+    sequence * lps
+    );
+void ungroup_sequence(
+    sequence * lps
+    );
+size_w size_sequence(
+    sequence * lps
+    );
+span_range * initundo_sequence(
+    sequence * lps,
+    size_w index,
+    size_w length,
+    action act
+    );
+span_range * stackback_sequence(
+    sequence * lps,
+    eventstack & source,
+    size_t idx
+    );
+void record_action_sequence(
+    sequence * lps,
+    action act,
+    size_w index
+    );
+bool can_optimize_sequence(
+    sequence * lps,
+    action act,
+    size_w index
+    );
+bool insert_worker_sequence(
+    sequence * lps,
+    size_w index,
+    const seqchar * buf,
+    size_w length,
+    action act
+    );
+bool insert_sequence(
+    sequence * lps,
+    size_w index,
+    const seqchar * buf,
+    size_w length
+    );
+bool insert_sequence(
+    sequence * lps,
+    size_w index,
+    const seqchar val
+    );
+void deletefromsequence_sequence(
+    sequence * lps,
+    span* * psptr
+    );
+bool erase_worker_sequence(
+    sequence * lps,
+    size_w index,
+    size_w length,
+    action act
+    );
+bool erase_sequence(
+    sequence * lps,
+    size_w index,
+    size_w len
+    );
+bool erase_sequence(
+    sequence * lps,
+    size_w index
+    );
+bool replace_sequence(
+    sequence * lps,
+    size_w index,
+    const seqchar * buf,
+    size_w length,
+    size_w erase_length
+    );
+bool replace_sequence(
+    sequence * lps,
+    size_w index,
+    const seqchar * buf,
+    size_w length
+    );
+bool replace_sequence(
+    sequence * lps,
+    size_w index,
+    const seqchar val
+    );
+bool append_sequence(
+    sequence * lps,
+    const seqchar * buf,
+    size_w length
+    );
+bool append_sequence(
+    sequence * lps,
+    const seqchar val
+    );
+bool clear_sequence(
+    sequence * lps
+    );
+size_w render_sequence(
+    sequence * lps,
+    size_w index,
+    seqchar * dest,
+    size_w length
+    );
+seqchar peek_sequence(
+    sequence * lps,
+    size_w index
+    );
+bool  poke_sequence(
+    sequence * lps,
+    size_w index,
+    seqchar value
+    );
+void breakopt_sequence(
+    sequence * lps
+    );
+struct _sequence
 {
-public:
-
-    // sequence construction
-    sequence();
-    ~sequence();
-
-    //
-    // initialize with a file
-    //
-    bool        init();
-    bool        open(TCHAR *filename, bool readonly);
-    bool        clear();
-
-    //
-    // initialize from an in-memory buffer
-    //
-    bool        init(const seqchar *buffer, size_t length);
-
-    //
-    //    sequence statistics
-    //
-    size_w        size() const;
-
-    //
-    // sequence manipulation 
-    //
-    bool        insert(size_w index, const seqchar *buf, size_w length);
-    bool        insert(size_w index, const seqchar  val, size_w count);
-    bool        insert(size_w index, const seqchar  val);
-    bool        replace(size_w index, const seqchar *buf, size_w length, size_w erase_length);
-    bool        replace(size_w index, const seqchar *buf, size_w length);
-    bool        replace(size_w index, const seqchar  val, size_w count);
-    bool        replace(size_w index, const seqchar  val);
-    bool        erase(size_w index, size_w len);
-    bool        erase(size_w index);
-    bool        append(const seqchar *buf, size_w len);
-    bool        append(const seqchar val);
-    void        breakopt();
-
-    //
-    // undo/redo support
-    //
-    bool        undo();
-    bool        redo();
-    bool        canundo() const;
-    bool        canredo() const;
-    void        group();
-    void        ungroup();
-    size_w        event_index() const  { return undoredo_index; }
-    size_w        event_length() const { return undoredo_length; }
-
-    // print out the sequence
-    void        debug1();
-    void        debug2();
-
-    //
-    // access and iteration
-    //
-    size_w        render(size_w index, seqchar *buf, size_w len) const;
-    seqchar        peek(size_w index) const;
-    bool        poke(size_w index, seqchar val);
-
-    //seqchar        operator[] (size_w index) const;
-    //ref            operator[] (size_w index);
-
-private:
-
-    typedef            std::vector<span_range*>      eventstack;
-    typedef            std::vector<buffer_control*>  bufferlist;
-    template <class type> void clear_vector(type &source);
-
     //
     //    Span-table management
     //
-    void            deletefromsequence(span **sptr);
-    span        *    spanfromindex(size_w index, size_w *spanindex) const;
-    void            scan(span *sptr);
-    size_w            sequence_length;
-    span        *    head;
-    span        *    tail;
-    span        *    frag1;
-    span        *    frag2;
-
+    size_w sequence_length;
+    span * head;
+    span * tail;
+    span * frag1;
+    span * frag2;
 
     //
     //    Undo and redo stacks
     //
-    span_range *    initundo(size_w index, size_w length, action act);
-    void            restore_spanrange(span_range *range, bool undo_or_redo);
-    //void            swap_spanrange(span_range *src, span_range *dest);
-    bool            undoredo(eventstack &source, eventstack &dest);
-    void            clearstack(eventstack &source);
-    span_range *    stackback(eventstack &source, size_t idx);
-
-    eventstack        undostack;
-    eventstack        redostack;
-    size_t            group_id;
-    size_t            group_refcount;
-    size_w            undoredo_index;
-    size_w            undoredo_length;
+    eventstack undostack;
+    eventstack redostack;
+    size_t group_id;
+    size_t group_refcount;
+    size_w undoredo_index;
+    size_w undoredo_length;
 
     //
     //    File and memory buffer management
     //
-    buffer_control *alloc_buffer(size_t size);
-    buffer_control *alloc_modifybuffer(size_t size);
-    bool            import_buffer(const seqchar *buf, size_t len, size_t *buffer_offset);
-
-    bufferlist        buffer_list;
-    int                modifybuffer_id;
-    int                modifybuffer_pos;
+    bufferlist buffer_list;
+    int modifybuffer_id;
+    int modifybuffer_pos;
 
     //
     //    Sequence manipulation
     //
-    bool            insert_worker(size_w index, const seqchar *buf, size_w len, action act);
-    bool            erase_worker(size_w index, size_w len, action act);
-    bool            can_optimize(action act, size_w index);
-    void            record_action(action act, size_w index);
-
-    size_w            lastaction_index;
-    action            lastaction;
-    bool            can_quicksave;
-
-    void            LOCK();
-    void            UNLOCK();
-
-
+    size_w lastaction_index;
+    action lastaction;
+    bool can_quicksave;
 };
-
 
 //
 //    action
@@ -188,19 +276,27 @@ enum _action
 //
 //    private class to the sequence
 //
+span * new_span(
+    size_w off = 0,
+    size_w len = 0,
+    int buf = 0,
+    span * nx = 0,
+    span * pr = 0
+    );
+void delete_span(
+    span * lps
+    );
 struct _span
 {
-    span   *next;
-    span   *prev;    // double-link-list 
+    span * next;
+    span * prev;    // double-link-list 
 
-    size_w  offset;
-    size_w  length;
-    int     buffer;
+    size_w offset;
+    size_w length;
+    int buffer;
 
-    int        id;
+    int id;
 };
-
-
 
 //
 //    span_range
@@ -210,47 +306,85 @@ struct _span
 //    the range of spans affected by an event (operation) on the sequence
 //  
 //
+span_range * new_span_range(
+    size_w seqlen = 0,
+    size_w idx = 0,
+    size_w len = 0,
+    action a = action_invalid,
+    bool qs = false,
+    size_t id = 0
+    );
+void delete_span_range(
+    span_range * lps
+    );
+void free_span_range(
+    span_range * lps
+    );
+void append_span_range(
+    span_range * lps,
+    span * sptr
+    );
+void append_span_range(
+    span_range * lps,
+    span_range * range
+    );
+void prepend_span_range(
+    span_range * lps,
+    span_range * range
+    );
+void spanboundary_span_range(
+    span_range * lps,
+    span * before,
+    span * after
+    );
+void swap_span_range(
+    span_range * src,
+    span_range * dest
+    );
 struct _span_range
 {
     // the span range
-    span    *first;
-    span    *last;
-    bool     boundary;
+    span * first;
+    span * last;
+    bool boundary;
 
     // sequence state
-    size_w     sequence_length;
-    size_w     index;
-    size_w     length;
-    action     act;
-    bool     quicksave;
-    size_t     group_id;
+    size_w sequence_length;
+    size_w index;
+    size_w length;
+    action act;
+    bool quicksave;
+    size_t group_id;
 };
 
-/*
 //
 //    ref
 //
 //    temporary 'reference' to the sequence, used for
 //  non-const array access with sequence::operator[]
 //
+ref * new_ref(
+    sequence * seq,
+    size_w index
+    );
+void delete_ref(
+    ref * lps
+    );
 struct _ref
 {
-    size_w      index;
-    sequence    *seq;
+    size_w index;
+    sequence * seq;
 };
-*/
 
 //
 //    buffer_control
 //
 struct _buffer_control
 {
-    seqchar *buffer;
+    seqchar * buffer;
     size_w  length;
     size_w  maxsize;
     int     id;
 };
-
-
 
 #endif

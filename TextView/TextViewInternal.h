@@ -160,7 +160,7 @@ private:
     //    
     //
     int            NeatTextYOffset(USPFONT *font);
-    int            TextWidth(HDC hdc, LPTSTR buf, int len);
+    int            TextWidth(HDC hdc, LPCTSTR lpString, int c);
     //int        TabWidth();
     int            LeftMarginWidth();
     void        UpdateMarginWidth();

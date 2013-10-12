@@ -39,7 +39,7 @@ USPCACHE *TextView::GetUspCache(HDC hdc, ULONG nLineNo, ULONG *nOffset/*=0*/)
     HDC         hdcTemp;
 
     USPDATA *uspData;
-    ULONG    lru_usage = -1;
+    ULONG    lru_usage = (ULONG) -1;
     int         lru_index = 0;
 
     //
@@ -200,7 +200,7 @@ LONG TextView::OnPaint()
 
     // make sure we never wrap around the 4gb boundary
     if (last < first)
-        last = -1;
+        last = (ULONG) -1;
 
     //
     // draw the display line-by-line
@@ -325,10 +325,10 @@ int TextView::LeftMarginWidth()
 //
 void TextView::UpdateMarginWidth()
 {
-    HDC        hdc = GetDC(m_hWnd);
-    HANDLE    hOldFont = SelectObject(hdc, m_uspFontList[0].hFont);
+    HDC hdc = GetDC(m_hWnd);
+    HANDLE hOldFont = SelectObject(hdc, m_uspFontList[0].hFont);
 
-    TCHAR    buf[32];
+    TCHAR buf[32];
     int len = wsprintf(buf, LINENO_FMT, m_nLineCount);
 
     m_nLinenoWidth = TextWidth(hdc, buf, len);

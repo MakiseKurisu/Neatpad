@@ -39,7 +39,7 @@ ULONG TextView::EnterText(LPTSTR szText, ULONG nLength)
         if (fReplaceSelection)
         {
             // group this erase with the insert/replace operation
-            m_pTextDoc->m_seq.group();
+            group_sequence(m_pTextDoc->m_seq);
             m_pTextDoc->erase_text(selstart, selend - selstart);
             m_nCursorOffset = selstart;
         }
@@ -48,7 +48,7 @@ ULONG TextView::EnterText(LPTSTR szText, ULONG nLength)
             return 0;
 
         if (fReplaceSelection)
-            m_pTextDoc->m_seq.ungroup();
+            ungroup_sequence(m_pTextDoc->m_seq);
 
         break;
 
@@ -116,7 +116,7 @@ BOOL TextView::ForwardDelete()
         m_pTextDoc->erase_text(selstart, selend - selstart);
         m_nCursorOffset = selstart;
 
-        m_pTextDoc->m_seq.breakopt();
+        breakopt_sequence(m_pTextDoc->m_seq);
     }
     else
     {
@@ -126,7 +126,7 @@ BOOL TextView::ForwardDelete()
         //ULONG              lineOffset;
         //ULONG              index;
 
-        m_pTextDoc->m_seq.render(m_nCursorOffset, tmp, 2);
+        render_sequence(m_pTextDoc->m_seq, m_nCursorOffset, tmp, 2);
 
         /*GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset);
 
@@ -172,7 +172,7 @@ BOOL TextView::BackDelete()
     {
         m_pTextDoc->erase_text(selstart, selend - selstart);
         m_nCursorOffset = selstart;
-        m_pTextDoc->m_seq.breakopt();
+        breakopt_sequence(m_pTextDoc->m_seq);
     }
     // otherwise do a back-delete
     else if (m_nCursorOffset > 0)
@@ -248,12 +248,12 @@ BOOL TextView::Redo()
 
 BOOL TextView::CanUndo()
 {
-    return m_pTextDoc->m_seq.canundo() ? TRUE : FALSE;
+    return canundo_sequence(m_pTextDoc->m_seq) ? TRUE : FALSE;
 }
 
 BOOL TextView::CanRedo()
 {
-    return m_pTextDoc->m_seq.canredo() ? TRUE : FALSE;
+    return canredo_sequence(m_pTextDoc->m_seq) ? TRUE : FALSE;
 }
 
 LONG TextView::OnChar(UINT nChar, UINT nFlags)
@@ -270,7 +270,7 @@ LONG TextView::OnChar(UINT nChar, UINT nFlags)
     if (EnterText(&ch, 1))
     {
         if (nChar == '\n')
-            m_pTextDoc->m_seq.breakopt();
+            breakopt_sequence(m_pTextDoc->m_seq);
 
         NotifyParent(TVN_CHANGED);
     }

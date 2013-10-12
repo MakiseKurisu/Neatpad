@@ -69,7 +69,7 @@ private:
     ULONG    erase_raw(ULONG offset_bytes, ULONG length);
 
 
-    sequence m_seq;
+    sequence * m_seq;
 
     ULONG  m_nDocLength_chars;
     ULONG  m_nDocLength_bytes;

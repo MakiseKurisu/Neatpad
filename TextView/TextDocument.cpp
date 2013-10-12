@@ -41,6 +41,8 @@ TextDocument::TextDocument()
 
     m_nFileFormat = NCP_ASCII;
     m_nHeaderSize = 0;
+
+    m_seq = new_sequence();
 }
 
 //
@@ -84,7 +86,7 @@ bool TextDocument::init(HANDLE hFile)
     // read entire file into memory
     ReadFile(hFile, buffer, m_nDocLength_bytes, &numread, 0);
 
-    m_seq.init((BYTE *) buffer, m_nDocLength_bytes);
+    init_sequence(m_seq, (BYTE *) buffer, m_nDocLength_bytes);
 
     // try to detect if this is an ascii/unicode/utf8 file
     m_nFileFormat = detect_file_format(&m_nHeaderSize);
@@ -134,7 +136,7 @@ return true;
 int TextDocument::detect_file_format(int *m_nHeaderSize)
 {
     BYTE header[4] = { 0 };
-    m_seq.render(0, header, 4);
+    render_sequence(m_seq, 0, header, 4);
 
     for (int i = 0; BOMLOOK[i].len; i++)
     {
@@ -156,7 +158,7 @@ int TextDocument::detect_file_format(int *m_nHeaderSize)
 //
 bool TextDocument::clear()
 {
-    m_seq.clear();
+    clear_sequence(m_seq);
     m_nDocLength_bytes = 0;
 
     if (m_pLineBuf_byte)
@@ -178,7 +180,7 @@ bool TextDocument::clear()
 bool TextDocument::EmptyDoc()
 {
     clear();
-    m_seq.init();
+    init_sequence(m_seq);
 
     // this is not robust. it's just to get the thing
     // up-and-running until I write a proper line-buffer mananger
@@ -201,7 +203,7 @@ int TextDocument::getchar(ULONG offset, ULONG lenbytes, ULONG *pch32)
     BYTE    rawdata[16];
 
     lenbytes = min(16, lenbytes);
-    m_seq.render(offset + m_nHeaderSize, rawdata, lenbytes);
+    render_sequence(m_seq, offset + m_nHeaderSize, rawdata, lenbytes);
 
 #ifdef UNICODE
 
@@ -276,7 +278,7 @@ ULONG TextDocument::gettext(ULONG offset, ULONG lenbytes, LPTSTR buf, ULONG *buf
         size_t rawlen = min(lenbytes, 0x100);
 
         // get next block of data from the piece-table
-        m_seq.render(offset + m_nHeaderSize, rawdata, rawlen);
+        render_sequence(m_seq, offset + m_nHeaderSize, rawdata, rawlen);
 
         // convert to UTF-16 
         size_t tmplen = *buflen;
@@ -300,7 +302,7 @@ ULONG TextDocument::gettext(ULONG offset, ULONG lenbytes, LPTSTR buf, ULONG *buf
     //while(remaining)
     /*    {
             lenbytes = min(lenbytes, sizeof(rawdata));
-            m_seq.render(offset + m_nHeaderSize, rawdata, lenbytes);
+            render_sequence(m_seq, offset + m_nHeaderSize, rawdata, lenbytes);
 
             #ifdef UNICODE
 
@@ -360,7 +362,7 @@ ULONG TextDocument::gettext(ULONG offset, ULONG lenbytes, LPTSTR buf, ULONG *buf
 ULONG TextDocument::getdata(ULONG offset, BYTE *buf, size_t len)
 {
     //memcpy(buf, buffer + offset + m_nHeaderSize, len);
-    m_seq.render(offset + m_nHeaderSize, buf, len);
+    render_sequence(m_seq, offset + m_nHeaderSize, buf, len);
     return len;
 }
 
@@ -754,7 +756,7 @@ ULONG TextDocument::insert_raw(ULONG offset_bytes, LPTSTR text, ULONG length)
         copied = utf16_to_rawdata(text, length, buf, (size_t *) &buflen);
 
         // do the piece-table insertion!
-        if (!m_seq.insert(offset, buf, buflen))
+        if (!insert_sequence(m_seq, offset, buf, buflen))
             break;
 
         text += copied;
@@ -763,7 +765,7 @@ ULONG TextDocument::insert_raw(ULONG offset_bytes, LPTSTR text, ULONG length)
         offset += buflen;
     }
 
-    m_nDocLength_bytes = m_seq.size();
+    m_nDocLength_bytes = size_sequence(m_seq);
     return rawlen;
 }
 
@@ -783,7 +785,7 @@ ULONG TextDocument::replace_raw(ULONG offset_bytes, LPTSTR text, ULONG length, U
         copied = utf16_to_rawdata(text, length, buf, (size_t *) &buflen);
 
         // do the piece-table replacement!
-        if (!m_seq.replace(offset, buf, buflen, erase_bytes))
+        if (!replace_sequence(m_seq, offset, buf, buflen, erase_bytes))
             break;
 
         text += copied;
@@ -794,7 +796,7 @@ ULONG TextDocument::replace_raw(ULONG offset_bytes, LPTSTR text, ULONG length, U
         erase_bytes = 0;
     }
 
-    m_nDocLength_bytes = m_seq.size();
+    m_nDocLength_bytes = size_sequence(m_seq);
     return rawlen;
 }
 
@@ -821,17 +823,17 @@ ULONG TextDocument::erase_raw(ULONG offset_bytes, ULONG length)
     }
 
     // do the piece-table deletion!
-    if(m_seq.erase(erase_offset + m_nHeaderSize, erase_bytes))
+    if(erase_sequence(m_seq, erase_offset + m_nHeaderSize, erase_bytes))
     {
-    m_nDocLength_bytes = m_seq.size();
+    m_nDocLength_bytes = size_sequence(m_seq);
     return length;
     }*/
 
     ULONG erase_bytes = count_chars(offset_bytes, length);
 
-    if (m_seq.erase(offset_bytes + m_nHeaderSize, erase_bytes))
+    if (erase_sequence(m_seq, offset_bytes + m_nHeaderSize, erase_bytes))
     {
-        m_nDocLength_bytes = m_seq.size();
+        m_nDocLength_bytes = size_sequence(m_seq);
         return length;
     }
 
@@ -959,16 +961,16 @@ bool TextDocument::Undo(ULONG *offset_start, ULONG *offset_end)
 {
     ULONG start, length;
 
-    if (!m_seq.undo())
+    if (!undo_sequence(m_seq))
         return false;
 
-    start = m_seq.event_index() - m_nHeaderSize;
-    length = m_seq.event_length();
+    start = m_seq->undoredo_index - m_nHeaderSize;
+    length = m_seq->undoredo_length;
 
     *offset_start = byteoffset_to_charoffset(start);
     *offset_end = byteoffset_to_charoffset(start + length);
 
-    m_nDocLength_bytes = m_seq.size();
+    m_nDocLength_bytes = size_sequence(m_seq);
 
     return true;
 }
@@ -977,16 +979,16 @@ bool TextDocument::Redo(ULONG *offset_start, ULONG *offset_end)
 {
     ULONG start, length;
 
-    if (!m_seq.redo())
+    if (!redo_sequence(m_seq))
         return false;
 
-    start = m_seq.event_index() - m_nHeaderSize;
-    length = m_seq.event_length();
+    start = m_seq->undoredo_index - m_nHeaderSize;
+    length = m_seq->undoredo_length;
 
     *offset_start = byteoffset_to_charoffset(start);
     *offset_end = byteoffset_to_charoffset(start + length);
 
-    m_nDocLength_bytes = m_seq.size();
+    m_nDocLength_bytes = size_sequence(m_seq);
 
     return true;
 }

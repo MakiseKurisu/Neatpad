@@ -22,13 +22,15 @@ int TextView::NeatTextYOffset(USPFONT *font)
     return m_nMaxAscent + m_nHeightAbove - font->tm.tmAscent;
 }
 
-int TextView::TextWidth(HDC hdc, LPTSTR buf, int len)
+int TextView::TextWidth(HDC hdc, LPCTSTR lpString, int c)
 {
-    SIZE sz;
-    if (len == -1)
-        len = lstrlen(buf);
-    GetTextExtentPoint32(hdc, buf, len, &sz);
-    return sz.cx;
+    SIZE stSize;
+    if (c == -1)
+    {
+        c = lstrlen(lpString);
+    }
+    GetTextExtentPoint32(hdc, lpString, c, &stSize);
+    return stSize.cx;
 }
 
 //

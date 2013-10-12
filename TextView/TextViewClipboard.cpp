@@ -43,7 +43,7 @@ BOOL TextView::OnPaste()
             EnterText(szText, textlen);
 
             if (textlen > 1)
-                m_pTextDoc->m_seq.breakopt();
+                breakopt_sequence(m_pTextDoc->m_seq);
 
             GlobalUnlock(hMem);
 
