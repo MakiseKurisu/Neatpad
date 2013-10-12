@@ -63,12 +63,153 @@ span * new_span(size_w off = 0, size_w len = 0, int buf = 0, span *nx = 0, span 
     return lps;
 }
 
+/*
 ref * new_ref(sequence * seq, size_w index)
 {
-    ref * stref = new ref;
-    stref->seq = seq;
-    stref->index = index;
-    return stref;
+ref * lps = new ref;
+lps->seq = seq;
+lps->index = index;
+return lps;
+}
+*/
+
+span_range * new_span_range(
+    size_w    seqlen = 0,
+    size_w    idx = 0,
+    size_w    len = 0,
+    action    a = action_invalid,
+    bool    qs = false,
+    size_t    id = 0
+    )
+{
+    span_range * lps = new span_range;
+    lps->first = 0;
+    lps->last = 0;
+    lps->boundary = true;
+    lps->sequence_length = seqlen;
+    lps->index = idx;
+    lps->length = len;
+    lps->act = a;
+    lps->quicksave = qs;
+    lps->group_id = id;
+    return lps;
+}
+
+// separate 'destruction' used when appropriate
+void free_span_range(span_range * lps)
+{
+    span *sptr, *next, *term;
+
+    if (lps->boundary == false)
+    {
+        // delete the range of spans
+        for (sptr = lps->first, term = lps->last->next; sptr && sptr != term; sptr = next)
+        {
+            next = sptr->next;
+            delete sptr;
+        }
+    }
+}
+
+// add a span into the range
+void append_span_range(span_range * lps, span *sptr)
+{
+    if (sptr != 0)
+    {
+        // first time a span has been added?
+        if (lps->first == 0)
+        {
+            lps->first = sptr;
+        }
+        // otherwise chain the spans together.
+        else
+        {
+            lps->last->next = sptr;
+            sptr->prev = lps->last;
+        }
+
+        lps->last = sptr;
+        lps->boundary = false;
+    }
+}
+
+// join two span-ranges together
+void append_span_range(span_range * lps, span_range *range)
+{
+    if (range->boundary == false)
+    {
+        if (lps->boundary)
+        {
+            lps->first = range->first;
+            lps->last = range->last;
+            lps->boundary = false;
+        }
+        else
+        {
+            range->first->prev = lps->last;
+            lps->last->next = range->first;
+            lps->last = range->last;
+        }
+    }
+}
+
+// join two span-ranges together. used only for 'back-delete'
+void prepend_span_range(span_range * lps, span_range *range)
+{
+    if (range->boundary == false)
+    {
+        if (lps->boundary)
+        {
+            lps->first = range->first;
+            lps->last = range->last;
+            lps->boundary = false;
+        }
+        else
+        {
+            range->last->next = lps->first;
+            lps->first->prev = range->last;
+            lps->first = range->first;
+        }
+    }
+}
+
+// An 'empty' range is represented by storing pointers to the
+// spans ***either side*** of the span-boundary position. Input is
+// always the span following the boundary.
+void spanboundary_span_range(span_range * lps, span *before, span *after)
+{
+    lps->first = before;
+    lps->last = after;
+    lps->boundary = true;
+}
+
+void swap_span_range(span_range *src, span_range *dest)
+{
+    if (src->boundary)
+    {
+        if (!dest->boundary)
+        {
+            src->first->next = dest->first;
+            src->last->prev = dest->last;
+            dest->first->prev = src->first;
+            dest->last->next = src->last;
+        }
+    }
+    else
+    {
+        if (dest->boundary)
+        {
+            src->first->prev->next = src->last->next;
+            src->last->next->prev = src->first->prev;
+        }
+        else
+        {
+            src->first->prev->next = dest->first;
+            src->last->next->prev = dest->last;
+            dest->first->prev = src->first->prev;
+            dest->last->next = src->last->next;
+        }
+    }
 }
 
 sequence::sequence()
@@ -164,7 +305,7 @@ void sequence::clearstack(eventstack &dest)
 {
     for (size_t i = 0; i < dest.size(); i++)
     {
-        dest[i]->free();
+        free_span_range(dest[i]);
         delete dest[i];
     }
 
@@ -327,35 +468,6 @@ span* sequence::spanfromindex(size_w index, size_w *spanindex = 0) const
     }
 
     return 0;
-}
-
-void sequence::swap_spanrange(span_range *src, span_range *dest)
-{
-    if (src->boundary)
-    {
-        if (!dest->boundary)
-        {
-            src->first->next = dest->first;
-            src->last->prev = dest->last;
-            dest->first->prev = src->first;
-            dest->last->next = src->last;
-        }
-    }
-    else
-    {
-        if (dest->boundary)
-        {
-            src->first->prev->next = src->last->next;
-            src->last->next->prev = src->first->prev;
-        }
-        else
-        {
-            src->first->prev->next = dest->first;
-            src->last->next->prev = dest->last;
-            dest->first->prev = src->first->prev;
-            dest->last->next = src->last->next;
-        }
-    }
 }
 
 void sequence::restore_spanrange(span_range *range, bool undo_or_redo)
@@ -534,9 +646,9 @@ size_w sequence::size() const
 //
 //    create a new (empty) span range and save the current sequence state
 //
-sequence::span_range* sequence::initundo(size_w index, size_w length, action act)
+span_range* sequence::initundo(size_w index, size_w length, action act)
 {
-    span_range *event = new span_range(
+    span_range *event = new_span_range(
         sequence_length,
         index,
         length,
@@ -550,7 +662,7 @@ sequence::span_range* sequence::initundo(size_w index, size_w length, action act
     return event;
 }
 
-sequence::span_range* sequence::stackback(eventstack &source, size_t idx)
+span_range* sequence::stackback(eventstack &source, size_t idx)
 {
     size_t length = source.size();
 
@@ -583,7 +695,7 @@ bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, ac
     span *        sptr;
     size_w        spanindex;
     size_t        modbuf_offset;
-    span_range    newspans;
+    span_range    *newspans = new_span_range();
     size_w        insoffset;
 
     if (index > sequence_length)
@@ -620,17 +732,17 @@ bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, ac
         // boundary there are no spans to replace, so use a "span boundary"
         //
         span_range *oldspans = initundo(index, length, act);
-        oldspans->spanboundary(sptr->prev, sptr);
+        spanboundary_span_range(oldspans, sptr->prev, sptr);
 
         // allocate new span in the modify buffer
-        newspans.append(new_span(
+        append_span_range(newspans, new_span(
             modbuf_offset,
             length,
             modifybuffer_id)
             );
 
         // link the span into the sequence
-        swap_spanrange(oldspans, &newspans);
+        swap_span_range(oldspans, newspans);
     }
     // general-case #2: inserting in the middle of a span
     else
@@ -640,30 +752,30 @@ bool sequence::insert_worker(size_w index, const seqchar *buf, size_w length, ac
         //  that we will be "splitting" in half
         //
         span_range *oldspans = initundo(index, length, act);
-        oldspans->append(sptr);
+        append_span_range(oldspans, sptr);
 
         //    span for the existing data before the insertion
-        newspans.append(new_span(
+        append_span_range(newspans, new_span(
             sptr->offset,
             insoffset,
             sptr->buffer)
             );
 
         // make a span for the inserted data
-        newspans.append(new_span(
+        append_span_range(newspans, new_span(
             modbuf_offset,
             length,
             modifybuffer_id)
             );
 
         // span for the existing data after the insertion
-        newspans.append(new_span(
+        append_span_range(newspans, new_span(
             sptr->offset + insoffset,
             sptr->length - insoffset,
             sptr->buffer)
             );
 
-        swap_spanrange(oldspans, &newspans);
+        swap_span_range(oldspans, newspans);
     }
 
     sequence_length += length;
@@ -722,8 +834,8 @@ void sequence::deletefromsequence(span **psptr)
 bool sequence::erase_worker(size_w index, size_w length, action act)
 {
     span        *sptr;
-    span_range     oldspans;
-    span_range     newspans;
+    span_range    *oldspans = new_span_range();
+    span_range    *newspans = new_span_range();
     span_range    *event;
     size_w         spanindex;
     size_w         remoffset;
@@ -821,27 +933,27 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
     if (remoffset != 0)
     {
         // split the span - keep the first "half"
-        newspans.append(new_span(sptr->offset, remoffset, sptr->buffer));
-        frag1 = newspans.first;
+        append_span_range(newspans, new_span(sptr->offset, remoffset, sptr->buffer));
+        frag1 = newspans->first;
 
         // have we split a single span into two?
         // i.e. the deletion is completely within a single span
         if (remoffset + removelen < sptr->length)
         {
             // make a second span for the second half of the split
-            newspans.append(new_span(
+            append_span_range(newspans, new_span(
                 sptr->offset + remoffset + removelen,
                 sptr->length - remoffset - removelen,
                 sptr->buffer)
                 );
 
-            frag2 = newspans.last;
+            frag2 = newspans->last;
         }
 
         removelen -= min(removelen, (sptr->length - remoffset));
 
         // archive the span we are going to replace
-        oldspans.append(sptr);
+        append_span_range(oldspans, sptr);
         sptr = sptr->next;
     }
 
@@ -853,34 +965,34 @@ bool sequence::erase_worker(size_w index, size_w length, action act)
         if (removelen < sptr->length)
         {
             // split the span, keeping the last "half"
-            newspans.append(new_span(
+            append_span_range(newspans, new_span(
                 sptr->offset + removelen,
                 sptr->length - removelen,
                 sptr->buffer)
                 );
 
-            frag2 = newspans.last;
+            frag2 = newspans->last;
         }
 
         removelen -= min(removelen, sptr->length);
 
         // archive the span we are replacing
-        oldspans.append(sptr);
+        append_span_range(oldspans, sptr);
         sptr = sptr->next;
     }
 
     // for replace operations, update the undo-event for the
     // insertion so that it knows about the newly removed spans
-    if (act == action_replace && !oldspans.boundary)
-        stackback(undostack, 0)->last = oldspans.last->next;
+    if (act == action_replace && !oldspans->boundary)
+        stackback(undostack, 0)->last = oldspans->last->next;
 
-    swap_spanrange(&oldspans, &newspans);
+    swap_span_range(oldspans, newspans);
     sequence_length -= length;
 
     if (append_spanrange)
-        event->append(&oldspans);
+        append_span_range(event, oldspans);
     else
-        event->prepend(&oldspans);
+        prepend_span_range(event, oldspans);
 
     return true;
 }
@@ -1113,20 +1225,24 @@ bool sequence::poke(size_w index, seqchar value)
 //
 //    readonly array access
 //
+/*
 seqchar sequence::operator[] (size_w index) const
 {
-    return peek(index);
+return peek(index);
 }
+*/
 
 //
 //    sequence::operator[] 
 //
 //    read/write array access
 //
+/*
 ref sequence::operator[] (size_w index)
 {
-    return *new_ref(this, index);
+return *new_ref(this, index);
 }
+*/
 
 //
 //    sequence::breakopt

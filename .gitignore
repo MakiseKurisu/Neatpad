@@ -1,5 +1,8 @@
+*.ilk
+*.idb
 *.pdb
 *.lastcodeanalysissucceeded
+*.xml
 *.bsc
 *.suo
 *.log
@@ -7,3 +10,5 @@
 *.obj
 *.res
 *.exp
+*.embed.manifest
+*_manifest.rc

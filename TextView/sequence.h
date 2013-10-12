@@ -19,24 +19,24 @@ typedef unsigned long      size_w;
 
 const size_w MAX_SEQUENCE_LENGTH = ((size_w) (-1) / sizeof(seqchar));
 
-struct _span;
-typedef struct _span span;
-struct _ref;
-typedef struct _ref ref;
-struct _buffer_control;
-typedef struct _buffer_control buffer_control;
 enum _action;
 typedef enum _action action;
+struct _span;
+typedef struct _span span;
+struct _span_range;
+typedef struct _span_range span_range;
+/*
+struct _ref;
+typedef struct _ref ref;
+*/
+struct _buffer_control;
+typedef struct _buffer_control buffer_control;
 
 //
 //    sequence class!
 //
 class sequence
 {
-public:
-    // forward declare the nested helper-classes
-    class            span_range;
-
 public:
 
     // sequence construction
@@ -99,8 +99,8 @@ public:
     seqchar        peek(size_w index) const;
     bool        poke(size_w index, seqchar val);
 
-    seqchar        operator[] (size_w index) const;
-    ref            operator[] (size_w index);
+    //seqchar        operator[] (size_w index) const;
+    //ref            operator[] (size_w index);
 
 private:
 
@@ -126,7 +126,7 @@ private:
     //
     span_range *    initundo(size_w index, size_w length, action act);
     void            restore_spanrange(span_range *range, bool undo_or_redo);
-    void            swap_spanrange(span_range *src, span_range *dest);
+    //void            swap_spanrange(span_range *src, span_range *dest);
     bool            undoredo(eventstack &source, eventstack &dest);
     void            clearstack(eventstack &source);
     span_range *    stackback(eventstack &source, size_t idx);
@@ -203,139 +203,15 @@ struct _span
 
 
 //
-//    sequence::span_range
+//    span_range
 //
 //    private class to the sequence. Used to represent a contiguous range of spans.
 //    used by the undo/redo stacks to store state. A span-range effectively represents
 //    the range of spans affected by an event (operation) on the sequence
 //  
 //
-class sequence::span_range
+struct _span_range
 {
-    friend class sequence;
-
-public:
-
-    // constructor
-    span_range(size_w    seqlen = 0,
-        size_w    idx = 0,
-        size_w    len = 0,
-        action    a = action_invalid,
-        bool    qs = false,
-        size_t    id = 0
-        )
-        :
-        first(0),
-        last(0),
-        boundary(true),
-        sequence_length(seqlen),
-        index(idx),
-        length(len),
-        act(a),
-        quicksave(qs),
-        group_id(id)
-    {
-    }
-
-    // destructor does nothing - because sometimes we don't want
-    // to free the contents when the span_range is deleted. e.g. when
-    // the span_range is just a temporary helper object. The contents
-    // must be deleted manually with span_range::free
-    ~span_range()
-    {
-    }
-
-    // separate 'destruction' used when appropriate
-    void free()
-    {
-        span *sptr, *next, *term;
-
-        if (boundary == false)
-        {
-            // delete the range of spans
-            for (sptr = first, term = last->next; sptr && sptr != term; sptr = next)
-            {
-                next = sptr->next;
-                delete sptr;
-            }
-        }
-    }
-
-    // add a span into the range
-    void append(span *sptr)
-    {
-        if (sptr != 0)
-        {
-            // first time a span has been added?
-            if (first == 0)
-            {
-                first = sptr;
-            }
-            // otherwise chain the spans together.
-            else
-            {
-                last->next = sptr;
-                sptr->prev = last;
-            }
-
-            last = sptr;
-            boundary = false;
-        }
-    }
-
-    // join two span-ranges together
-    void append(span_range *range)
-    {
-        if (range->boundary == false)
-        {
-            if (boundary)
-            {
-                first = range->first;
-                last = range->last;
-                boundary = false;
-            }
-            else
-            {
-                range->first->prev = last;
-                last->next = range->first;
-                last = range->last;
-            }
-        }
-    }
-
-    // join two span-ranges together. used only for 'back-delete'
-    void prepend(span_range *range)
-    {
-        if (range->boundary == false)
-        {
-            if (boundary)
-            {
-                first = range->first;
-                last = range->last;
-                boundary = false;
-            }
-            else
-            {
-                range->last->next = first;
-                first->prev = range->last;
-                first = range->first;
-            }
-        }
-    }
-
-    // An 'empty' range is represented by storing pointers to the
-    // spans ***either side*** of the span-boundary position. Input is
-    // always the span following the boundary.
-    void spanboundary(span *before, span *after)
-    {
-        first = before;
-        last = after;
-        boundary = true;
-    }
-
-
-private:
-
     // the span range
     span    *first;
     span    *last;
@@ -350,6 +226,7 @@ private:
     size_t     group_id;
 };
 
+/*
 //
 //    ref
 //
@@ -361,6 +238,7 @@ struct _ref
     size_w      index;
     sequence    *seq;
 };
+*/
 
 //
 //    buffer_control
