@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.20827.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neatpad", "Neatpad\Neatpad.vcxproj", "{26F6A4A6-3D4F-4375-A3C3-8A11895DF50A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52} = {9279ABF9-EA89-41AD-BB77-1DF2B843CF52}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextView", "TextView\TextView.vcxproj", "{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26F6A4A6-3D4F-4375-A3C3-8A11895DF50A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{26F6A4A6-3D4F-4375-A3C3-8A11895DF50A}.Debug|Win32.Build.0 = Debug|Win32
+		{26F6A4A6-3D4F-4375-A3C3-8A11895DF50A}.Release|Win32.ActiveCfg = Release|Win32
+		{26F6A4A6-3D4F-4375-A3C3-8A11895DF50A}.Release|Win32.Build.0 = Release|Win32
+		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}.Debug|Win32.Build.0 = Debug|Win32
+		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}.Release|Win32.ActiveCfg = Release|Win32
+		{9279ABF9-EA89-41AD-BB77-1DF2B843CF52}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -10,11 +10,13 @@
 #include <windows.h>
 #include <tchar.h>
 #include <commctrl.h>
-#include "..\TextView\TextView.h"
+#include "TextView\TextView.h"
 #include "resource.h"
 
 #define APP_TITLE   _T("Neatpad")
 #define WEBSITE_STR _T("www.catch22.net")
+
+#pragma comment(lib, "TextView.lib")
 
 TCHAR		szAppName[] = APP_TITLE;
 HWND		hwndMain;
@@ -22,8 +24,6 @@ HWND		hwndTextView;
 
 TCHAR szFileName[MAX_PATH];
 TCHAR szFileTitle[MAX_PATH];
-
-#pragma comment(linker, "/OPT:NOWIN98")
 
 BOOL ShowOpenFileDlg(HWND hwnd, PSTR pstrFileName, PSTR pstrTitleName)
 {

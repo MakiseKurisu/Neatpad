@@ -1,0 +1,9 @@
+*.pdb
+*.lastcodeanalysissucceeded
+*.bsc
+*.suo
+*.log
+*.tlog
+*.obj
+*.res
+*.exp
