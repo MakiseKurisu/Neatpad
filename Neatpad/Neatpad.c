@@ -13,8 +13,8 @@
 #include "TextView\TextView.h"
 #include "resource.h"
 
-#define APP_TITLE   _T("Neatpad")
-#define WEBSITE_STR _T("www.catch22.net")
+#define APP_TITLE   TEXT("Neatpad")
+#define WEBSITE_STR TEXT("www.catch22.net")
 
 #pragma comment(lib, "TextView.lib")
 
@@ -25,9 +25,9 @@ HWND		hwndTextView;
 TCHAR szFileName[MAX_PATH];
 TCHAR szFileTitle[MAX_PATH];
 
-BOOL ShowOpenFileDlg(HWND hwnd, PSTR pstrFileName, PSTR pstrTitleName)
+BOOL ShowOpenFileDlg(HWND hwnd, LPTSTR pstrFileName, LPTSTR pstrTitleName)
 {
-	TCHAR *szFilter = _T("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
+	TCHAR *szFilter = TEXT("Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0");
 	
 	OPENFILENAME ofn	= { sizeof(ofn) };
 
@@ -53,17 +53,17 @@ BOOL ShowOpenFileDlg(HWND hwnd, PSTR pstrFileName, PSTR pstrTitleName)
 void ShowAboutDlg(HWND hwndParent)
 {
 	MessageBox( hwndParent, 
-				APP_TITLE _T("\r\n\r\n")  WEBSITE_STR, 
+				APP_TITLE TEXT("\r\n\r\n")  WEBSITE_STR, 
 				APP_TITLE, 
 				MB_OK | MB_ICONINFORMATION
 				);
 }
 
-void SetWindowFileName(HWND hwnd, TCHAR *szFileName)
+void SetWindowFileName(HWND hwnd, LPTSTR szFileName)
 {
 	TCHAR ach[MAX_PATH + sizeof(szAppName) + 4];
 
-	wsprintf(ach, _T("%s - %s"), szFileName, szAppName);
+	wsprintf(ach, TEXT("%s - %s"), szFileName, szAppName);
 	SetWindowText(hwnd, ach);
 }
 
@@ -91,7 +91,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		switch(LOWORD(wParam))
 		{
 		case IDM_FILE_NEW:
-			SetWindowFileName(hwnd, _T("Untitled"));
+			SetWindowFileName(hwnd, TEXT("Untitled"));
 			return 0;
 
 		case IDM_FILE_OPEN:

@@ -19,7 +19,7 @@ LRESULT WINAPI TextView::OnPaint()
 	HDC			hdc;
 	PAINTSTRUCT ps;
 	RECT		rect;
-	char		*text = _T("Hello World!");
+	TCHAR		*text = TEXT("Hello World!");
 
 	HANDLE		hOldFont;
 	HFONT		hFont;
@@ -106,7 +106,7 @@ BOOL InitTextView()
 HWND CreateTextView(HWND hwndParent)
 {
 	return CreateWindowEx(WS_EX_CLIENTEDGE, 
-		TEXTVIEW_CLASS, _T(""), 
+		TEXTVIEW_CLASS, TEXT(""), 
 		WS_VSCROLL |WS_HSCROLL | WS_CHILD | WS_VISIBLE,
 		0, 0, 0, 0, 
 		hwndParent, 

@@ -22,7 +22,7 @@ HWND CreateTextView(HWND hwndParent);
 //
 //	TextView Macros defined here
 //
-#define TEXTVIEW_CLASS _T("TextView32")
+#define TEXTVIEW_CLASS TEXT("TextView32")
 
 
 #ifdef __cplusplus
