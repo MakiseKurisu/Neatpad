@@ -19,16 +19,16 @@
 //
 int TextView::NeatTextYOffset(USPFONT *font)
 {
-	return m_nMaxAscent + m_nHeightAbove - font->tm.tmAscent;
+    return m_nMaxAscent + m_nHeightAbove - font->tm.tmAscent;
 }
 
 int TextView::TextWidth(HDC hdc, TCHAR *buf, int len)
 {
-	SIZE sz;
-	if(len == -1)
-		len = lstrlen(buf);
-	GetTextExtentPoint32(hdc, buf, len, &sz);
-	return sz.cx;
+    SIZE sz;
+    if (len == -1)
+        len = lstrlen(buf);
+    GetTextExtentPoint32(hdc, buf, len, &sz);
+    return sz.cx;
 }
 
 //
@@ -36,29 +36,29 @@ int TextView::TextWidth(HDC hdc, TCHAR *buf, int len)
 //
 VOID TextView::RecalcLineHeight()
 {
-	m_nLineHeight	= 0;
-	m_nMaxAscent	= 0;
+    m_nLineHeight = 0;
+    m_nMaxAscent = 0;
 
-	// find the tallest font in the TextView
-	for(int i = 0; i < m_nNumFonts; i++)
-	{
-		// always include a font's external-leading
-		int fontheight = m_uspFontList[i].tm.tmHeight + 
-						 m_uspFontList[i].tm.tmExternalLeading;
+    // find the tallest font in the TextView
+    for (int i = 0; i < m_nNumFonts; i++)
+    {
+        // always include a font's external-leading
+        int fontheight = m_uspFontList[i].tm.tmHeight +
+            m_uspFontList[i].tm.tmExternalLeading;
 
-		m_nLineHeight = max(m_nLineHeight, fontheight);
-		m_nMaxAscent  = max(m_nMaxAscent, m_uspFontList[i].tm.tmAscent);
-	}
+        m_nLineHeight = max(m_nLineHeight, fontheight);
+        m_nMaxAscent = max(m_nMaxAscent, m_uspFontList[i].tm.tmAscent);
+    }
 
-	// add on the above+below spacings
-	m_nLineHeight += m_nHeightAbove + m_nHeightBelow;
+    // add on the above+below spacings
+    m_nLineHeight += m_nHeightAbove + m_nHeightBelow;
 
-	// force caret resize if we've got the focus
-	if(GetFocus() == m_hWnd)
-	{
-		OnKillFocus(0);
-		OnSetFocus(0);
-	}
+    // force caret resize if we've got the focus
+    if (GetFocus() == m_hWnd)
+    {
+        OnKillFocus(0);
+        OnSetFocus(0);
+    }
 }
 
 //
@@ -66,26 +66,26 @@ VOID TextView::RecalcLineHeight()
 //
 LONG TextView::SetFont(HFONT hFont, int idx)
 {
-	USPFONT *uspFont = &m_uspFontList[idx];
+    USPFONT *uspFont = &m_uspFontList[idx];
 
-	// need a DC to query font data
-	HDC hdc  = GetDC(m_hWnd);
+    // need a DC to query font data
+    HDC hdc = GetDC(m_hWnd);
 
-	// Initialize the font for USPLIB
-	UspFreeFont(uspFont);
-	UspInitFont(uspFont, hdc, hFont);
+    // Initialize the font for USPLIB
+    UspFreeFont(uspFont);
+    UspInitFont(uspFont, hdc, hFont);
 
-	ReleaseDC(m_hWnd, hdc);
+    ReleaseDC(m_hWnd, hdc);
 
-	// calculate new line metrics
-	m_nFontWidth = m_uspFontList[0].tm.tmAveCharWidth;
+    // calculate new line metrics
+    m_nFontWidth = m_uspFontList[0].tm.tmAveCharWidth;
 
-	RecalcLineHeight();
-	UpdateMarginWidth();
+    RecalcLineHeight();
+    UpdateMarginWidth();
 
-	ResetLineCache();
+    ResetLineCache();
 
-	return 0;
+    return 0;
 }
 
 //
@@ -93,12 +93,12 @@ LONG TextView::SetFont(HFONT hFont, int idx)
 //
 LONG TextView::AddFont(HFONT hFont)
 {
-	int idx = m_nNumFonts++;
+    int idx = m_nNumFonts++;
 
-	SetFont(hFont, idx);
-	UpdateMetrics();
+    SetFont(hFont, idx);
+    UpdateMetrics();
 
-	return 0;
+    return 0;
 }
 
 //
@@ -106,11 +106,11 @@ LONG TextView::AddFont(HFONT hFont)
 //
 LONG TextView::OnSetFont(HFONT hFont)
 {
-	// default font is always #0
-	SetFont(hFont, 0);
-	UpdateMetrics();
+    // default font is always #0
+    SetFont(hFont, 0);
+    UpdateMetrics();
 
-	return 0;
+    return 0;
 }
 
 //
@@ -119,8 +119,8 @@ LONG TextView::OnSetFont(HFONT hFont)
 //
 LONG TextView::SetLineSpacing(int nAbove, int nBelow)
 {
-	m_nHeightAbove = nAbove;
-	m_nHeightBelow = nBelow;
-	RecalcLineHeight();
-	return TRUE;
+    m_nHeightAbove = nAbove;
+    m_nHeightBelow = nBelow;
+    RecalcLineHeight();
+    return TRUE;
 }

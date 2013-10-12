@@ -20,8 +20,7 @@
 #define CONTEXT_CMD_LOC TEXT("*\\shell\\Open with Neatpad\\command")
 #define CONTEXT_APP_LOC TEXT("*\\shell\\Open with Neatpad")
 
-#define IMAGEFILE_XOPT TEXT("Software\\Microsoft\\Windows NT\\CurrentVersion")\
-					   TEXT("\\Image File Execution Options\\Notepad.exe")
+#define IMAGEFILE_XOPT TEXT("Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\Notepad.exe")
 
 
 
@@ -44,56 +43,56 @@ BOOL  g_fSaveOnExit;
 int	  g_nLongLineLimit;
 BOOL  g_nHLCurLine;
 BOOL  g_fShowStatusbar;
-BOOL  g_fAddToExplorer		= 0;
-BOOL  g_fReplaceNotepad		= 0;
+BOOL  g_fAddToExplorer = 0;
+BOOL  g_fReplaceNotepad = 0;
 
 COLORREF g_rgbColourList[TXC_MAX_COLOURS];
 COLORREF g_rgbCustColours[16];
-extern COLORREF g_rgbAutoColourList[];
+extern COLORREF g_rgbAutoColourList [];
 
 // Get a binary buffer from the registry
-BOOL GetSettingBin(HKEY hkey, TCHAR szKeyName[], PVOID pBuffer, LONG nLength)
+BOOL GetSettingBin(HKEY hkey, TCHAR szKeyName [], PVOID pBuffer, LONG nLength)
 {
-	ZeroMemory(pBuffer, nLength);
-	return !RegQueryValueEx(hkey, szKeyName, 0, 0, (BYTE *)pBuffer, &nLength);
+    ZeroMemory(pBuffer, nLength);
+    return !RegQueryValueEx(hkey, szKeyName, 0, 0, (BYTE *) pBuffer, &nLength);
 }
 
 // Get an integer value from the registry
-BOOL GetSettingInt(HKEY hkey, TCHAR szKeyName[], LONG *pnReturnVal, LONG nDefault)
+BOOL GetSettingInt(HKEY hkey, TCHAR szKeyName [], LONG *pnReturnVal, LONG nDefault)
 {
-	ULONG len = sizeof(nDefault);
+    ULONG len = sizeof(nDefault);
 
-	*pnReturnVal = nDefault;
+    *pnReturnVal = nDefault;
 
-	return !RegQueryValueEx(hkey, szKeyName, 0, 0, (BYTE *)pnReturnVal, &len);
+    return !RegQueryValueEx(hkey, szKeyName, 0, 0, (BYTE *) pnReturnVal, &len);
 }
 
 // Get a string buffer from the registry
-BOOL GetSettingStr(HKEY hkey, TCHAR szKeyName[], TCHAR pszReturnStr[], DWORD nLength, TCHAR szDefault[])
+BOOL GetSettingStr(HKEY hkey, TCHAR szKeyName [], TCHAR pszReturnStr [], DWORD nLength, TCHAR szDefault [])
 {
-	ULONG len = nLength * sizeof(TCHAR);
+    ULONG len = nLength * sizeof(TCHAR);
 
-	lstrcpyn(pszReturnStr, szDefault, nLength);
+    lstrcpyn(pszReturnStr, szDefault, nLength);
 
-	return !RegQueryValueEx(hkey, szKeyName, 0, 0, (BYTE *)pszReturnStr, &len);
+    return !RegQueryValueEx(hkey, szKeyName, 0, 0, (BYTE *) pszReturnStr, &len);
 }
 
 // Write a binary value from the registry
-BOOL WriteSettingBin(HKEY hkey, TCHAR szKeyName[], PVOID pData, ULONG nLength)
+BOOL WriteSettingBin(HKEY hkey, TCHAR szKeyName [], PVOID pData, ULONG nLength)
 {
-	return !RegSetValueEx(hkey, szKeyName, 0, REG_BINARY, (BYTE *)pData, nLength);
+    return !RegSetValueEx(hkey, szKeyName, 0, REG_BINARY, (BYTE *) pData, nLength);
 }
 
 // Write an integer value from the registry
-BOOL WriteSettingInt(HKEY hkey, TCHAR szKeyName[], LONG nValue)
+BOOL WriteSettingInt(HKEY hkey, TCHAR szKeyName [], LONG nValue)
 {
-	return !RegSetValueEx(hkey, szKeyName, 0, REG_DWORD, (BYTE *)&nValue, sizeof(nValue));
+    return !RegSetValueEx(hkey, szKeyName, 0, REG_DWORD, (BYTE *) &nValue, sizeof(nValue));
 }
 
 // Get a string buffer from the registry
-BOOL WriteSettingStr(HKEY hkey, TCHAR szKeyName[], TCHAR szString[])
+BOOL WriteSettingStr(HKEY hkey, TCHAR szKeyName [], TCHAR szString [])
 {
-	return !RegSetValueEx(hkey, szKeyName, 0, REG_SZ, (BYTE *)szString, (lstrlen(szString) + 1) * sizeof(TCHAR));
+    return !RegSetValueEx(hkey, szKeyName, 0, REG_SZ, (BYTE *) szString, (lstrlen(szString) + 1) * sizeof(TCHAR));
 }
 
 //
@@ -101,28 +100,28 @@ BOOL WriteSettingStr(HKEY hkey, TCHAR szKeyName[], TCHAR szString[])
 //
 BOOL SetExplorerContextMenu(BOOL fAddToMenu)
 {
-	HRESULT hr;
+    HRESULT hr;
 
-	if(fAddToMenu)
-	{
-		TCHAR szAppPath[MAX_PATH];
-		TCHAR szDefaultStr[MAX_PATH];
+    if (fAddToMenu)
+    {
+        TCHAR szAppPath[MAX_PATH];
+        TCHAR szDefaultStr[MAX_PATH];
 
-		GetModuleFileName(0, szAppPath, MAX_PATH);
+        GetModuleFileName(0, szAppPath, MAX_PATH);
 
-		wsprintf(szDefaultStr, TEXT("\"%s\" \"%%1\""), szAppPath);
+        wsprintf(szDefaultStr, TEXT("\"%s\" \"%%1\""), szAppPath);
 
-		hr = RegSetValue(HKEY_CLASSES_ROOT, CONTEXT_CMD_LOC, REG_SZ, szDefaultStr, lstrlen(szDefaultStr) * sizeof(TCHAR));
-	}
-	else
-	{
-		hr = RegDeleteKey(HKEY_CLASSES_ROOT, CONTEXT_CMD_LOC);
+        hr = RegSetValue(HKEY_CLASSES_ROOT, CONTEXT_CMD_LOC, REG_SZ, szDefaultStr, lstrlen(szDefaultStr) * sizeof(TCHAR));
+    }
+    else
+    {
+        hr = RegDeleteKey(HKEY_CLASSES_ROOT, CONTEXT_CMD_LOC);
 
-		if(hr == ERROR_SUCCESS)
-			hr = RegDeleteKey(HKEY_CLASSES_ROOT, CONTEXT_APP_LOC);
-	}
+        if (hr == ERROR_SUCCESS)
+            hr = RegDeleteKey(HKEY_CLASSES_ROOT, CONTEXT_APP_LOC);
+    }
 
-	return (hr == ERROR_SUCCESS) ? TRUE : FALSE;
+    return (hr == ERROR_SUCCESS) ? TRUE : FALSE;
 }
 
 //
@@ -131,237 +130,237 @@ BOOL SetExplorerContextMenu(BOOL fAddToMenu)
 //
 BOOL SetImageFileExecutionOptions(BOOL fReplaceWithCurrentApp)
 {
-	HKEY	hKey;
-	HRESULT hr;
-	TCHAR	szPath[MAX_PATH];
+    HKEY	hKey;
+    HRESULT hr;
+    TCHAR	szPath[MAX_PATH];
 
-	// create an 'ImageFileExecutionOptions' entry for the standard Notepad app
-	hr = RegCreateKeyEx(HKEY_LOCAL_MACHINE, IMAGEFILE_XOPT, 0, 0, 0, KEY_WRITE, 0, &hKey, 0);
+    // create an 'ImageFileExecutionOptions' entry for the standard Notepad app
+    hr = RegCreateKeyEx(HKEY_LOCAL_MACHINE, IMAGEFILE_XOPT, 0, 0, 0, KEY_WRITE, 0, &hKey, 0);
 
-	if(hr != ERROR_SUCCESS)
-		return FALSE;
+    if (hr != ERROR_SUCCESS)
+        return FALSE;
 
-	// get path of current exe
-	GetModuleFileName(0, szPath+1, MAX_PATH);
+    // get path of current exe
+    GetModuleFileName(0, szPath + 1, MAX_PATH);
 
-	// enclose it in double-quotes
-	szPath[0] = '\"';
-	lstrcat(szPath, TEXT("\""));
-	lstrcat(szPath, TEXT(" -ifeo"));
+    // enclose it in double-quotes
+    szPath[0] = '\"';
+    lstrcat(szPath, TEXT("\""));
+    lstrcat(szPath, TEXT(" -ifeo"));
 
-	// set the 'debugger' key so that whenever notepad.exe is executed, neatpad runs instead
-	if(fReplaceWithCurrentApp)
-		WriteSettingStr(hKey, TEXT("Debugger"), szPath);
-	else
-		RegDeleteValue(hKey, TEXT("Debugger"));
-		
-	RegCloseKey(hKey);
-	return TRUE;
+    // set the 'debugger' key so that whenever notepad.exe is executed, neatpad runs instead
+    if (fReplaceWithCurrentApp)
+        WriteSettingStr(hKey, TEXT("Debugger"), szPath);
+    else
+        RegDeleteValue(hKey, TEXT("Debugger"));
+
+    RegCloseKey(hKey);
+    return TRUE;
 }
 
 void LoadRegSettings()
 {
-	HKEY hKey, hColKey;
+    HKEY hKey, hColKey;
 
-	// open registry location for reading
-	RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_READ, 0, &hKey, 0);
+    // open registry location for reading
+    RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_READ, 0, &hKey, 0);
 
-	GetSettingInt(hKey, TEXT("FontSize"),		&g_nFontSize, 10);
-	GetSettingInt(hKey, TEXT("FontBold"),		&g_fFontBold, FALSE);
-	GetSettingStr(hKey, TEXT("FontName"),		g_szFontName, LF_FACESIZE, TEXT("Courier New"));
-	GetSettingInt(hKey, TEXT("FontSmooth"),	&g_nFontSmoothing, DEFAULT_QUALITY);
+    GetSettingInt(hKey, TEXT("FontSize"), &g_nFontSize, 10);
+    GetSettingInt(hKey, TEXT("FontBold"), &g_fFontBold, FALSE);
+    GetSettingStr(hKey, TEXT("FontName"), g_szFontName, LF_FACESIZE, TEXT("Courier New"));
+    GetSettingInt(hKey, TEXT("FontSmooth"), &g_nFontSmoothing, DEFAULT_QUALITY);
 
-	GetSettingInt(hKey, TEXT("PaddingAbove"), &g_nPaddingAbove, 0);
-	GetSettingInt(hKey, TEXT("PaddingBelow"), &g_nPaddingBelow, 1);
-	GetSettingInt(hKey, TEXT("PaddingFlags"), &g_fPaddingFlags, COURIERNEW|LUCIDACONS);
+    GetSettingInt(hKey, TEXT("PaddingAbove"), &g_nPaddingAbove, 0);
+    GetSettingInt(hKey, TEXT("PaddingBelow"), &g_nPaddingBelow, 1);
+    GetSettingInt(hKey, TEXT("PaddingFlags"), &g_fPaddingFlags, COURIERNEW | LUCIDACONS);
 
-	GetSettingInt(hKey, TEXT("SelMargin"),	 &g_fSelMargin, TRUE);
-	GetSettingInt(hKey, TEXT("LineNumbers"),   &g_fLineNumbers, FALSE);
-	GetSettingInt(hKey, TEXT("LongLines"),	 &g_fLongLines, TRUE);
-	GetSettingInt(hKey, TEXT("LongLineLimit"), &g_nLongLineLimit, 80);
-	GetSettingInt(hKey, TEXT("SaveOnExit"),	 &g_fSaveOnExit, TRUE);
-	GetSettingInt(hKey, TEXT("HLCurLine"),	 &g_nHLCurLine, FALSE);
+    GetSettingInt(hKey, TEXT("SelMargin"), &g_fSelMargin, TRUE);
+    GetSettingInt(hKey, TEXT("LineNumbers"), &g_fLineNumbers, FALSE);
+    GetSettingInt(hKey, TEXT("LongLines"), &g_fLongLines, TRUE);
+    GetSettingInt(hKey, TEXT("LongLineLimit"), &g_nLongLineLimit, 80);
+    GetSettingInt(hKey, TEXT("SaveOnExit"), &g_fSaveOnExit, TRUE);
+    GetSettingInt(hKey, TEXT("HLCurLine"), &g_nHLCurLine, FALSE);
 
-	GetSettingInt(hKey, TEXT("AddExplorer"),	 &g_fAddToExplorer, FALSE);
-	GetSettingInt(hKey, TEXT("ReplaceNotepad"), &g_fReplaceNotepad, FALSE);
-	GetSettingInt(hKey, TEXT("ShowStatusbar"), &g_fShowStatusbar, FALSE);
-	
-	// read the display colours
-	RegCreateKeyEx(hKey, TEXT("Colours"), 0, 0, 0, KEY_READ, 0, &hColKey, 0);
+    GetSettingInt(hKey, TEXT("AddExplorer"), &g_fAddToExplorer, FALSE);
+    GetSettingInt(hKey, TEXT("ReplaceNotepad"), &g_fReplaceNotepad, FALSE);
+    GetSettingInt(hKey, TEXT("ShowStatusbar"), &g_fShowStatusbar, FALSE);
 
-	GetSettingInt(hColKey, TEXT("Foreground"),	&g_rgbColourList[TXC_FOREGROUND],		g_rgbAutoColourList[TXC_FOREGROUND]		);
-	GetSettingInt(hColKey, TEXT("Background"),	&g_rgbColourList[TXC_BACKGROUND],		g_rgbAutoColourList[TXC_BACKGROUND]		);	
-	GetSettingInt(hColKey, TEXT("SelFG"),			&g_rgbColourList[TXC_HIGHLIGHTTEXT],	g_rgbAutoColourList[TXC_HIGHLIGHTTEXT]	);
-	GetSettingInt(hColKey, TEXT("SelBG"),			&g_rgbColourList[TXC_HIGHLIGHT],		g_rgbAutoColourList[TXC_HIGHLIGHT]		);
-	GetSettingInt(hColKey, TEXT("SelFG2"),		&g_rgbColourList[TXC_HIGHLIGHTTEXT2],   g_rgbAutoColourList[TXC_HIGHLIGHTTEXT2]	);
-	GetSettingInt(hColKey, TEXT("SelBG2"),		&g_rgbColourList[TXC_HIGHLIGHT2],		g_rgbAutoColourList[TXC_HIGHLIGHT2]		);
-	GetSettingInt(hColKey, TEXT("Margin1"),		&g_rgbColourList[TXC_SELMARGIN1],		g_rgbAutoColourList[TXC_SELMARGIN1]		);
-	GetSettingInt(hColKey, TEXT("Margin2"),		&g_rgbColourList[TXC_SELMARGIN2],		g_rgbAutoColourList[TXC_SELMARGIN2]		);
-	GetSettingInt(hColKey, TEXT("LinenoText"),	&g_rgbColourList[TXC_LINENUMBERTEXT],	g_rgbAutoColourList[TXC_LINENUMBERTEXT]	);
-	GetSettingInt(hColKey, TEXT("Lineno"),		&g_rgbColourList[TXC_LINENUMBER],		g_rgbAutoColourList[TXC_LINENUMBER]		);
-	GetSettingInt(hColKey, TEXT("LongLineText"),	&g_rgbColourList[TXC_LONGLINETEXT],		g_rgbAutoColourList[TXC_LONGLINETEXT]	);
-	GetSettingInt(hColKey, TEXT("LongLine"),		&g_rgbColourList[TXC_LONGLINE],			g_rgbAutoColourList[TXC_LONGLINE]		);
-	GetSettingInt(hColKey, TEXT("CurlineText"),	&g_rgbColourList[TXC_CURRENTLINETEXT],	g_rgbAutoColourList[TXC_CURRENTLINETEXT]	);
-	GetSettingInt(hColKey, TEXT("Curline"),		&g_rgbColourList[TXC_CURRENTLINE],		g_rgbAutoColourList[TXC_CURRENTLINE]		);
-	
-	GetSettingBin(hColKey, TEXT("Custom"),		g_rgbCustColours, sizeof(g_rgbCustColours)); 
+    // read the display colours
+    RegCreateKeyEx(hKey, TEXT("Colours"), 0, 0, 0, KEY_READ, 0, &hColKey, 0);
 
-	RegCloseKey(hColKey);
-	RegCloseKey(hKey);
+    GetSettingInt(hColKey, TEXT("Foreground"), &g_rgbColourList[TXC_FOREGROUND], g_rgbAutoColourList[TXC_FOREGROUND]);
+    GetSettingInt(hColKey, TEXT("Background"), &g_rgbColourList[TXC_BACKGROUND], g_rgbAutoColourList[TXC_BACKGROUND]);
+    GetSettingInt(hColKey, TEXT("SelFG"), &g_rgbColourList[TXC_HIGHLIGHTTEXT], g_rgbAutoColourList[TXC_HIGHLIGHTTEXT]);
+    GetSettingInt(hColKey, TEXT("SelBG"), &g_rgbColourList[TXC_HIGHLIGHT], g_rgbAutoColourList[TXC_HIGHLIGHT]);
+    GetSettingInt(hColKey, TEXT("SelFG2"), &g_rgbColourList[TXC_HIGHLIGHTTEXT2], g_rgbAutoColourList[TXC_HIGHLIGHTTEXT2]);
+    GetSettingInt(hColKey, TEXT("SelBG2"), &g_rgbColourList[TXC_HIGHLIGHT2], g_rgbAutoColourList[TXC_HIGHLIGHT2]);
+    GetSettingInt(hColKey, TEXT("Margin1"), &g_rgbColourList[TXC_SELMARGIN1], g_rgbAutoColourList[TXC_SELMARGIN1]);
+    GetSettingInt(hColKey, TEXT("Margin2"), &g_rgbColourList[TXC_SELMARGIN2], g_rgbAutoColourList[TXC_SELMARGIN2]);
+    GetSettingInt(hColKey, TEXT("LinenoText"), &g_rgbColourList[TXC_LINENUMBERTEXT], g_rgbAutoColourList[TXC_LINENUMBERTEXT]);
+    GetSettingInt(hColKey, TEXT("Lineno"), &g_rgbColourList[TXC_LINENUMBER], g_rgbAutoColourList[TXC_LINENUMBER]);
+    GetSettingInt(hColKey, TEXT("LongLineText"), &g_rgbColourList[TXC_LONGLINETEXT], g_rgbAutoColourList[TXC_LONGLINETEXT]);
+    GetSettingInt(hColKey, TEXT("LongLine"), &g_rgbColourList[TXC_LONGLINE], g_rgbAutoColourList[TXC_LONGLINE]);
+    GetSettingInt(hColKey, TEXT("CurlineText"), &g_rgbColourList[TXC_CURRENTLINETEXT], g_rgbAutoColourList[TXC_CURRENTLINETEXT]);
+    GetSettingInt(hColKey, TEXT("Curline"), &g_rgbColourList[TXC_CURRENTLINE], g_rgbAutoColourList[TXC_CURRENTLINE]);
+
+    GetSettingBin(hColKey, TEXT("Custom"), g_rgbCustColours, sizeof(g_rgbCustColours));
+
+    RegCloseKey(hColKey);
+    RegCloseKey(hKey);
 }
 
 void LoadRegSysSettings()
 {
-	HKEY hKey;
+    HKEY hKey;
 
-	RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_READ, 0, &hKey, 0);
-	GetSettingInt(hKey, TEXT("AddExplorer"),	 &g_fAddToExplorer, FALSE);
-	GetSettingInt(hKey, TEXT("ReplaceNotepad"), &g_fReplaceNotepad, FALSE);
-	RegCloseKey(hKey);
+    RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_READ, 0, &hKey, 0);
+    GetSettingInt(hKey, TEXT("AddExplorer"), &g_fAddToExplorer, FALSE);
+    GetSettingInt(hKey, TEXT("ReplaceNotepad"), &g_fReplaceNotepad, FALSE);
+    RegCloseKey(hKey);
 }
 
 void SaveRegSysSettings()
 {
-	HKEY hKey;
+    HKEY hKey;
 
-	RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_WRITE, 0, &hKey, 0);
-	WriteSettingInt(hKey, TEXT("AddExplorer"),	g_fAddToExplorer);
-	WriteSettingInt(hKey, TEXT("ReplaceNotepad"), g_fReplaceNotepad);
-	RegCloseKey(hKey);
+    RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_WRITE, 0, &hKey, 0);
+    WriteSettingInt(hKey, TEXT("AddExplorer"), g_fAddToExplorer);
+    WriteSettingInt(hKey, TEXT("ReplaceNotepad"), g_fReplaceNotepad);
+    RegCloseKey(hKey);
 }
 
 void SaveRegSettings()
 {
-	HKEY hKey, hColKey;
+    HKEY hKey, hColKey;
 
-	// open registry location for writing
-	RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_WRITE, 0, &hKey, 0);
+    // open registry location for writing
+    RegCreateKeyEx(HKEY_CURRENT_USER, REGLOC, 0, 0, 0, KEY_WRITE, 0, &hKey, 0);
 
-	WriteSettingInt(hKey, TEXT("FontSize"),	g_nFontSize);
-	WriteSettingInt(hKey, TEXT("FontBold"),	g_fFontBold);
-	WriteSettingStr(hKey, TEXT("FontName"),	g_szFontName);
-	WriteSettingInt(hKey, TEXT("FontSmooth"),	g_nFontSmoothing);
+    WriteSettingInt(hKey, TEXT("FontSize"), g_nFontSize);
+    WriteSettingInt(hKey, TEXT("FontBold"), g_fFontBold);
+    WriteSettingStr(hKey, TEXT("FontName"), g_szFontName);
+    WriteSettingInt(hKey, TEXT("FontSmooth"), g_nFontSmoothing);
 
-	WriteSettingInt(hKey, TEXT("PaddingAbove"), g_nPaddingAbove);
-	WriteSettingInt(hKey, TEXT("PaddingBelow"), g_nPaddingBelow);
-	WriteSettingInt(hKey, TEXT("PaddingFlags"), g_fPaddingFlags);
+    WriteSettingInt(hKey, TEXT("PaddingAbove"), g_nPaddingAbove);
+    WriteSettingInt(hKey, TEXT("PaddingBelow"), g_nPaddingBelow);
+    WriteSettingInt(hKey, TEXT("PaddingFlags"), g_fPaddingFlags);
 
-	WriteSettingInt(hKey, TEXT("SelMargin"),	  g_fSelMargin);
-	WriteSettingInt(hKey, TEXT("LineNumbers"),  g_fLineNumbers);
-	WriteSettingInt(hKey, TEXT("LongLines"),	  g_fLongLines);
-	WriteSettingInt(hKey, TEXT("SaveOnExit"),	  g_fSaveOnExit);
-	WriteSettingInt(hKey, TEXT("LongLineLimit"),g_nLongLineLimit);
-	WriteSettingInt(hKey, TEXT("HLCurLine"),	  g_nHLCurLine);
+    WriteSettingInt(hKey, TEXT("SelMargin"), g_fSelMargin);
+    WriteSettingInt(hKey, TEXT("LineNumbers"), g_fLineNumbers);
+    WriteSettingInt(hKey, TEXT("LongLines"), g_fLongLines);
+    WriteSettingInt(hKey, TEXT("SaveOnExit"), g_fSaveOnExit);
+    WriteSettingInt(hKey, TEXT("LongLineLimit"), g_nLongLineLimit);
+    WriteSettingInt(hKey, TEXT("HLCurLine"), g_nHLCurLine);
 
-	WriteSettingInt(hKey, TEXT("AddExplorer"),  g_fAddToExplorer);
-	WriteSettingInt(hKey, TEXT("ReplaceNotepad"), g_fReplaceNotepad);
-	WriteSettingInt(hKey, TEXT("ShowStatusbar"), g_fShowStatusbar);
-	
-	// write the display colours
-	RegCreateKeyEx(hKey, TEXT("Colours"), 0, 0, 0, KEY_WRITE, 0, &hColKey, 0);
+    WriteSettingInt(hKey, TEXT("AddExplorer"), g_fAddToExplorer);
+    WriteSettingInt(hKey, TEXT("ReplaceNotepad"), g_fReplaceNotepad);
+    WriteSettingInt(hKey, TEXT("ShowStatusbar"), g_fShowStatusbar);
 
-	WriteSettingInt(hColKey, TEXT("Foreground"),	g_rgbColourList[TXC_FOREGROUND]); 
-	WriteSettingInt(hColKey, TEXT("Background"),	g_rgbColourList[TXC_BACKGROUND]); 
-	WriteSettingInt(hColKey, TEXT("SelFG"),		g_rgbColourList[TXC_HIGHLIGHTTEXT]); 
-	WriteSettingInt(hColKey, TEXT("SelBG"),		g_rgbColourList[TXC_HIGHLIGHT]); 
-	WriteSettingInt(hColKey, TEXT("SelFG2"),		g_rgbColourList[TXC_HIGHLIGHTTEXT2]); 
-	WriteSettingInt(hColKey, TEXT("SelBG2"),		g_rgbColourList[TXC_HIGHLIGHT2]); 
+    // write the display colours
+    RegCreateKeyEx(hKey, TEXT("Colours"), 0, 0, 0, KEY_WRITE, 0, &hColKey, 0);
 
-	WriteSettingInt(hColKey, TEXT("Margin1"),		g_rgbColourList[TXC_SELMARGIN1]); 
-	WriteSettingInt(hColKey, TEXT("Margin2"),		g_rgbColourList[TXC_SELMARGIN2]); 
-	WriteSettingInt(hColKey, TEXT("LinenoText"),	g_rgbColourList[TXC_LINENUMBERTEXT]); 
-	WriteSettingInt(hColKey, TEXT("Lineno"),		g_rgbColourList[TXC_LINENUMBER]); 
-	WriteSettingInt(hColKey, TEXT("LongLineText"),g_rgbColourList[TXC_LONGLINETEXT]); 
-	WriteSettingInt(hColKey, TEXT("LongLine"),	g_rgbColourList[TXC_LONGLINE]); 
+    WriteSettingInt(hColKey, TEXT("Foreground"), g_rgbColourList[TXC_FOREGROUND]);
+    WriteSettingInt(hColKey, TEXT("Background"), g_rgbColourList[TXC_BACKGROUND]);
+    WriteSettingInt(hColKey, TEXT("SelFG"), g_rgbColourList[TXC_HIGHLIGHTTEXT]);
+    WriteSettingInt(hColKey, TEXT("SelBG"), g_rgbColourList[TXC_HIGHLIGHT]);
+    WriteSettingInt(hColKey, TEXT("SelFG2"), g_rgbColourList[TXC_HIGHLIGHTTEXT2]);
+    WriteSettingInt(hColKey, TEXT("SelBG2"), g_rgbColourList[TXC_HIGHLIGHT2]);
 
-	WriteSettingInt(hColKey, TEXT("CurlineText"),	g_rgbColourList[TXC_CURRENTLINETEXT]); 
-	WriteSettingInt(hColKey, TEXT("Curline"),		g_rgbColourList[TXC_CURRENTLINE]); 
+    WriteSettingInt(hColKey, TEXT("Margin1"), g_rgbColourList[TXC_SELMARGIN1]);
+    WriteSettingInt(hColKey, TEXT("Margin2"), g_rgbColourList[TXC_SELMARGIN2]);
+    WriteSettingInt(hColKey, TEXT("LinenoText"), g_rgbColourList[TXC_LINENUMBERTEXT]);
+    WriteSettingInt(hColKey, TEXT("Lineno"), g_rgbColourList[TXC_LINENUMBER]);
+    WriteSettingInt(hColKey, TEXT("LongLineText"), g_rgbColourList[TXC_LONGLINETEXT]);
+    WriteSettingInt(hColKey, TEXT("LongLine"), g_rgbColourList[TXC_LONGLINE]);
+
+    WriteSettingInt(hColKey, TEXT("CurlineText"), g_rgbColourList[TXC_CURRENTLINETEXT]);
+    WriteSettingInt(hColKey, TEXT("Curline"), g_rgbColourList[TXC_CURRENTLINE]);
 
 
-	WriteSettingBin(hColKey, TEXT("Custom"),		g_rgbCustColours, sizeof(g_rgbCustColours)); 
+    WriteSettingBin(hColKey, TEXT("Custom"), g_rgbCustColours, sizeof(g_rgbCustColours));
 
-	RegCloseKey(hColKey);
-	RegCloseKey(hKey);
+    RegCloseKey(hColKey);
+    RegCloseKey(hKey);
 }
 
 void ApplyRegSettings()
 {
-	int i;
+    int i;
 
-	if(g_hFont)
-		DeleteObject(g_hFont);
+    if (g_hFont)
+        DeleteObject(g_hFont);
 
-	g_hFont = EasyCreateFont(g_nFontSize, g_fFontBold, g_nFontSmoothing, g_szFontName);
+    g_hFont = EasyCreateFont(g_nFontSize, g_fFontBold, g_nFontSmoothing, g_szFontName);
 
-	TextView_SetLineSpacing(g_hwndTextView, g_nPaddingAbove, g_nPaddingBelow);
+    TextView_SetLineSpacing(g_hwndTextView, g_nPaddingAbove, g_nPaddingBelow);
 
-	TextView_SetStyleBool(g_hwndTextView, TXS_SELMARGIN,	g_fSelMargin);
-	TextView_SetStyleBool(g_hwndTextView, TXS_LINENUMBERS,	g_fLineNumbers);
-	TextView_SetStyleBool(g_hwndTextView, TXS_LONGLINES,	g_fLongLines);
+    TextView_SetStyleBool(g_hwndTextView, TXS_SELMARGIN, g_fSelMargin);
+    TextView_SetStyleBool(g_hwndTextView, TXS_LINENUMBERS, g_fLineNumbers);
+    TextView_SetStyleBool(g_hwndTextView, TXS_LONGLINES, g_fLongLines);
 
-	TextView_SetStyleBool(g_hwndTextView, TXS_HIGHLIGHTCURLINE,	g_nHLCurLine);
+    TextView_SetStyleBool(g_hwndTextView, TXS_HIGHLIGHTCURLINE, g_nHLCurLine);
 
-	TextView_SetCaretWidth(g_hwndTextView, 2);
-	TextView_SetLongLine(g_hwndTextView, g_nLongLineLimit);
-	
-	SendMessage(g_hwndTextView, WM_SETFONT, (WPARAM)g_hFont, 0);
+    TextView_SetCaretWidth(g_hwndTextView, 2);
+    TextView_SetLongLine(g_hwndTextView, g_nLongLineLimit);
 
-	for(i = 0; i < TXC_MAX_COLOURS; i++)
-	{
-		TextView_SetColor(g_hwndTextView, i, g_rgbColourList[i]);
-	}
+    SendMessage(g_hwndTextView, WM_SETFONT, (WPARAM) g_hFont, 0);
 
-	//
-	//	System-wide options require Administrator access. On Vista we
-	//	need to elevate using the UAC prompt. Only do this if the settings have actually
-	//	changed
-	//
-	//SetExplorerContextMenu(g_fAddToExplorerContextMenu);
-	//SetImageFileExecutionOptions(g_fReplaceNotepad);
+    for (i = 0; i < TXC_MAX_COLOURS; i++)
+    {
+        TextView_SetColor(g_hwndTextView, i, g_rgbColourList[i]);
+    }
+
+    //
+    //	System-wide options require Administrator access. On Vista we
+    //	need to elevate using the UAC prompt. Only do this if the settings have actually
+    //	changed
+    //
+    //SetExplorerContextMenu(g_fAddToExplorerContextMenu);
+    //SetImageFileExecutionOptions(g_fReplaceNotepad);
 }
 
 void ShowOptions(HWND hwndParent)
 {
-	PROPSHEETHEADER psh    = {   sizeof(psh)   };
-	PROPSHEETPAGE   psp[3] = {  { sizeof(psp[0]) },  
-								{ sizeof(psp[1]) }, 
-								{ sizeof(psp[2]) }, 
-							};
+    PROPSHEETHEADER psh = { sizeof(psh) };
+    PROPSHEETPAGE   psp[3] = { { sizeof(psp[0]) },
+    { sizeof(psp[1]) },
+    { sizeof(psp[2]) },
+    };
 
-	CoInitialize(0);
-	
-	// configure property sheet
-	psh.dwFlags			= PSH_PROPSHEETPAGE;
-	psh.hwndParent		= hwndParent;
-	psh.nPages			= sizeof(psp) / sizeof(psp[0]);
-	psh.ppsp			= psp;
-	psh.pszCaption		= TEXT("Options");
+    CoInitialize(0);
 
-	// configure property sheet page(1)
-	psp[0].dwFlags		= PSP_USETITLE;
-	psp[0].hInstance	= g_hResourceModule;//GetModuleHandle(0);
-	psp[0].pfnDlgProc	= FontOptionsDlgProc;
-	psp[0].pszTemplate	= MAKEINTRESOURCE(IDD_FONT);
-	psp[0].pszTitle		= TEXT("Font");
+    // configure property sheet
+    psh.dwFlags = PSH_PROPSHEETPAGE;
+    psh.hwndParent = hwndParent;
+    psh.nPages = sizeof(psp) / sizeof(psp[0]);
+    psh.ppsp = psp;
+    psh.pszCaption = TEXT("Options");
 
-	// configure property sheet page(2)
-	psp[1].dwFlags		= PSP_USETITLE;
-	psp[1].hInstance	= g_hResourceModule;//GetModuleHandle(0);
-	psp[1].pfnDlgProc	= DisplayOptionsDlgProc;
-	psp[1].pszTemplate	= MAKEINTRESOURCE(IDD_DISPLAY);
-	psp[1].pszTitle		= TEXT("Display");
+    // configure property sheet page(1)
+    psp[0].dwFlags = PSP_USETITLE;
+    psp[0].hInstance = g_hResourceModule;//GetModuleHandle(0);
+    psp[0].pfnDlgProc = FontOptionsDlgProc;
+    psp[0].pszTemplate = MAKEINTRESOURCE(IDD_FONT);
+    psp[0].pszTitle = TEXT("Font");
 
-	// configure property sheet page(3)
-	psp[2].dwFlags		= PSP_USETITLE;
-	psp[2].hInstance	= g_hResourceModule;//GetModuleHandle(0);
-	psp[2].pfnDlgProc	= MiscOptionsDlgProc;
-	psp[2].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS);
-	psp[2].pszTitle		= TEXT("Settings");
+    // configure property sheet page(2)
+    psp[1].dwFlags = PSP_USETITLE;
+    psp[1].hInstance = g_hResourceModule;//GetModuleHandle(0);
+    psp[1].pfnDlgProc = DisplayOptionsDlgProc;
+    psp[1].pszTemplate = MAKEINTRESOURCE(IDD_DISPLAY);
+    psp[1].pszTitle = TEXT("Display");
 
-	if(PropertySheet(&psh))
-	{
-		ApplyRegSettings();		
-	}
+    // configure property sheet page(3)
+    psp[2].dwFlags = PSP_USETITLE;
+    psp[2].hInstance = g_hResourceModule;//GetModuleHandle(0);
+    psp[2].pfnDlgProc = MiscOptionsDlgProc;
+    psp[2].pszTemplate = MAKEINTRESOURCE(IDD_OPTIONS);
+    psp[2].pszTitle = TEXT("Settings");
 
-	CoUninitialize();
+    if (PropertySheet(&psh))
+    {
+        ApplyRegSettings();
+    }
+
+    CoUninitialize();
 }

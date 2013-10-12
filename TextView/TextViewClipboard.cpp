@@ -27,33 +27,33 @@
 //
 BOOL TextView::OnPaste()
 {
-	BOOL success = FALSE;
+    BOOL success = FALSE;
 
-	if(m_nEditMode == MODE_READONLY)
-		return FALSE;
+    if (m_nEditMode == MODE_READONLY)
+        return FALSE;
 
-	if(OpenClipboard(m_hWnd))
-	{
-		HANDLE hMem		= GetClipboardData(CF_TCHARTEXT);
-		TCHAR *szText	= (TCHAR *)GlobalLock(hMem);
+    if (OpenClipboard(m_hWnd))
+    {
+        HANDLE hMem = GetClipboardData(CF_TCHARTEXT);
+        TCHAR *szText = (TCHAR *) GlobalLock(hMem);
 
-		if(szText)
-		{
-			ULONG textlen = lstrlen(szText);
-			EnterText(szText, textlen);
+        if (szText)
+        {
+            ULONG textlen = lstrlen(szText);
+            EnterText(szText, textlen);
 
-			if(textlen > 1)
-				m_pTextDoc->m_seq.breakopt();	
+            if (textlen > 1)
+                m_pTextDoc->m_seq.breakopt();
 
-			GlobalUnlock(hMem);
-			
-			success = TRUE;
-		}
+            GlobalUnlock(hMem);
 
-		CloseClipboard();
-	}
+            success = TRUE;
+        }
 
-	return success;
+        CloseClipboard();
+    }
+
+    return success;
 }
 
 //
@@ -63,18 +63,18 @@ BOOL TextView::OnPaste()
 //
 ULONG TextView::GetText(TCHAR *szDest, ULONG nStartOffset, ULONG nLength)
 {
-	ULONG copied = 0;
+    ULONG copied = 0;
 
-	if(nLength > 1)
-	{
-		TextIterator itor = m_pTextDoc->iterate(nStartOffset);
-		copied = itor.gettext(szDest, nLength - 1);
+    if (nLength > 1)
+    {
+        TextIterator itor = m_pTextDoc->iterate(nStartOffset);
+        copied = itor.gettext(szDest, nLength - 1);
 
-		// null-terminate
-		szDest[copied] = 0;
-	}
-	
-	return copied;
+        // null-terminate
+        szDest[copied] = 0;
+    }
+
+    return copied;
 }
 
 //
@@ -82,37 +82,37 @@ ULONG TextView::GetText(TCHAR *szDest, ULONG nStartOffset, ULONG nLength)
 //
 BOOL TextView::OnCopy()
 {
-	ULONG	selstart	= min(m_nSelectionStart, m_nSelectionEnd);
-	ULONG	sellen		= SelectionSize();
-	BOOL	success		= FALSE;
+    ULONG	selstart = min(m_nSelectionStart, m_nSelectionEnd);
+    ULONG	sellen = SelectionSize();
+    BOOL	success = FALSE;
 
-	if(sellen  == 0)
-		return FALSE;
+    if (sellen == 0)
+        return FALSE;
 
-	if(OpenClipboard(m_hWnd))
-	{
-		HANDLE hMem;
-		TCHAR  *ptr;
-		
-		if((hMem = GlobalAlloc(GPTR, (sellen + 1) * sizeof(TCHAR))) != 0)
-		{
-			if((ptr = (TCHAR *)GlobalLock(hMem)) != 0)
-			{
-				EmptyClipboard();
+    if (OpenClipboard(m_hWnd))
+    {
+        HANDLE hMem;
+        TCHAR  *ptr;
 
-				GetText(ptr, selstart, sellen + 1);
+        if ((hMem = GlobalAlloc(GPTR, (sellen + 1) * sizeof(TCHAR))) != 0)
+        {
+            if ((ptr = (TCHAR *) GlobalLock(hMem)) != 0)
+            {
+                EmptyClipboard();
 
-				SetClipboardData(CF_TCHARTEXT, hMem);
-				success = TRUE;
+                GetText(ptr, selstart, sellen + 1);
 
-				GlobalUnlock(hMem);
-			}
-		}
+                SetClipboardData(CF_TCHARTEXT, hMem);
+                success = TRUE;
 
-		CloseClipboard();
-	}
+                GlobalUnlock(hMem);
+            }
+        }
 
-	return success;
+        CloseClipboard();
+    }
+
+    return success;
 }
 
 //
@@ -120,19 +120,19 @@ BOOL TextView::OnCopy()
 //
 BOOL TextView::OnCut()
 {
-	BOOL success = FALSE;
+    BOOL success = FALSE;
 
-	if(m_nEditMode == MODE_READONLY)
-		return FALSE;
+    if (m_nEditMode == MODE_READONLY)
+        return FALSE;
 
-	if(SelectionSize() > 0)
-	{
-		// copy selected text to clipboard then erase current selection
-		success = OnCopy();
-		success = success && ForwardDelete();
-	}
+    if (SelectionSize() > 0)
+    {
+        // copy selected text to clipboard then erase current selection
+        success = OnCopy();
+        success = success && ForwardDelete();
+    }
 
-	return success;
+    return success;
 }
 
 //
@@ -140,17 +140,17 @@ BOOL TextView::OnCut()
 //
 BOOL TextView::OnClear()
 {
-	BOOL success = FALSE;
+    BOOL success = FALSE;
 
-	if(m_nEditMode == MODE_READONLY)
-		return FALSE;
+    if (m_nEditMode == MODE_READONLY)
+        return FALSE;
 
-	if(SelectionSize() > 0)
-	{
-		ForwardDelete();
-		success = TRUE;
-	}
+    if (SelectionSize() > 0)
+    {
+        ForwardDelete();
+        success = TRUE;
+    }
 
-	return success;
+    return success;
 }
 

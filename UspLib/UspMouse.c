@@ -43,100 +43,100 @@ ITEM_RUN *GetItemRun(USPDATA *uspData, int visualIdx);
 //
 //	The script direction is returned (right/left) in *fRTL
 //
-BOOL WINAPI UspSnapXToOffset (	
-		USPDATA	  * uspData,		
-		int			xpos,			
-		int       * snappedX,		// out, optional
-		int       * charPos,		// out
-		BOOL	  * fRTL			// out, optional
-	)
+BOOL WINAPI UspSnapXToOffset(
+    USPDATA	  * uspData,
+    int			xpos,
+    int       * snappedX,		// out, optional
+    int       * charPos,		// out
+    BOOL	  * fRTL			// out, optional
+    )
 {
-	int i, cp, trailing, runx = 0;
-	int runCount = uspData->itemRunCount;
+    int i, cp, trailing, runx = 0;
+    int runCount = uspData->itemRunCount;
 
-	if(charPos)		*charPos	= 0;
-	if(snappedX)	*snappedX	= 0;
-	if(fRTL)		*fRTL		= 0;
+    if (charPos)		*charPos = 0;
+    if (snappedX)	*snappedX = 0;
+    if (fRTL)		*fRTL = 0;
 
-	if(xpos < 0)
-		xpos = 0;
+    if (xpos < 0)
+        xpos = 0;
 
-	// don't allow mouse to move into the CR-LF sequence. This is incorrect
-	// for RTL and mixed LTR/RTL runs!!!
-	for(i = runCount-1; i >= 0; i--)
-	{
-		if(uspData->itemRunList[i].eol)
-			runCount--;
-	}
+    // don't allow mouse to move into the CR-LF sequence. This is incorrect
+    // for RTL and mixed LTR/RTL runs!!!
+    for (i = runCount - 1; i >= 0; i--)
+    {
+        if (uspData->itemRunList[i].eol)
+            runCount--;
+    }
 
-	//if(runCount > 0 && uspData->itemRunList[runCount-1].eol)
-	//	runCount--;
+    //if(runCount > 0 && uspData->itemRunList[runCount-1].eol)
+    //	runCount--;
 
-	//
-	// process each "run" or span of text in visual order
-	//
-	for(i = 0; i < runCount; i++)
-	{
-		ITEM_RUN *itemRun;
+    //
+    // process each "run" or span of text in visual order
+    //
+    for (i = 0; i < runCount; i++)
+    {
+        ITEM_RUN *itemRun;
 
-		// get width of this span of text
-		if((itemRun = GetItemRun(uspData, i)) == 0)
-			break;
+        // get width of this span of text
+        if ((itemRun = GetItemRun(uspData, i)) == 0)
+            break;
 
-		if(itemRun->eol)
-		{
-			runx += itemRun->width;			
-			continue;
-		}
+        if (itemRun->eol)
+        {
+            runx += itemRun->width;
+            continue;
+        }
 
-		// does the mouse fall within this run of text?
-		if((i == runCount - 1) || xpos >= runx && xpos < runx + itemRun->width)
-		{
-			// get the character position
-			ScriptXtoCP(xpos - runx, 
-				itemRun->len,
-				itemRun->glyphCount,
-				uspData->clusterList	+ itemRun->charPos,
-				uspData->svaList		+ itemRun->glyphPos,
-				uspData->widthList		+ itemRun->glyphPos,
-				&itemRun->analysis,
-				&cp,
-				&trailing
-				);
-				
-			// convert this character position back to a x-coord
-			if(snappedX)
-			{
-				ScriptCPtoX(cp+trailing,
-					FALSE,
-					itemRun->len,
-					itemRun->glyphCount,
-					uspData->clusterList	+ itemRun->charPos,
-					uspData->svaList		+ itemRun->glyphPos,
-					uspData->widthList		+ itemRun->glyphPos,
-					&itemRun->analysis,
-					snappedX
-					);
-					
-				// return the adjusted x-coordinate
-				*snappedX += runx;
-			}
+        // does the mouse fall within this run of text?
+        if ((i == runCount - 1) || xpos >= runx && xpos < runx + itemRun->width)
+        {
+            // get the character position
+            ScriptXtoCP(xpos - runx,
+                itemRun->len,
+                itemRun->glyphCount,
+                uspData->clusterList + itemRun->charPos,
+                uspData->svaList + itemRun->glyphPos,
+                uspData->widthList + itemRun->glyphPos,
+                &itemRun->analysis,
+                &cp,
+                &trailing
+                );
 
-			// return the character-offset
-			*charPos = cp + trailing + itemRun->charPos;
+            // convert this character position back to a x-coord
+            if (snappedX)
+            {
+                ScriptCPtoX(cp + trailing,
+                    FALSE,
+                    itemRun->len,
+                    itemRun->glyphCount,
+                    uspData->clusterList + itemRun->charPos,
+                    uspData->svaList + itemRun->glyphPos,
+                    uspData->widthList + itemRun->glyphPos,
+                    &itemRun->analysis,
+                    snappedX
+                    );
 
-			// return script-direction for this run
-			if(fRTL)
-				*fRTL = itemRun->analysis.fRTL;
+                // return the adjusted x-coordinate
+                *snappedX += runx;
+            }
 
-			return TRUE;
-		}
+            // return the character-offset
+            *charPos = cp + trailing + itemRun->charPos;
 
-		// advance xpos to next run
-		runx += itemRun->width;
-	}
+            // return script-direction for this run
+            if (fRTL)
+                *fRTL = itemRun->analysis.fRTL;
 
-	return FALSE;
+            return TRUE;
+        }
+
+        // advance xpos to next run
+        runx += itemRun->width;
+    }
+
+    return FALSE;
 }
 
 //
@@ -146,66 +146,66 @@ BOOL WINAPI UspSnapXToOffset (
 //
 //	The script direction is also returned (right/left) in *fRTL
 //
-BOOL WINAPI UspXToOffset (
-		USPDATA	  * uspData,		
-		int			xpos,			
-		int       * charPos,		// out
-		BOOL	  * trailing,		// out
-		BOOL	  * fRTL			// out, optional
-	)
+BOOL WINAPI UspXToOffset(
+    USPDATA	  * uspData,
+    int			xpos,
+    int       * charPos,		// out
+    BOOL	  * trailing,		// out
+    BOOL	  * fRTL			// out, optional
+    )
 {
-	int i, runx = 0;
-	int runCount = uspData->itemRunCount;
+    int i, runx = 0;
+    int runCount = uspData->itemRunCount;
 
-	if(xpos < 0)
-		xpos = 0;
+    if (xpos < 0)
+        xpos = 0;
 
-	if(runCount > 0 && uspData->itemRunList[runCount-1].eol)
-		runCount--;
+    if (runCount > 0 && uspData->itemRunList[runCount - 1].eol)
+        runCount--;
 
-	//
-	// process each "run" or span of text 
-	//
-	for(i = 0; i < runCount; i++)
-	{
-		ITEM_RUN *itemRun;
+    //
+    // process each "run" or span of text 
+    //
+    for (i = 0; i < runCount; i++)
+    {
+        ITEM_RUN *itemRun;
 
-		// get width of this span of text
-		if((itemRun = GetItemRun(uspData, i)) == 0)
-			break;
+        // get width of this span of text
+        if ((itemRun = GetItemRun(uspData, i)) == 0)
+            break;
 
-		// does the mouse fall within this run of text?
-		if((i == runCount - 1) || xpos >= runx && xpos < runx + itemRun->width)
-		{
-			// get the character position
-			ScriptXtoCP(xpos - runx, 
-				itemRun->len,
-				itemRun->glyphCount,
-				uspData->clusterList	+ itemRun->charPos,
-				uspData->svaList		+ itemRun->glyphPos,
-				uspData->widthList		+ itemRun->glyphPos,
-				&itemRun->analysis,
-				charPos,
-				trailing
-				);
-				
-			*charPos += itemRun->charPos;
+        // does the mouse fall within this run of text?
+        if ((i == runCount - 1) || xpos >= runx && xpos < runx + itemRun->width)
+        {
+            // get the character position
+            ScriptXtoCP(xpos - runx,
+                itemRun->len,
+                itemRun->glyphCount,
+                uspData->clusterList + itemRun->charPos,
+                uspData->svaList + itemRun->glyphPos,
+                uspData->widthList + itemRun->glyphPos,
+                &itemRun->analysis,
+                charPos,
+                trailing
+                );
 
-			// return script-direction for this run
-			if(fRTL)
-				*fRTL = itemRun->analysis.fRTL;
+            *charPos += itemRun->charPos;
 
-			return TRUE;
-		}
+            // return script-direction for this run
+            if (fRTL)
+                *fRTL = itemRun->analysis.fRTL;
 
-		// advance xpos to next run
-		runx += itemRun->width;
-	}
+            return TRUE;
+        }
 
-	*trailing = 0;
-	*charPos  = 0;
-	if(fRTL) *fRTL = 0;
-	return FALSE;
+        // advance xpos to next run
+        runx += itemRun->width;
+    }
+
+    *trailing = 0;
+    *charPos = 0;
+    if (fRTL) *fRTL = 0;
+    return FALSE;
 }
 
 //
@@ -213,49 +213,49 @@ BOOL WINAPI UspXToOffset (
 //	coordinate, relative to the start of the string
 //	Duplicates the behaviour of ScriptStringCPToX
 //
-BOOL WINAPI UspOffsetToX (
-		USPDATA		* uspData, 
-		int			  charPos, 
-		BOOL		  trailing,		// out
-		int			* px			// out
-	)
+BOOL WINAPI UspOffsetToX(
+    USPDATA		* uspData,
+    int			  charPos,
+    BOOL		  trailing,		// out
+    int			* px			// out
+    )
 {
-	int i;
-	int xpos = 0;
-	ITEM_RUN *itemRun;
+    int i;
+    int xpos = 0;
+    ITEM_RUN *itemRun;
 
-	*px = 0;
+    *px = 0;
 
-	//
-	// process each "run" or span of text in visual order
-	//
-	for(i = 0; i < uspData->itemRunCount; i++)
-	{
-		// get width of this span of text
-		if((itemRun = GetItemRun(uspData, i)) == 0)
-			break;
+    //
+    // process each "run" or span of text in visual order
+    //
+    for (i = 0; i < uspData->itemRunCount; i++)
+    {
+        // get width of this span of text
+        if ((itemRun = GetItemRun(uspData, i)) == 0)
+            break;
 
-		// does the mouse fall within this run of text?
-		if((i == uspData->itemRunCount - 1) || 
-			charPos >= itemRun->charPos && charPos < itemRun->charPos + itemRun->len)
-		{
-			ScriptCPtoX(charPos - itemRun->charPos,
-				trailing,
-				itemRun->len,
-				itemRun->glyphCount,
-				uspData->clusterList	+ itemRun->charPos,
-				uspData->svaList		+ itemRun->glyphPos,
-				uspData->widthList		+ itemRun->glyphPos,
-				&itemRun->analysis,
-				px
-			  );
+        // does the mouse fall within this run of text?
+        if ((i == uspData->itemRunCount - 1) ||
+            charPos >= itemRun->charPos && charPos < itemRun->charPos + itemRun->len)
+        {
+            ScriptCPtoX(charPos - itemRun->charPos,
+                trailing,
+                itemRun->len,
+                itemRun->glyphCount,
+                uspData->clusterList + itemRun->charPos,
+                uspData->svaList + itemRun->glyphPos,
+                uspData->widthList + itemRun->glyphPos,
+                &itemRun->analysis,
+                px
+                );
 
-			*px += xpos;
-			return TRUE;
-		}
+            *px += xpos;
+            return TRUE;
+        }
 
-		xpos += itemRun->width;
-	}
+        xpos += itemRun->width;
+    }
 
-	return FALSE;
+    return FALSE;
 }

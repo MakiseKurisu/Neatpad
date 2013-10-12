@@ -23,53 +23,53 @@
 
 BOOL ElevateToAdmin(HWND hwnd, BOOL fChecked1, BOOL fChecked2)//TCHAR *szParams)
 {
-	//// http://codefromthe70s.org/vistatutorial.asp
-	SHELLEXECUTEINFO sei = { sizeof(sei) };
-	TCHAR szFile[MAX_PATH];
-	TCHAR szParams[32];
-	
-	BOOL  success = FALSE;
+    //// http://codefromthe70s.org/vistatutorial.asp
+    SHELLEXECUTEINFO sei = { sizeof(sei) };
+    TCHAR szFile[MAX_PATH];
+    TCHAR szParams[32];
 
-	wsprintf(szParams, TEXT("-uac %d %d"), fChecked1, fChecked2);
+    BOOL  success = FALSE;
 
-	GetModuleFileName(0, szFile, MAX_PATH);
+    wsprintf(szParams, TEXT("-uac %d %d"), fChecked1, fChecked2);
 
-	sei.hwnd			= hwnd;
-	sei.lpVerb			= L"runas";
-	sei.lpFile			= szFile;
-	sei.lpParameters	= szParams;//L"oof";
-	sei.fMask			= SEE_MASK_NOCLOSEPROCESS;
-	sei.nShow			= SW_SHOWNORMAL;
+    GetModuleFileName(0, szFile, MAX_PATH);
 
-	if(ShellExecuteEx(&sei))
-	{
-		WaitForSingleObject(sei.hProcess, INFINITE);
-		GetExitCodeProcess(sei.hProcess, &success);
-		CloseHandle(sei.hProcess);
-		success = !success;
-	}
-	
-	return success;
+    sei.hwnd = hwnd;
+    sei.lpVerb = L"runas";
+    sei.lpFile = szFile;
+    sei.lpParameters = szParams;//L"oof";
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+    sei.nShow = SW_SHOWNORMAL;
+
+    if (ShellExecuteEx(&sei))
+    {
+        WaitForSingleObject(sei.hProcess, INFINITE);
+        GetExitCodeProcess(sei.hProcess, &success);
+        CloseHandle(sei.hProcess);
+        success = !success;
+    }
+
+    return success;
 }
 
 void ApplyAdminSettings(HWND hwnd)
 {
-	BOOL fChecked1;
-	BOOL fChecked2;
-	
-	fChecked1 = IsDlgButtonChecked(hwnd, IDC_ADDCONTEXT);
-	fChecked2 = IsDlgButtonChecked(hwnd, IDC_REPLACENOTEPAD);
-	
-	// do we need to elevate?
-	if(g_fAddToExplorer != fChecked1 || g_fReplaceNotepad != fChecked2)
-	{
-		// spawn ourselves to set the HKLM registry keys
-		ElevateToAdmin(hwnd, fChecked1, fChecked2);
+    BOOL fChecked1;
+    BOOL fChecked2;
 
-		// the spawned process will do a SaveRegSysSettings if
-		// it was successful - so do a 'Load' to refresh our own state
-		LoadRegSysSettings();
-	}
+    fChecked1 = IsDlgButtonChecked(hwnd, IDC_ADDCONTEXT);
+    fChecked2 = IsDlgButtonChecked(hwnd, IDC_REPLACENOTEPAD);
+
+    // do we need to elevate?
+    if (g_fAddToExplorer != fChecked1 || g_fReplaceNotepad != fChecked2)
+    {
+        // spawn ourselves to set the HKLM registry keys
+        ElevateToAdmin(hwnd, fChecked1, fChecked2);
+
+        // the spawned process will do a SaveRegSysSettings if
+        // it was successful - so do a 'Load' to refresh our own state
+        LoadRegSysSettings();
+    }
 }
 
 //
@@ -77,57 +77,57 @@ void ApplyAdminSettings(HWND hwnd)
 //
 BOOL CALLBACK MiscOptionsDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	PSHNOTIFY *pshn;
-	HICON hShield;
+    PSHNOTIFY *pshn;
+    HICON hShield;
 
-	switch(msg)
-	{
+    switch (msg)
+    {
 
-	case WM_INITDIALOG:
+    case WM_INITDIALOG:
 
-		//oof(hwnd);
+        //oof(hwnd);
 
-		// load the 'vista shield icon'
-		hShield = LoadImage(0, MAKEINTRESOURCE(106), IMAGE_ICON, 32, 32, LR_CREATEDIBSECTION);//IDI_SHIELD));
+        // load the 'vista shield icon'
+        hShield = LoadImage(0, MAKEINTRESOURCE(106), IMAGE_ICON, 32, 32, LR_CREATEDIBSECTION);//IDI_SHIELD));
 
-		// display the next-best-thing if not running on Vista
-		if(hShield == 0)
-		{
-			hShield = LoadIcon(0, MAKEINTRESOURCE(IDI_INFORMATION));
-		}
-			
-		SendDlgItemMessage(hwnd, IDC_SHIELD, STM_SETICON, (WPARAM)hShield, 0);
+        // display the next-best-thing if not running on Vista
+        if (hShield == 0)
+        {
+            hShield = LoadIcon(0, MAKEINTRESOURCE(IDI_INFORMATION));
+        }
 
-		CheckDlgButton(hwnd, IDC_ADDCONTEXT, g_fAddToExplorer);
-		CheckDlgButton(hwnd, IDC_REPLACENOTEPAD, g_fReplaceNotepad);
+        SendDlgItemMessage(hwnd, IDC_SHIELD, STM_SETICON, (WPARAM) hShield, 0);
 
-		return TRUE;
+        CheckDlgButton(hwnd, IDC_ADDCONTEXT, g_fAddToExplorer);
+        CheckDlgButton(hwnd, IDC_REPLACENOTEPAD, g_fReplaceNotepad);
 
-	case WM_CLOSE:
-		return TRUE;
+        return TRUE;
 
-	case WM_NOTIFY:
+    case WM_CLOSE:
+        return TRUE;
 
-		pshn = (PSHNOTIFY *)lParam;
+    case WM_NOTIFY:
 
-		if(pshn->hdr.code == PSN_APPLY)
-		{
-			ApplyAdminSettings(hwnd);
-			return TRUE;
-		}
+        pshn = (PSHNOTIFY *) lParam;
 
-		return FALSE;
+        if (pshn->hdr.code == PSN_APPLY)
+        {
+            ApplyAdminSettings(hwnd);
+            return TRUE;
+        }
 
-	case WM_COMMAND:
+        return FALSE;
 
-		switch(LOWORD(wParam))
-		{
-		case IDCANCEL:
-			return TRUE;
-		}
+    case WM_COMMAND:
 
-		return FALSE;
-	}
+        switch (LOWORD(wParam))
+        {
+        case IDCANCEL:
+            return TRUE;
+        }
 
-	return FALSE;
+        return FALSE;
+    }
+
+    return FALSE;
 }

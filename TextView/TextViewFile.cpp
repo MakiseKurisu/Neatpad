@@ -19,27 +19,27 @@
 //
 LONG TextView::OpenFile(TCHAR *szFileName)
 {
-	ClearFile();
+    ClearFile();
 
-	if(m_pTextDoc->init(szFileName))
-	{
-		m_nLineCount   = m_pTextDoc->linecount();
-		m_nLongestLine = m_pTextDoc->longestline(m_nTabWidthChars);
+    if (m_pTextDoc->init(szFileName))
+    {
+        m_nLineCount = m_pTextDoc->linecount();
+        m_nLongestLine = m_pTextDoc->longestline(m_nTabWidthChars);
 
-		m_nVScrollPos  = 0;
-		m_nHScrollPos  = 0;
+        m_nVScrollPos = 0;
+        m_nHScrollPos = 0;
 
-		m_nSelectionStart	= 0;
-		m_nSelectionEnd		= 0;
-		m_nCursorOffset		= 0;
+        m_nSelectionStart = 0;
+        m_nSelectionEnd = 0;
+        m_nCursorOffset = 0;
 
-		UpdateMarginWidth();
-		UpdateMetrics();
-		ResetLineCache();
-		return TRUE;
-	}
+        UpdateMarginWidth();
+        UpdateMetrics();
+        ResetLineCache();
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 //
@@ -47,30 +47,30 @@ LONG TextView::OpenFile(TCHAR *szFileName)
 //
 LONG TextView::ClearFile()
 {
-	if(m_pTextDoc)
-	{
-		m_pTextDoc->clear();
-		m_pTextDoc->EmptyDoc();
-	}
+    if (m_pTextDoc)
+    {
+        m_pTextDoc->clear();
+        m_pTextDoc->EmptyDoc();
+    }
 
-	ResetLineCache();
+    ResetLineCache();
 
-	m_nLineCount		= m_pTextDoc->linecount();
-	m_nLongestLine		= m_pTextDoc->longestline(m_nTabWidthChars);
+    m_nLineCount = m_pTextDoc->linecount();
+    m_nLongestLine = m_pTextDoc->longestline(m_nTabWidthChars);
 
-	m_nVScrollPos		= 0;
-	m_nHScrollPos		= 0;
+    m_nVScrollPos = 0;
+    m_nHScrollPos = 0;
 
-	m_nSelectionStart	= 0;
-	m_nSelectionEnd		= 0;
-	m_nCursorOffset		= 0;
+    m_nSelectionStart = 0;
+    m_nSelectionEnd = 0;
+    m_nCursorOffset = 0;
 
-	m_nCurrentLine		= 0;
-	m_nCaretPosX		= 0;
+    m_nCurrentLine = 0;
+    m_nCaretPosX = 0;
 
-	UpdateMetrics();
+    UpdateMetrics();
 
-	
 
-	return TRUE;
+
+    return TRUE;
 }

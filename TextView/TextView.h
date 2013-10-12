@@ -13,17 +13,17 @@ extern "C" {
 #pragma message("Warning: UNICODE is not defined\n")
 #endif
 
-//
-//	TextView API declared here
-//
-BOOL	 InitTextView();
-HWND	 CreateTextView(HWND hwndParent);
-COLORREF RealizeColour(COLORREF col);
+    //
+    //	TextView API declared here
+    //
+    BOOL	 InitTextView();
+    HWND	 CreateTextView(HWND hwndParent);
+    COLORREF RealizeColour(COLORREF col);
 
 
-//
-// currently supported Neatpad Codepages
-//
+    //
+    // currently supported Neatpad Codepages
+    //
 #define NCP_ASCII		0
 #define NCP_UTF8		1
 #define NCP_UTF16		2
@@ -31,16 +31,16 @@ COLORREF RealizeColour(COLORREF col);
 #define NCP_UTF32		4
 #define NCP_UTF32BE		5
 
-//
-//	TextView edit modes
-//
+    //
+    //	TextView edit modes
+    //
 #define MODE_READONLY	0
 #define MODE_INSERT		1
 #define MODE_OVERWRITE	2
 
-//
-//	TextView Window Messages defined here
-//
+    //
+    //	TextView Window Messages defined here
+    //
 #define TXM_BASE				(WM_USER)
 #define TXM_OPENFILE			(TXM_BASE + 0)
 #define TXM_CLEAR				(TXM_BASE + 1)
@@ -68,50 +68,50 @@ COLORREF RealizeColour(COLORREF col);
 #define TXM_GETEDITMODE			(TXM_BASE + 23)
 #define TXM_SETCONTEXTMENU		(TXM_BASE + 24)
 
-//
-//	TextView Notification Messages defined here - 
-//	sent via the WM_NOTIFY message
-//
+    //
+    //	TextView Notification Messages defined here - 
+    //	sent via the WM_NOTIFY message
+    //
 #define TVN_BASE				(WM_USER)
 #define TVN_CURSOR_CHANGE		(TVN_BASE + 0)
 #define TVN_SELECTION_CHANGE	(TVN_BASE + 1)
 #define TVN_EDITMODE_CHANGE		(TVN_BASE + 2)
 #define TVN_CHANGED				(TVN_BASE + 3)
 
-typedef struct
-{
-	NMHDR	hdr;
-	ULONG	nLineNo;
-	ULONG	nColumnNo;
-	ULONG	nOffset;
-} TVNCURSORINFO;
+    typedef struct
+    {
+        NMHDR	hdr;
+        ULONG	nLineNo;
+        ULONG	nColumnNo;
+        ULONG	nOffset;
+    } TVNCURSORINFO;
 
-//
-//	TextView Window Styles defined here
-//	(set using TXM_SETSTYLE)
-//
+    //
+    //	TextView Window Styles defined here
+    //	(set using TXM_SETSTYLE)
+    //
 #define TXS_SELMARGIN			1
 #define TXS_LINENUMBERS			2
 #define TXS_TREECTRL			4
 #define TXS_LONGLINES			8
 #define TXS_HIGHLIGHTCURLINE	16
 
-//
-//	End-of-line mode
-//
+    //
+    //	End-of-line mode
+    //
 #define TXL_LF				1		// line-feed
 #define TXL_CR				2		// carriage-return
 #define TXL_CRLF			4		// carriage-return, line-feed (default)
 #define TXL_ALL				7		// allow all forms regardless
 
-//
-//	TextView Macros defined here
-//
+    //
+    //	TextView Macros defined here
+    //
 #define TEXTVIEW_CLASS TEXT("TextView32")
 
-//
-//	TextView colours
-//
+    //
+    //	TextView colours
+    //
 #define TXC_FOREGROUND			0			// normal foreground colour
 #define TXC_BACKGROUND			1			// normal background colour
 #define TXC_HIGHLIGHTTEXT		2			// normal text highlight colour
@@ -136,83 +136,83 @@ typedef struct
 #define REALIZE_SYSCOL(col) (RealizeColour(col))
 
 
-//
-//	TextView Message Macros defined here
-//
+    //
+    //	TextView Message Macros defined here
+    //
 #define TextView_OpenFile(hwndTV, szFile)	\
-	SendMessage((hwndTV), TXM_OPENFILE, 0, (LPARAM)(TCHAR *)(szFile))
+    SendMessage((hwndTV), TXM_OPENFILE, 0, (LPARAM) (TCHAR *) (szFile))
 
 #define TextView_Clear(hwndTV)	\
-	SendMessage((hwndTV), TXM_CLEAR, 0, 0)
+    SendMessage((hwndTV), TXM_CLEAR, 0, 0)
 
 #define TextView_SetLineSpacing(hwndTV, nAbove, nBelow) \
-	SendMessage((hwndTV), TXM_SETLINESPACING, (int)(nAbove), (int)(nBelow))
+    SendMessage((hwndTV), TXM_SETLINESPACING, (int) (nAbove), (int) (nBelow))
 
 #define TextView_AddFont(hwndTV, hFont) \
-	SendMessage((hwndTV), TXM_ADDFONT, (WPARAM)(HFONT)(hFont), 0)
+    SendMessage((hwndTV), TXM_ADDFONT, (WPARAM) (HFONT) (hFont), 0)
 
 #define TextView_SetColor(hwndTV, nIdx, rgbColor) \
-	SendMessage((hwndTV), TXM_SETCOLOR, (WPARAM)(nIdx), (LPARAM)(rgbColor))
+    SendMessage((hwndTV), TXM_SETCOLOR, (WPARAM) (nIdx), (LPARAM) (rgbColor))
 
 #define TextView_SetStyle(hwndTV, uMask, uStyles) \
-	SendMessage((hwndTV), TXM_SETSTYLE, (WPARAM)(uMask), (LPARAM)(uStyles))
+    SendMessage((hwndTV), TXM_SETSTYLE, (WPARAM) (uMask), (LPARAM) (uStyles))
 
 #define TextView_SetStyleBool(hwndTV, uStyle, fBoolean) \
-	SendMessage((hwndTV), TXM_SETSTYLE, (WPARAM)(uStyle), (LPARAM)(fBoolean ? uStyle : 0))
-	
+    SendMessage((hwndTV), TXM_SETSTYLE, (WPARAM) (uStyle), (LPARAM) (fBoolean ? uStyle : 0))
+
 #define TextView_SetCaretWidth(hwndTV, nWidth) \
-	SendMessage((hwndTV), TXM_SETCARETWIDTH, (WPARAM)(nWidth), 0)
+    SendMessage((hwndTV), TXM_SETCARETWIDTH, (WPARAM) (nWidth), 0)
 
 #define TextView_SetImageList(hwndTV, hImgList) \
-	SendMessage((hwndTV), TXM_SETIMAGELIST, (WPARAM)(HIMAGELIST)(hImgList), 0)
+    SendMessage((hwndTV), TXM_SETIMAGELIST, (WPARAM) (HIMAGELIST) (hImgList), 0)
 
 #define TextView_SetLongLine(hwndTV, nLength) \
-	SendMessage((hwndTV), TXM_SETLONGLINE, (WPARAM)(0), (LPARAM)(nLength))
+    SendMessage((hwndTV), TXM_SETLONGLINE, (WPARAM) (0), (LPARAM) (nLength))
 
 #define TextView_SetLineImage(hwndTV, nLineNo, nImageIdx) \
-	SendMessage((hwndTV), TXM_SETLINEIMAGE, (WPARAM)(ULONG)(nLineNo), (LPARAM)(ULONG)nImageIdx)
+    SendMessage((hwndTV), TXM_SETLINEIMAGE, (WPARAM) (ULONG) (nLineNo), (LPARAM) (ULONG) nImageIdx)
 
 #define TextView_GetFormat(hwndTV) \
-	SendMessage((hwndTV), TXM_GETFORMAT, 0, 0)
+    SendMessage((hwndTV), TXM_GETFORMAT, 0, 0)
 
 #define TextView_Undo(hwndTV) \
-	SendMessage((hwndTV), TXM_UNDO, 0, 0)
+    SendMessage((hwndTV), TXM_UNDO, 0, 0)
 
 #define TextView_Redo(hwndTV) \
-	SendMessage((hwndTV), TXM_REDO, 0, 0)
+    SendMessage((hwndTV), TXM_REDO, 0, 0)
 
 #define TextView_CanUndo(hwndTV) \
-	SendMessage((hwndTV), TXM_CANUNDO, 0, 0)
+    SendMessage((hwndTV), TXM_CANUNDO, 0, 0)
 
 #define TextView_CanRedo(hwndTV) \
-	SendMessage((hwndTV), TXM_CANREDO, 0, 0)
+    SendMessage((hwndTV), TXM_CANREDO, 0, 0)
 
 #define TextView_GetSelSize(hwndTV) \
-	SendMessage((hwndTV), TXM_GETSELSIZE, 0, 0)
+    SendMessage((hwndTV), TXM_GETSELSIZE, 0, 0)
 
 #define TextView_SelectAll(hwndTV) \
-	SendMessage((hwndTV), TXM_SETSELALL, 0, 0)
+    SendMessage((hwndTV), TXM_SETSELALL, 0, 0)
 
 #define TextView_GetCurPos(hwndTV) \
-	SendMessage((hwndTV), TXM_GETCURPOS, 0, 0)
+    SendMessage((hwndTV), TXM_GETCURPOS, 0, 0)
 
 #define TextView_GetCurLine(hwndTV) \
-	SendMessage((hwndTV), TXM_GETCURLINE, 0, 0)
+    SendMessage((hwndTV), TXM_GETCURLINE, 0, 0)
 
 #define TextView_GetCurCol(hwndTV) \
-	SendMessage((hwndTV), TXM_GETCURCOL, 0, 0)
+    SendMessage((hwndTV), TXM_GETCURCOL, 0, 0)
 
 #define TextView_SetEditMode(hwndTV, nEditMode) \
-	SendMessage((hwndTV), TXM_SETEDITMODE, (WPARAM)(nEditMode), 0)
+    SendMessage((hwndTV), TXM_SETEDITMODE, (WPARAM) (nEditMode), 0)
 
 #define TextView_GetEditMode(hwndTV) \
-	SendMessage((hwndTV), TXM_GETEDITMODE, 0, 0)
+    SendMessage((hwndTV), TXM_GETEDITMODE, 0, 0)
 
 #define TextView_SetContextMenu(hwndTV, hPopupMenu) \
-	SendMessage((hwndTV), TXM_SETCONTEXTMENU, (WPARAM)(hPopupMenu), 0)
+    SendMessage((hwndTV), TXM_SETCONTEXTMENU, (WPARAM) (hPopupMenu), 0)
 
 #define TextView_SetFont(hwndTV, hFont) \
-	SendMessage((hwndTV), WM_SETFONT, (WPARAM)(HFONT)(hFont), 0)
+    SendMessage((hwndTV), WM_SETFONT, (WPARAM) (HFONT) (hFont), 0)
 
 #ifdef __cplusplus
 }
