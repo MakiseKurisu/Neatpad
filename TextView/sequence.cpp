@@ -134,13 +134,13 @@ buffer_control * alloc_buffer_sequence(
 {
     buffer_control * bc;
 
-    if ((bc = new buffer_control) == 0)
+    if ((bc = new_buffer_control()) == 0)
         return 0;
 
     // allocate a new buffer of byte/wchar/long/whatever
     if ((bc->buffer = new seqchar[maxsize]) == 0)
     {
-        delete bc;
+        delete_buffer_control(bc);
         return 0;
     }
 
@@ -992,7 +992,7 @@ bool clear_sequence(
     for (size_t i = 0; i < lps->buffer_list.size(); i++)
     {
         delete [] lps->buffer_list[i]->buffer;
-        delete lps->buffer_list[i];
+        delete_buffer_control(lps->buffer_list[i]);
     }
 
     lps->buffer_list.clear();
@@ -1316,6 +1316,19 @@ ref * new_ref(
 
 void delete_ref(
     ref * lps
+    )
+{
+    delete lps;
+}
+
+buffer_control * new_buffer_control()
+{
+    buffer_control * lps = new buffer_control;
+    return lps;
+}
+
+void delete_buffer_control(
+    buffer_control * lps
     )
 {
     delete lps;

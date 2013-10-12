@@ -32,13 +32,13 @@ typedef struct _ref ref;
 struct _buffer_control;
 typedef struct _buffer_control buffer_control;
 
-typedef std::vector<span_range*> eventstack;
+typedef std::vector<span_range *> eventstack;
 void clear_eventstack_sequence(
     sequence * lps,
     eventstack & dest
     );
 
-typedef std::vector<buffer_control*> bufferlist;
+typedef std::vector<buffer_control *> bufferlist;
 
 //
 //    sequence class!
@@ -379,6 +379,10 @@ struct _ref
 //
 //    buffer_control
 //
+buffer_control * new_buffer_control();
+void delete_buffer_control(
+    buffer_control * lps
+    );
 struct _buffer_control
 {
     seqchar * buffer;
