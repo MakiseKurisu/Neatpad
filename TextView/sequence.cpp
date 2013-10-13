@@ -1074,19 +1074,6 @@ bool  poke_sequence(
     return replace_sequence(lps, index, &value, 1);
 }
 
-//
-//    sequence::breakopt
-//
-//    Prevent subsequent operations from being optimized (coalesced) 
-//  with the last.
-//
-void breakopt_sequence(
-    sequence * lps
-    )
-{
-    lps->lastaction = action_invalid;
-}
-
 size_w event_index_sequence(
     sequence * lps
     )
@@ -1101,6 +1088,12 @@ size_w event_length_sequence(
     return lps->undoredo_length;
 }
 
+//
+//    sequence::breakopt
+//
+//    Prevent subsequent operations from being optimized (coalesced) 
+//  with the last.
+//
 void breakopt_sequence(
     sequence * lps
     )

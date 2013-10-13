@@ -212,7 +212,7 @@ seqchar peek_sequence(
     sequence * lps,
     size_w index
     );
-bool  poke_sequence(
+bool poke_sequence(
     sequence * lps,
     size_w index,
     seqchar value
