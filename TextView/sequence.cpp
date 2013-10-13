@@ -29,19 +29,23 @@ void clear_eventstack(
 
 sequence * new_sequence()
 {
-    sequence * lps = new sequence;
+    sequence * lps = (sequence *) malloc(sizeof(sequence));
 
-    record_action_sequence(lps, action_invalid, 0);
+    if (lps)
+    {
+        memset(lps, 0, sizeof(*lps));
+        record_action_sequence(lps, action_invalid, 0);
 
-    lps->sequence_length = 0;
+        lps->sequence_length = 0;
 
-    lps->head = new_span(0, 0, 0);
-    lps->tail = new_span(0, 0, 0);
-    lps->head->next = lps->tail;
-    lps->tail->prev = lps->head;
+        lps->head = new_span(0, 0, 0);
+        lps->tail = new_span(0, 0, 0);
+        lps->head->next = lps->tail;
+        lps->tail->prev = lps->head;
 
-    lps->group_id = 0;
-    lps->group_refcount = 0;
+        lps->group_id = 0;
+        lps->group_refcount = 0;
+    }
 
     return lps;
 }
@@ -54,6 +58,8 @@ void delete_sequence(
 
     delete_span(lps->head);
     delete_span(lps->tail);
+
+    free(lps);
 }
 
 bool init_sequence(
@@ -1111,13 +1117,18 @@ span * new_span(
 {
     static int count = -2;
 
-    span * lps = new span;
-    lps->next = nx;
-    lps->prev = pr;
-    lps->offset = off;
-    lps->length = len;
-    lps->buffer = buf;
-    lps->id = count++;
+    span * lps = (span *) malloc(sizeof(span));
+
+    if (lps)
+    {
+        memset(lps, 0, sizeof(*lps));
+        lps->next = nx;
+        lps->prev = pr;
+        lps->offset = off;
+        lps->length = len;
+        lps->buffer = buf;
+        lps->id = count++;
+    }
 
     return lps;
 }
@@ -1126,7 +1137,7 @@ void delete_span(
     span * lps
     )
 {
-    delete lps;
+    free(lps);
 }
 
 span_range * new_span_range(
@@ -1138,17 +1149,21 @@ span_range * new_span_range(
     size_t id
     )
 {
-    span_range * lps = new span_range;
+    span_range * lps = (span_range *) malloc(sizeof(span_range));
 
-    lps->first = 0;
-    lps->last = 0;
-    lps->boundary = true;
-    lps->sequence_length = seqlen;
-    lps->index = idx;
-    lps->length = len;
-    lps->act = a;
-    lps->quicksave = qs;
-    lps->group_id = id;
+    if (lps)
+    {
+        memset(lps, 0, sizeof(*lps));
+        lps->first = 0;
+        lps->last = 0;
+        lps->boundary = true;
+        lps->sequence_length = seqlen;
+        lps->index = idx;
+        lps->length = len;
+        lps->act = a;
+        lps->quicksave = qs;
+        lps->group_id = id;
+    }
 
     return lps;
 }
@@ -1157,7 +1172,7 @@ void delete_span_range(
     span_range * lps
     )
 {
-    delete lps;
+    free(lps);
 }
 
 // separate 'destruction' used when appropriate
@@ -1300,9 +1315,15 @@ ref * new_ref(
     size_w index
     )
 {
-    ref * lps = new ref;
-    lps->seq = seq;
-    lps->index = index;
+    ref * lps = (ref *) malloc(sizeof(ref));
+
+    if (lps)
+    {
+        memset(lps, 0, sizeof(*lps));
+        lps->seq = seq;
+        lps->index = index;
+    }
+
     return lps;
 }
 
@@ -1310,12 +1331,18 @@ void delete_ref(
     ref * lps
     )
 {
-    delete lps;
+    free(lps);
 }
 
 buffer_control * new_buffer_control()
 {
-    buffer_control * lps = new buffer_control;
+    buffer_control * lps = (buffer_control *) malloc(sizeof(buffer_control));
+
+    if (lps)
+    {
+        memset(lps, 0, sizeof(*lps));
+    }
+
     return lps;
 }
 
@@ -1323,5 +1350,5 @@ void delete_buffer_control(
     buffer_control * lps
     )
 {
-    delete lps;
+    free(lps);
 }
