@@ -217,6 +217,12 @@ bool  poke_sequence(
     size_w index,
     seqchar value
     );
+size_w event_index_sequence(
+    sequence * lps
+    );
+size_w event_length_sequence(
+    sequence * lps
+    );
 void breakopt_sequence(
     sequence * lps
     );

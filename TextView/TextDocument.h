@@ -196,15 +196,6 @@ private:
     ULONG len_bytes;
 };
 
-class LineIterator
-{
-public:
-    LineIterator();
-
-private:
-    TextDocument *m_pTextDoc;
-};
-
 struct _BOM_LOOKUP
 {
     DWORD  bom;

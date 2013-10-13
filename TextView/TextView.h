@@ -107,7 +107,7 @@ extern "C" {
     //
     //    TextView Macros defined here
     //
-#define TEXTVIEW_CLASS TEXT("TextView32")
+#define TEXTVIEW_CLASS TEXT("TextView")
 
     //
     //    TextView colours

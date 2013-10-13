@@ -1109,6 +1109,27 @@ void breakopt_sequence(
     lps->lastaction = action_invalid;
 }
 
+size_w event_index_sequence(
+    sequence * lps
+    )
+{
+    return lps->undoredo_index;
+}
+
+size_w event_length_sequence(
+    sequence * lps
+    )
+{
+    return lps->undoredo_length;
+}
+
+void breakopt_sequence(
+    sequence * lps
+    )
+{
+    lps->lastaction = action_invalid;
+}
+
 span * new_span(
     size_w off,
     size_w len,
