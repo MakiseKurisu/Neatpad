@@ -24,59 +24,59 @@ extern "C" {
     //
     // currently supported Neatpad Codepages
     //
-#define NCP_ASCII        0
+#define NCP_ASCII       0
 #define NCP_UTF8        1
-#define NCP_UTF16        2
-#define NCP_UTF16BE        3
-#define NCP_UTF32        4
-#define NCP_UTF32BE        5
+#define NCP_UTF16       2
+#define NCP_UTF16BE     3
+#define NCP_UTF32       4
+#define NCP_UTF32BE     5
 
     //
     //    TextView edit modes
     //
-#define MODE_READONLY    0
-#define MODE_INSERT        1
-#define MODE_OVERWRITE    2
+#define MODE_READONLY   0
+#define MODE_INSERT     1
+#define MODE_OVERWRITE  2
 
     //
     //    TextView Window Messages defined here
     //
 #define TXM_BASE                (WM_USER)
 #define TXM_OPENFILE            (TXM_BASE + 0)
-#define TXM_CLEAR                (TXM_BASE + 1)
-#define TXM_SETLINESPACING        (TXM_BASE + 2)
-#define TXM_ADDFONT                (TXM_BASE + 3)
+#define TXM_CLEAR               (TXM_BASE + 1)
+#define TXM_SETLINESPACING      (TXM_BASE + 2)
+#define TXM_ADDFONT             (TXM_BASE + 3)
 #define TXM_SETCOLOR            (TXM_BASE + 4)
 #define TXM_GETCOLOR            (TXM_BASE + 5)
 #define TXM_SETSTYLE            (TXM_BASE + 6)
 #define TXM_GETSTYLE            (TXM_BASE + 7)
-#define TXM_SETCARETWIDTH        (TXM_BASE + 8)
+#define TXM_SETCARETWIDTH       (TXM_BASE + 8)
 #define TXM_SETIMAGELIST        (TXM_BASE + 9)
-#define TXM_SETLONGLINE            (TXM_BASE + 10)
+#define TXM_SETLONGLINE         (TXM_BASE + 10)
 #define TXM_SETLINEIMAGE        (TXM_BASE + 11)
-#define TXM_GETFORMAT            (TXM_BASE + 12)
+#define TXM_GETFORMAT           (TXM_BASE + 12)
 #define TXM_UNDO                (TXM_BASE + 13)
 #define TXM_REDO                (TXM_BASE + 14)
-#define TXM_CANUNDO                (TXM_BASE + 15)
-#define TXM_CANREDO                (TXM_BASE + 16)
-#define TXM_GETSELSIZE            (TXM_BASE + 17)
-#define TXM_SETSELALL            (TXM_BASE + 18)
-#define TXM_GETCURPOS            (TXM_BASE + 19)
-#define TXM_GETCURLINE            (TXM_BASE + 20)
-#define TXM_GETCURCOL            (TXM_BASE + 21)
-#define TXM_SETEDITMODE            (TXM_BASE + 22)
-#define TXM_GETEDITMODE            (TXM_BASE + 23)
-#define TXM_SETCONTEXTMENU        (TXM_BASE + 24)
+#define TXM_CANUNDO             (TXM_BASE + 15)
+#define TXM_CANREDO             (TXM_BASE + 16)
+#define TXM_GETSELSIZE          (TXM_BASE + 17)
+#define TXM_SETSELALL           (TXM_BASE + 18)
+#define TXM_GETCURPOS           (TXM_BASE + 19)
+#define TXM_GETCURLINE          (TXM_BASE + 20)
+#define TXM_GETCURCOL           (TXM_BASE + 21)
+#define TXM_SETEDITMODE         (TXM_BASE + 22)
+#define TXM_GETEDITMODE         (TXM_BASE + 23)
+#define TXM_SETCONTEXTMENU      (TXM_BASE + 24)
 
     //
     //    TextView Notification Messages defined here - 
     //    sent via the WM_NOTIFY message
     //
 #define TVN_BASE                (WM_USER)
-#define TVN_CURSOR_CHANGE        (TVN_BASE + 0)
+#define TVN_CURSOR_CHANGE       (TVN_BASE + 0)
 #define TVN_SELECTION_CHANGE    (TVN_BASE + 1)
-#define TVN_EDITMODE_CHANGE        (TVN_BASE + 2)
-#define TVN_CHANGED                (TVN_BASE + 3)
+#define TVN_EDITMODE_CHANGE     (TVN_BASE + 2)
+#define TVN_CHANGED             (TVN_BASE + 3)
 
     typedef struct
     {
@@ -90,19 +90,19 @@ extern "C" {
     //    TextView Window Styles defined here
     //    (set using TXM_SETSTYLE)
     //
-#define TXS_SELMARGIN            0x00000001
-#define TXS_LINENUMBERS            0x00000002
+#define TXS_SELMARGIN           0x00000001
+#define TXS_LINENUMBERS         0x00000002
 #define TXS_TREECTRL            0x00000004
-#define TXS_LONGLINES            0x00000008
+#define TXS_LONGLINES           0x00000008
 #define TXS_HIGHLIGHTCURLINE    0x00000010
 
     //
     //    End-of-line mode
     //
-#define TXL_LF                1        // line-feed
-#define TXL_CR                2        // carriage-return
-#define TXL_CRLF            4        // carriage-return, line-feed (default)
-#define TXL_ALL                7        // allow all forms regardless
+#define TXL_LF                  1           // line-feed
+#define TXL_CR                  2           // carriage-return
+#define TXL_CRLF                4           // carriage-return, line-feed (default)
+#define TXL_ALL                 7           // allow all forms regardless
 
     //
     //    TextView Macros defined here
@@ -112,25 +112,25 @@ extern "C" {
     //
     //    TextView colours
     //
-#define TXC_FOREGROUND            0            // normal foreground colour
-#define TXC_BACKGROUND            1            // normal background colour
-#define TXC_HIGHLIGHTTEXT        2            // normal text highlight colour
-#define TXC_HIGHLIGHT            3            // normal background highlight colour
-#define TXC_HIGHLIGHTTEXT2        4            // inactive text highlight colour
-#define TXC_HIGHLIGHT2            5            // inactive background highlight colour
-#define TXC_SELMARGIN1            6            // selection margin colour#1
-#define TXC_SELMARGIN2            7            // selection margin colour#2
-#define TXC_LINENUMBERTEXT        8            // line number text
-#define TXC_LINENUMBER            9            // line number background
-#define TXC_LONGLINETEXT        10            // long-line text
-#define TXC_LONGLINE            11            // long-line background
-#define TXC_CURRENTLINETEXT        12            // active line text
-#define TXC_CURRENTLINE            13            // active line background
-#define TXC_MAX_COLOURS            14            // keep this updated!
+#define TXC_FOREGROUND          0           // normal foreground colour
+#define TXC_BACKGROUND          1           // normal background colour
+#define TXC_HIGHLIGHTTEXT       2           // normal text highlight colour
+#define TXC_HIGHLIGHT           3           // normal background highlight colour
+#define TXC_HIGHLIGHTTEXT2      4           // inactive text highlight colour
+#define TXC_HIGHLIGHT2          5           // inactive background highlight colour
+#define TXC_SELMARGIN1          6           // selection margin colour#1
+#define TXC_SELMARGIN2          7           // selection margin colour#2
+#define TXC_LINENUMBERTEXT      8           // line number text
+#define TXC_LINENUMBER          9           // line number background
+#define TXC_LONGLINETEXT        10          // long-line text
+#define TXC_LONGLINE            11          // long-line background
+#define TXC_CURRENTLINETEXT     12          // active line text
+#define TXC_CURRENTLINE         13          // active line background
+#define TXC_MAX_COLOURS         14          // keep this updated!
 
 #define SYSCOL(COLOR_IDX)                       ( 0x80000000 |                     COLOR_IDX  )
-#define MIXED_SYSCOL(COLOR_IDX1, COLOR_IDX2)   ( 0xC0000000 | (COLOR_IDX2 << 8) | COLOR_IDX1 )
-#define MIXED_SYSCOL2(COLOR_IDX1, COLOR_IDX2)  ( 0xE0000000 | (COLOR_IDX2 << 8) | COLOR_IDX1 )
+#define MIXED_SYSCOL(COLOR_IDX1, COLOR_IDX2)    ( 0xC0000000 | (COLOR_IDX2 << 8) | COLOR_IDX1 )
+#define MIXED_SYSCOL2(COLOR_IDX1, COLOR_IDX2)   ( 0xE0000000 | (COLOR_IDX2 << 8) | COLOR_IDX1 )
 
 #define SYSCOLIDX(COLREF)   ( 0x00FFFFFF & COLREF )
 #define REALIZE_SYSCOL(col) (RealizeColour(col))

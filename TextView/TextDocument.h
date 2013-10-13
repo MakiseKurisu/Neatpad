@@ -71,15 +71,15 @@ private:
 
     sequence * m_seq;
 
-    ULONG  m_nDocLength_chars;
-    ULONG  m_nDocLength_bytes;
+    ULONG m_nDocLength_chars;
+    ULONG m_nDocLength_bytes;
 
-    ULONG *m_pLineBuf_byte;
-    ULONG *m_pLineBuf_char;
+    ULONG * m_pLineBuf_byte;
+    ULONG * m_pLineBuf_char;
     ULONG  m_nNumLines;
 
-    int       m_nFileFormat;
-    int    m_nHeaderSize;
+    int m_nFileFormat;
+    int m_nHeaderSize;
 };
 
 class TextIterator
@@ -131,58 +131,6 @@ public:
         }
     }
 
-    /*int insert_text(LPTSTR buf, int buflen)
-    {
-    if(text_doc)
-    {
-    // get text from the TextDocument at the specified byte-offset
-    int len = text_doc->insert(off_bytes, buf, buflen);
-
-    // adjust the iterator's internal position
-    off_bytes += len;
-    return buflen;
-    }
-    else
-    {
-    return 0;
-    }
-    }
-
-    int replace_text(LPTSTR buf, int buflen)
-    {
-    if(text_doc)
-    {
-    // get text from the TextDocument at the specified byte-offset
-    int len = text_doc->replace(off_bytes, buf, buflen);
-
-    // adjust the iterator's internal position
-    off_bytes += len;
-    return buflen;
-    }
-    else
-    {
-    return 0;
-    }
-    }
-
-    int erase_text(int length)
-    {
-    if(text_doc)
-    {
-    // get text from the TextDocument at the specified byte-offset
-    int len = text_doc->erase(off_bytes, length);
-
-    // adjust the iterator's internal position
-    off_bytes += len;
-    return len;
-    }
-    else
-    {
-    return 0;
-    }
-    }*/
-
-
     operator bool()
     {
         return text_doc ? true : false;
@@ -190,7 +138,7 @@ public:
 
 private:
 
-    TextDocument *text_doc;
+    TextDocument * text_doc;
 
     ULONG off_bytes;
     ULONG len_bytes;
@@ -198,9 +146,9 @@ private:
 
 struct _BOM_LOOKUP
 {
-    DWORD  bom;
-    ULONG  len;
-    int    type;
+    DWORD bom;
+    ULONG len;
+    int type;
 };
 
 #endif

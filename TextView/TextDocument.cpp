@@ -982,7 +982,7 @@ bool TextDocument::Redo(ULONG *offset_start, ULONG *offset_end)
     if (!redo_sequence(m_seq))
         return false;
 
-    start = event_length_index(m_seq) - m_nHeaderSize;
+    start = event_index_sequence(m_seq) - m_nHeaderSize;
     length = event_length_sequence(m_seq);
 
     *offset_start = byteoffset_to_charoffset(start);

@@ -1074,28 +1074,6 @@ bool  poke_sequence(
     return replace_sequence(lps, index, &value, 1);
 }
 
-/*
-//
-//    sequence::operator[] const
-//
-//    readonly array access
-//
-seqchar sequence::operator[] (size_w index) const
-{
-return peek(index);
-}
-
-//
-//    sequence::operator[]
-//
-//    read/write array access
-//
-ref sequence::operator[] (size_w index)
-{
-return *new_ref(this, index);
-}
-*/
-
 //
 //    sequence::breakopt
 //
