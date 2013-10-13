@@ -4,11 +4,11 @@
 #include "codepages.h"
 #include "sequence.h"
 
-class TextIterator;
+struct _TextIterator;
+typedef struct _TextIterator TextIterator;
 
 class TextDocument
 {
-    friend class TextIterator;
     friend class TextView;
 
 public:
@@ -47,7 +47,7 @@ public:
     ULONG longestline(int tabwidth);
     ULONG size();
 
-private:
+//private:
 
     bool init_linebuffer();
 
@@ -82,62 +82,31 @@ private:
     int m_nHeaderSize;
 };
 
-class TextIterator
+TextIterator * new_TextIterator(
+    ULONG off = 0,
+    ULONG len = 0,
+    TextDocument * td = 0
+    );
+TextIterator * new_TextIterator(
+    const TextIterator & ti
+    );
+TextIterator * copy_TextIterator(
+    TextIterator * lps,
+    const TextIterator & ti
+    );
+void delete_TextIterator(
+    TextIterator * lps
+    );
+ULONG gettext_TextIterator(
+    TextIterator * lps,
+    LPTSTR buf,
+    ULONG buflen
+    );
+bool valid_TextIterator(
+    TextIterator * lps
+    );
+struct _TextIterator
 {
-public:
-    // default constructor sets all members to zero
-    TextIterator()
-        : text_doc(0), off_bytes(0), len_bytes(0)
-    {
-    }
-
-    TextIterator(ULONG off, ULONG len, TextDocument *td)
-        : text_doc(td), off_bytes(off), len_bytes(len)
-    {
-
-    }
-
-    // default copy-constructor
-    TextIterator(const TextIterator &ti)
-        : text_doc(ti.text_doc), off_bytes(ti.off_bytes), len_bytes(ti.len_bytes)
-    {
-    }
-
-    // assignment operator
-    TextIterator & operator= (TextIterator &ti)
-    {
-        text_doc = ti.text_doc;
-        off_bytes = ti.off_bytes;
-        len_bytes = ti.len_bytes;
-        return *this;
-    }
-
-    ULONG gettext(LPTSTR buf, ULONG buflen)
-    {
-        if (text_doc)
-        {
-            // get text from the TextDocument at the specified byte-offset
-            ULONG len = text_doc->gettext(off_bytes, len_bytes, buf, &buflen);
-
-            // adjust the iterator's internal position
-            off_bytes += len;
-            len_bytes -= len;
-
-            return buflen;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    operator bool()
-    {
-        return text_doc ? true : false;
-    }
-
-private:
-
     TextDocument * text_doc;
 
     ULONG off_bytes;

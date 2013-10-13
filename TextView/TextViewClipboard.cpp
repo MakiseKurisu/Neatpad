@@ -35,7 +35,7 @@ BOOL TextView::OnPaste()
     if (OpenClipboard(m_hWnd))
     {
         HANDLE hMem = GetClipboardData(CF_TCHARTEXT);
-        LPTSTR szText = (LPTSTR ) GlobalLock(hMem);
+        LPTSTR szText = (LPTSTR) GlobalLock(hMem);
 
         if (szText)
         {
@@ -67,9 +67,9 @@ ULONG TextView::GetText(LPTSTR szDest, ULONG nStartOffset, ULONG nLength)
 
     if (nLength > 1)
     {
-        TextIterator itor = m_pTextDoc->iterate(nStartOffset);
-        copied = itor.gettext(szDest, nLength - 1);
-
+        TextIterator * itor = new_TextIterator(m_pTextDoc->iterate(nStartOffset));
+        copied = gettext_TextIterator(itor, szDest, nLength - 1);
+        delete_TextIterator(itor);
         // null-terminate
         szDest[copied] = 0;
     }
@@ -96,7 +96,7 @@ BOOL TextView::OnCopy()
 
         if ((hMem = GlobalAlloc(GPTR, (sellen + 1) * sizeof(TCHAR))) != 0)
         {
-            if ((ptr = (LPTSTR ) GlobalLock(hMem)) != 0)
+            if ((ptr = (LPTSTR) GlobalLock(hMem)) != 0)
             {
                 EmptyClipboard();
 

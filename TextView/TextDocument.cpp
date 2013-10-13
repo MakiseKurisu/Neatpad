@@ -594,7 +594,7 @@ TextIterator TextDocument::iterate(ULONG offset_chars)
     //if(!lineinfo_from_offset(offset_chars, 0, linelen, &offset_bytes, &length_bytes))
     //    return TextIterator();
 
-    return TextIterator(off_bytes, len_bytes, this);
+    return *new_TextIterator(off_bytes, len_bytes, this);
 }
 
 
@@ -607,9 +607,9 @@ TextIterator TextDocument::iterate_line(ULONG lineno, ULONG *linestart, ULONG *l
     ULONG length_bytes;
 
     if (!lineinfo_from_lineno(lineno, linestart, linelen, &offset_bytes, &length_bytes))
-        return TextIterator();
+        return *new_TextIterator();
 
-    return TextIterator(offset_bytes, length_bytes, this);
+    return *new_TextIterator(offset_bytes, length_bytes, this);
 }
 
 TextIterator TextDocument::iterate_line_offset(ULONG offset_chars, ULONG *lineno, ULONG *linestart)
@@ -618,9 +618,9 @@ TextIterator TextDocument::iterate_line_offset(ULONG offset_chars, ULONG *lineno
     ULONG length_bytes;
 
     if (!lineinfo_from_offset(offset_chars, lineno, linestart, 0, &offset_bytes, &length_bytes))
-        return TextIterator();
+        return *new_TextIterator();
 
-    return TextIterator(offset_bytes, length_bytes, this);
+    return *new_TextIterator(offset_bytes, length_bytes, this);
 }
 
 ULONG TextDocument::lineno_from_offset(ULONG offset)
@@ -991,4 +991,81 @@ bool TextDocument::Redo(ULONG *offset_start, ULONG *offset_end)
     m_nDocLength_bytes = size_sequence(m_seq);
 
     return true;
+}
+
+TextIterator * new_TextIterator(
+    ULONG off,
+    ULONG len,
+    TextDocument * td
+    )
+{
+    TextIterator * lps = new TextIterator;
+
+    lps->text_doc = td;
+    lps->off_bytes = off;
+    lps->len_bytes = len;
+
+    return lps;
+}
+
+TextIterator * new_TextIterator(
+    const TextIterator & ti
+    )
+{
+    TextIterator * lps = new TextIterator;
+
+    lps->text_doc = ti.text_doc;
+    lps->off_bytes = ti.off_bytes;
+    lps->len_bytes = ti.len_bytes;
+
+    return lps;
+}
+
+TextIterator * copy_TextIterator(
+    TextIterator * lps,
+    const TextIterator & ti
+    )
+{
+    lps->text_doc = ti.text_doc;
+    lps->off_bytes = ti.off_bytes;
+    lps->len_bytes = ti.len_bytes;
+
+    return lps;
+}
+
+void delete_TextIterator(
+    TextIterator * lps
+    )
+{
+    delete lps;
+}
+
+ULONG gettext_TextIterator(
+    TextIterator * lps,
+    LPTSTR buf,
+    ULONG buflen
+    )
+{
+    if (lps->text_doc)
+    {
+        // get text from the TextDocument at the specified byte-offset
+        ULONG len = lps->text_doc->gettext(lps->off_bytes, lps->len_bytes, buf, &buflen);
+
+        // adjust the iterator's internal position
+        lps->off_bytes += len;
+        lps->len_bytes -= len;
+
+        return buflen;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+bool valid_TextIterator(
+    TextIterator * lps
+    )
+{
+    return lps->text_doc ? true : false;
 }
