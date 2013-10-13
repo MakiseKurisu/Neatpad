@@ -80,7 +80,7 @@ bool TextDocument::init(HANDLE hFile)
         return false;
 
     // allocate new file-buffer
-    if ((buffer = new char[m_nDocLength_bytes]) == 0)
+    if ((buffer = (char *) malloc(sizeof(char) * m_nDocLength_bytes)) == 0)
         return false;
 
     // read entire file into memory
@@ -96,7 +96,7 @@ bool TextDocument::init(HANDLE hFile)
         clear();
 
     CloseHandle(hFile);
-    delete [] buffer;
+    free(buffer);
     return true;
 }
 
@@ -163,13 +163,13 @@ bool TextDocument::clear()
 
     if (m_pLineBuf_byte)
     {
-        delete [] m_pLineBuf_byte;
+        free(m_pLineBuf_byte);
         m_pLineBuf_byte = 0;
     }
 
     if (m_pLineBuf_char)
     {
-        delete [] m_pLineBuf_char;
+        free(m_pLineBuf_char);
         m_pLineBuf_char = 0;
     }
 
@@ -184,8 +184,8 @@ bool TextDocument::EmptyDoc()
 
     // this is not robust. it's just to get the thing
     // up-and-running until I write a proper line-buffer mananger
-    m_pLineBuf_byte = new ULONG[0x1000];
-    m_pLineBuf_char = new ULONG[0x1000];
+    m_pLineBuf_byte = (ULONG *) malloc(sizeof(ULONG) * 0x1000);
+    m_pLineBuf_char = (ULONG *) malloc(sizeof(ULONG) * 0x1000);
 
     m_pLineBuf_byte[0] = 0;
     m_pLineBuf_char[0] = 0;
@@ -384,11 +384,11 @@ bool TextDocument::init_linebuffer()
     ULONG buflen = m_nDocLength_bytes - m_nHeaderSize;
 
     // allocate the line-buffer for storing each line's BYTE offset
-    if ((m_pLineBuf_byte = new ULONG[buflen + 1]) == 0)
+    if ((m_pLineBuf_byte = (ULONG *) malloc(sizeof(ULONG) * (buflen + 1))) == 0)
         return false;
 
     // allocate the line-buffer for storing each line's CHARACTER offset
-    if ((m_pLineBuf_char = new ULONG[buflen + 1]) == 0)
+    if ((m_pLineBuf_char = (ULONG *) malloc(sizeof(ULONG) * (buflen + 1))) == 0)
         return false;
 
     m_nNumLines = 0;
@@ -999,11 +999,16 @@ TextIterator * new_TextIterator(
     TextDocument * td
     )
 {
-    TextIterator * lps = new TextIterator;
+    TextIterator * lps = (TextIterator *) malloc(sizeof(TextIterator));
 
-    lps->text_doc = td;
-    lps->off_bytes = off;
-    lps->len_bytes = len;
+    if (lps)
+    {
+        memset(lps, 0, sizeof(*lps));
+
+        lps->text_doc = td;
+        lps->off_bytes = off;
+        lps->len_bytes = len;
+    }
 
     return lps;
 }
@@ -1031,7 +1036,7 @@ void delete_TextIterator(
     TextIterator * lps
     )
 {
-    delete lps;
+    free(lps);
 }
 
 ULONG gettext_TextIterator(
