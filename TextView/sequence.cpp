@@ -15,16 +15,16 @@
 
 
 void clear_eventstack(
-    eventstack & dest
+    eventstack * dest
     )
 {
-    for (size_t i = 0; i < dest.size(); i++)
+    for (size_t i = 0; i < dest->size(); i++)
     {
-        free_span_range(dest[i]);
-        delete_span_range(dest[i]);
+        free_span_range((*dest)[i]);
+        delete_span_range((*dest)[i]);
     }
 
-    dest.clear();
+    dest->clear();
 }
 
 sequence * new_sequence()
@@ -34,17 +34,21 @@ sequence * new_sequence()
     if (lps)
     {
         memset(lps, 0, sizeof(*lps));
+
+        lps->undostack = new eventstack;
+        lps->redostack = new eventstack;
+
         record_action_sequence(lps, action_invalid, 0);
 
+        lps->head = lps->tail = 0;
         lps->sequence_length = 0;
+        lps->group_id = 0;
+        lps->group_refcount = 0;
 
         lps->head = new_span(0, 0, 0);
         lps->tail = new_span(0, 0, 0);
         lps->head->next = lps->tail;
         lps->tail->prev = lps->head;
-
-        lps->group_id = 0;
-        lps->group_refcount = 0;
     }
 
     return lps;
@@ -58,6 +62,9 @@ void delete_sequence(
 
     delete_span(lps->head);
     delete_span(lps->tail);
+
+    delete lps->undostack;
+    delete lps->redostack;
 
     free(lps);
 }
@@ -144,7 +151,7 @@ buffer_control * alloc_buffer_sequence(
         return 0;
 
     // allocate a new buffer of byte/wchar/long/whatever
-    if ((bc->buffer = new seqchar[maxsize]) == 0)
+    if ((bc->buffer = (seqchar *) malloc(sizeof(seqchar) * maxsize)) == 0)
     {
         delete_buffer_control(bc);
         return 0;
@@ -334,33 +341,33 @@ void restore_spanrange_sequence(
 //
 bool undoredo_sequence(
     sequence * lps,
-    eventstack & source,
-    eventstack & dest
+    eventstack * source,
+    eventstack * dest
     )
 {
-    span_range *range = 0;
+    span_range * range = 0;
     size_t group_id;
 
-    if (source.empty())
+    if (source->empty())
         return false;
 
     // make sure that no "optimized" actions can occur
     record_action_sequence(lps, action_invalid, 0);
 
-    group_id = source.back()->group_id;
+    group_id = source->back()->group_id;
 
     do
     {
         // remove the next event from the source stack
-        range = source.back();
-        source.pop_back();
+        range = source->back();
+        source->pop_back();
 
         // add event onto the destination stack
-        dest.push_back(range);
+        dest->push_back(range);
 
         // do the actual work
         restore_spanrange_sequence(lps, range, source == lps->undostack ? true : false);
-    } while (!source.empty() && (source.back()->group_id == group_id && group_id != 0));
+    } while (!source->empty() && (source->back()->group_id == group_id && group_id != 0));
 
     return true;
 }
@@ -392,7 +399,7 @@ bool canundo_sequence(
     sequence * lps
     )
 {
-    return lps->undostack.size() != 0;
+    return lps->undostack->size() != 0;
 }
 
 //
@@ -402,7 +409,7 @@ bool canredo_sequence(
     sequence * lps
     )
 {
-    return lps->redostack.size() != 0;
+    return lps->redostack->size() != 0;
 }
 
 //
@@ -457,22 +464,22 @@ span_range * initundo_sequence(
 {
     span_range * sr = new_span_range(lps->sequence_length, index, length, act, lps->can_quicksave, lps->group_refcount ? lps->group_id : 0);
 
-    lps->undostack.push_back(sr);
+    lps->undostack->push_back(sr);
 
     return sr;
 }
 
 span_range * stackback_sequence(
     sequence * lps,
-    eventstack & source,
+    eventstack * source,
     size_t idx
     )
 {
-    size_t length = source.size();
+    size_t length = source->size();
 
     if (length > 0 && idx < length)
     {
-        return source[length - idx - 1];
+        return (*source)[length - idx - 1];
     }
     else
     {
@@ -542,7 +549,7 @@ bool insert_worker_sequence(
     if (insoffset == 0 && can_optimize_sequence(lps, act, index))
     {
         // simply extend the last span's length
-        span_range * sr = lps->undostack.back();
+        span_range * sr = lps->undostack->back();
         sptr->prev->length += length;
         sr->length += length;
     }
@@ -719,7 +726,7 @@ bool erase_worker_sequence(
     //
     else if (index + length == spanindex + sptr->length && can_optimize_sequence(lps, action_erase, index + length))
     {
-        event = lps->undostack.back();
+        event = lps->undostack->back();
         event->length += length;
         event->index -= length;
         append_spanrange = false;
@@ -902,8 +909,8 @@ bool replace_sequence(
         ungroup_sequence(lps);
         record_action_sequence(lps, action_invalid, 0);
 
-        span_range *range = lps->undostack.back();
-        lps->undostack.pop_back();
+        span_range *range = lps->undostack->back();
+        lps->undostack->pop_back();
         restore_spanrange_sequence(lps, range, true);
         delete_span_range(range);
 
@@ -997,7 +1004,7 @@ bool clear_sequence(
     // delete all memory-buffers
     for (size_t i = 0; i < lps->buffer_list.size(); i++)
     {
-        delete [] lps->buffer_list[i]->buffer;
+        free(lps->buffer_list[i]->buffer);
         delete_buffer_control(lps->buffer_list[i]);
     }
 
@@ -1122,6 +1129,7 @@ span * new_span(
     if (lps)
     {
         memset(lps, 0, sizeof(*lps));
+
         lps->next = nx;
         lps->prev = pr;
         lps->offset = off;
@@ -1154,6 +1162,7 @@ span_range * new_span_range(
     if (lps)
     {
         memset(lps, 0, sizeof(*lps));
+
         lps->first = 0;
         lps->last = 0;
         lps->boundary = true;
@@ -1320,6 +1329,7 @@ ref * new_ref(
     if (lps)
     {
         memset(lps, 0, sizeof(*lps));
+
         lps->seq = seq;
         lps->index = index;
     }

@@ -34,9 +34,8 @@ struct _buffer_control;
 typedef struct _buffer_control buffer_control;
 
 typedef std::vector<span_range *> eventstack;
-void clear_eventstack_sequence(
-    sequence * lps,
-    eventstack & dest
+void clear_eventstack(
+    eventstack * dest
     );
 
 typedef std::vector<buffer_control *> bufferlist;
@@ -123,7 +122,7 @@ span_range * initundo_sequence(
     );
 span_range * stackback_sequence(
     sequence * lps,
-    eventstack & source,
+    eventstack * source,
     size_t idx
     );
 void record_action_sequence(
@@ -241,8 +240,8 @@ struct _sequence
     //
     //    Undo and redo stacks
     //
-    eventstack undostack;
-    eventstack redostack;
+    eventstack * undostack;
+    eventstack * redostack;
     size_t group_id;
     size_t group_refcount;
     size_w undoredo_index;
