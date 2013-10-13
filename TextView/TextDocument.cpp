@@ -1012,13 +1012,7 @@ TextIterator * new_TextIterator(
     const TextIterator & ti
     )
 {
-    TextIterator * lps = new TextIterator;
-
-    lps->text_doc = ti.text_doc;
-    lps->off_bytes = ti.off_bytes;
-    lps->len_bytes = ti.len_bytes;
-
-    return lps;
+    return new_TextIterator(ti.off_bytes, ti.len_bytes, ti.text_doc);
 }
 
 TextIterator * copy_TextIterator(

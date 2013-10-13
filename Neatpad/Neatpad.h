@@ -1,6 +1,8 @@
 #ifndef NEATPAD_INCLUDED
 #define NEATPAD_INCLUDED
 
+#include "debug.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

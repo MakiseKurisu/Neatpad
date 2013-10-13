@@ -433,12 +433,33 @@ BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *w
         // perform memory allocations. Let ScriptShape catch any alloc-failures
         if (uspData->glyphCount + reallocSize >= uspData->glyphAllocLen)
         {
+            LPVOID REALLOC = NULL;
             uspData->glyphAllocLen += reallocSize;
 
-            uspData->glyphList = realloc(uspData->glyphList, uspData->glyphAllocLen * sizeof(WORD));
-            uspData->offsetList = realloc(uspData->offsetList, uspData->glyphAllocLen * sizeof(GOFFSET));
-            uspData->widthList = realloc(uspData->widthList, uspData->glyphAllocLen * sizeof(int));
-            uspData->svaList = realloc(uspData->svaList, uspData->glyphAllocLen * sizeof(SCRIPT_VISATTR));
+            REALLOC = realloc(uspData->glyphList, uspData->glyphAllocLen * sizeof(WORD));
+            if (!REALLOC)
+            {
+                free(uspData->glyphList);
+            }
+            uspData->glyphList = REALLOC;
+            REALLOC = realloc(uspData->offsetList, uspData->glyphAllocLen * sizeof(GOFFSET));
+            if (!REALLOC)
+            {
+                free(uspData->offsetList);
+            }
+            uspData->offsetList = REALLOC;
+            REALLOC = realloc(uspData->widthList, uspData->glyphAllocLen * sizeof(int));
+            if (!REALLOC)
+            {
+                free(uspData->widthList);
+            }
+            uspData->widthList = REALLOC;
+            REALLOC = realloc(uspData->svaList, uspData->glyphAllocLen * sizeof(SCRIPT_VISATTR));
+            if (!REALLOC)
+            {
+                free(uspData->svaList);
+            }
+            uspData->svaList = REALLOC;
         }
 
         //
@@ -711,10 +732,27 @@ BOOL WINAPI UspAnalyze(
     // Rellocate logical cluster+attribute arrays prior to shaping
     if (uspData->stringAllocLen < wlen)
     {
+        LPVOID REALLOC = NULL;
+
         uspData->stringAllocLen = wlen;
-        uspData->clusterList = realloc(uspData->clusterList, wlen * sizeof(WORD));
-        uspData->attrList = realloc(uspData->attrList, wlen * sizeof(ATTR));
-        uspData->breakList = realloc(uspData->breakList, wlen * sizeof(SCRIPT_LOGATTR));
+        REALLOC = realloc(uspData->clusterList, wlen * sizeof(WORD));
+        if (!REALLOC)
+        {
+            free(uspData->clusterList);
+        }
+        uspData->clusterList = REALLOC;
+        REALLOC = realloc(uspData->attrList, wlen * sizeof(ATTR));
+        if (!REALLOC)
+        {
+            free(uspData->attrList);
+        }
+        uspData->attrList = REALLOC;
+        REALLOC = realloc(uspData->breakList, wlen * sizeof(SCRIPT_LOGATTR));
+        if (!REALLOC)
+        {
+            free(uspData->breakList);
+        }
+        uspData->breakList = REALLOC;
     }
 
     // Generate the word-break information in logical order

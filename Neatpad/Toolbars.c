@@ -14,7 +14,7 @@
 #include <stdarg.h>
 #include <tchar.h>
 #include <commctrl.h>
-#include "neatpad.h"
+#include "Neatpad.h"
 
 
 

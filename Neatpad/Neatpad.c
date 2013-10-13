@@ -631,6 +631,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int iShowC
     //TCHAR        *pszCmdlineFile = 0;
     TCHAR        arg[MAX_PATH];
 
+#ifdef	_DEBUG
+    int tmpFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+    tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
+    _CrtSetDbgFlag(tmpFlag);
+#endif
+
     //
     // get the first commandline argument
     //

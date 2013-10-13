@@ -1,6 +1,7 @@
 #ifndef SEQUENCE_INCLUDED
 #define SEQUENCE_INCLUDED
 
+#include "debug.h"
 #include <vector>
 
 //

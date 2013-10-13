@@ -5,6 +5,8 @@
 #ifndef TEXTVIEW_INCLUDED
 #define TEXTVIEW_INCLUDED
 
+#include "debug.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

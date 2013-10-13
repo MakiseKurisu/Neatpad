@@ -12,6 +12,7 @@
 
 #include <windows.h>
 #include <commdlg.h>
+#include "Neatpad.h"
 
 static HANDLE g_hDevMode = NULL;
 static HANDLE g_hDevNames = NULL;
