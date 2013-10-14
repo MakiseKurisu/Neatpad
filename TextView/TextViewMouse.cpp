@@ -163,7 +163,7 @@ LONG TextView::OnLButtonDown(UINT nFlags, int mx, int my)
             RefreshWindow();
         }
 
-        m_pTextDoc->lineinfo_from_lineno(nLineNo, &m_nSelectionStart, &m_nSelectionEnd, 0, 0);
+        lineinfo_from_lineno_TextDocument(m_pTextDoc, nLineNo, &m_nSelectionStart, &m_nSelectionEnd, 0, 0);
         m_nSelectionEnd += m_nSelectionStart;
         m_nCursorOffset = m_nSelectionStart;
 
@@ -329,7 +329,7 @@ LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
         //if(m_nSelectionEnd != nFileOff)
         {
             ULONG linelen;
-            m_pTextDoc->lineinfo_from_lineno(nLineNo, 0, &linelen, 0, 0);
+            lineinfo_from_lineno_TextDocument(m_pTextDoc, nLineNo, 0, &linelen, 0, 0);
 
             m_nCursorOffset = nFileOff;
 
@@ -499,7 +499,7 @@ BOOL TextView::MouseCoordToFilePos(int         mx,            // [in]  mouse x-c
     if (nLineNo >= m_nLineCount)
     {
         nLineNo = m_nLineCount ? m_nLineCount - 1 : 0;
-        off_chars = m_pTextDoc->size();
+        off_chars = size_TextDocument(m_pTextDoc);
     }
 
     mx += m_nHScrollPos * m_nFontWidth;
@@ -511,7 +511,7 @@ BOOL TextView::MouseCoordToFilePos(int         mx,            // [in]  mouse x-c
     UspSnapXToOffset(uspData, mx, &mx, &cp, 0);
 
     // return coords!
-    TextIterator * itor = new_TextIterator(m_pTextDoc->iterate_line(nLineNo, &off_chars));
+    TextIterator * itor = new_TextIterator(iterate_line_TextDocument(m_pTextDoc, nLineNo, &off_chars));
     *pnLineNo = nLineNo;
     *pnFileOffset = cp + off_chars;
     *psnappedX = mx;// - m_nHScrollPos * m_nFontWidth;
@@ -573,18 +573,18 @@ LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
     //
     //    Find the start-of-line information from specified file-offset
     //
-    lineno = m_pTextDoc->lineno_from_offset(start);
+    lineno = lineno_from_offset_TextDocument(m_pTextDoc, start);
 
     // clip to top of window
     if (lineno < m_nVScrollPos)
     {
         lineno = m_nVScrollPos;
-        copy_TextIterator(itor, m_pTextDoc->iterate_line(lineno, &off_chars, &len_chars));
+        copy_TextIterator(itor, iterate_line_TextDocument(m_pTextDoc, lineno, &off_chars, &len_chars));
         start = off_chars;
     }
     else
     {
-        copy_TextIterator(itor, m_pTextDoc->iterate_line(lineno, &off_chars, &len_chars));
+        copy_TextIterator(itor, iterate_line_TextDocument(m_pTextDoc, lineno, &off_chars, &len_chars));
     }
 
     if (!valid_TextIterator(itor) || start >= finish)
@@ -607,7 +607,7 @@ LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
         InvalidateRect(m_hWnd, &rect, FALSE);
 
         // jump down to next line
-        copy_TextIterator(itor, m_pTextDoc->iterate_line(++lineno, &off_chars, &len_chars));
+        copy_TextIterator(itor, iterate_line_TextDocument(m_pTextDoc, ++lineno, &off_chars, &len_chars));
         ypos += m_nLineHeight;
     }
 
@@ -687,7 +687,7 @@ VOID TextView::UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx, ULONG 
     USPDATA      * uspData;
 
     // get line information from cursor-offset
-    if (m_pTextDoc->lineinfo_from_offset(offset, &lineno, &off_chars, 0, 0, 0))
+    if (lineinfo_from_offset_TextDocument(m_pTextDoc, offset, &lineno, &off_chars, 0, 0, 0))
     {
         // locate the USPDATA for this line
         if ((uspData = GetUspData(NULL, lineno)) != 0)

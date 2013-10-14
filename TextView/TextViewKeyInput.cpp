@@ -39,16 +39,16 @@ ULONG TextView::EnterText(LPTSTR szText, ULONG nLength)
         if (fReplaceSelection)
         {
             // group this erase with the insert/replace operation
-            group_sequence(m_pTextDoc->m_seq);
-            m_pTextDoc->erase_text(selstart, selend - selstart);
+            group_sequence(m_pTextDoc->seq);
+            erase_text_TextDocument(m_pTextDoc, selstart, selend - selstart);
             m_nCursorOffset = selstart;
         }
 
-        if (!m_pTextDoc->insert_text(m_nCursorOffset, szText, nLength))
+        if (!insert_text_TextDocument(m_pTextDoc, m_nCursorOffset, szText, nLength))
             return 0;
 
         if (fReplaceSelection)
-            ungroup_sequence(m_pTextDoc->m_seq);
+            ungroup_sequence(m_pTextDoc->seq);
 
         break;
 
@@ -82,7 +82,7 @@ ULONG TextView::EnterText(LPTSTR szText, ULONG nLength)
 
         }
 
-        if (!m_pTextDoc->replace_text(m_nCursorOffset, szText, nLength, erase_len))
+        if (!replace_text_TextDocument(m_pTextDoc, m_nCursorOffset, szText, nLength, erase_len))
             return 0;
 
         break;
@@ -113,10 +113,10 @@ BOOL TextView::ForwardDelete()
 
     if (selstart != selend)
     {
-        m_pTextDoc->erase_text(selstart, selend - selstart);
+        erase_text_TextDocument(m_pTextDoc, selstart, selend - selstart);
         m_nCursorOffset = selstart;
 
-        breakopt_sequence(m_pTextDoc->m_seq);
+        breakopt_sequence(m_pTextDoc->seq);
     }
     else
     {
@@ -126,7 +126,7 @@ BOOL TextView::ForwardDelete()
         //ULONG              lineOffset;
         //ULONG              index;
 
-        render_sequence(m_pTextDoc->m_seq, m_nCursorOffset, tmp, 2);
+        render_sequence(m_pTextDoc->seq, m_nCursorOffset, tmp, 2);
 
         /*GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset);
 
@@ -142,7 +142,7 @@ BOOL TextView::ForwardDelete()
         ULONG oldpos = m_nCursorOffset;
         MoveCharNext();
 
-        m_pTextDoc->erase_text(oldpos, m_nCursorOffset - oldpos);
+        erase_text_TextDocument(m_pTextDoc, oldpos, m_nCursorOffset - oldpos);
         m_nCursorOffset = oldpos;
 
 
@@ -170,9 +170,9 @@ BOOL TextView::BackDelete()
     // if there's a selection then delete it
     if (selstart != selend)
     {
-        m_pTextDoc->erase_text(selstart, selend - selstart);
+        erase_text_TextDocument(m_pTextDoc, selstart, selend - selstart);
         m_nCursorOffset = selstart;
-        breakopt_sequence(m_pTextDoc->m_seq);
+        breakopt_sequence(m_pTextDoc->seq);
     }
     // otherwise do a back-delete
     else if (m_nCursorOffset > 0)
@@ -181,7 +181,7 @@ BOOL TextView::BackDelete()
         ULONG oldpos = m_nCursorOffset;
         MoveCharPrev();
         //m_pTextDoc->erase_text(m_nCursorOffset, 1);
-        m_pTextDoc->erase_text(m_nCursorOffset, oldpos - m_nCursorOffset);
+        erase_text_TextDocument(m_pTextDoc, m_nCursorOffset, oldpos - m_nCursorOffset);
     }
 
     m_nSelectionStart = m_nCursorOffset;
@@ -196,9 +196,9 @@ BOOL TextView::BackDelete()
 
 void TextView::Smeg(BOOL fAdvancing)
 {
-    m_pTextDoc->init_linebuffer();
+    init_linebuffer_TextDocument(m_pTextDoc);
 
-    m_nLineCount = m_pTextDoc->linecount();
+    m_nLineCount = linecount_TextDocument(m_pTextDoc);
 
     UpdateMetrics();
     UpdateMarginWidth();
@@ -216,7 +216,7 @@ BOOL TextView::Undo()
     if (m_nEditMode == MODE_READONLY)
         return FALSE;
 
-    if (!m_pTextDoc->Undo(&m_nSelectionStart, &m_nSelectionEnd))
+    if (!Undo_TextDocument(m_pTextDoc, &m_nSelectionStart, &m_nSelectionEnd))
         return FALSE;
 
     m_nCursorOffset = m_nSelectionEnd;
@@ -234,7 +234,7 @@ BOOL TextView::Redo()
     if (m_nEditMode == MODE_READONLY)
         return FALSE;
 
-    if (!m_pTextDoc->Redo(&m_nSelectionStart, &m_nSelectionEnd))
+    if (!Redo_TextDocument(m_pTextDoc, &m_nSelectionStart, &m_nSelectionEnd))
         return FALSE;
 
     m_nCursorOffset = m_nSelectionEnd;
@@ -248,12 +248,12 @@ BOOL TextView::Redo()
 
 BOOL TextView::CanUndo()
 {
-    return canundo_sequence(m_pTextDoc->m_seq) ? TRUE : FALSE;
+    return canundo_sequence(m_pTextDoc->seq) ? TRUE : FALSE;
 }
 
 BOOL TextView::CanRedo()
 {
-    return canredo_sequence(m_pTextDoc->m_seq) ? TRUE : FALSE;
+    return canredo_sequence(m_pTextDoc->seq) ? TRUE : FALSE;
 }
 
 LONG TextView::OnChar(UINT nChar, UINT nFlags)
@@ -270,7 +270,7 @@ LONG TextView::OnChar(UINT nChar, UINT nFlags)
     if (EnterText(&ch, 1))
     {
         if (nChar == '\n')
-            breakopt_sequence(m_pTextDoc->m_seq);
+            breakopt_sequence(m_pTextDoc->seq);
 
         NotifyParent(TVN_CHANGED);
     }

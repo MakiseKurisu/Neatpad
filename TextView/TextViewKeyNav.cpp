@@ -349,7 +349,7 @@ VOID TextView::MoveFileStart()
 //
 VOID TextView::MoveFileEnd()
 {
-    m_nCursorOffset = m_pTextDoc->size();
+    m_nCursorOffset = size_TextDocument(m_pTextDoc);
 }
 
 

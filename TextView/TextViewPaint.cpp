@@ -78,7 +78,7 @@ USPCACHE *TextView::GetUspCache(HDC hdc, ULONG nLineNo, ULONG *nOffset/*=0*/)
     //
     // get the text for the entire line and apply style attributes
     //
-    len = m_pTextDoc->getline(nLineNo, buff, TEXTBUFSIZE, &off_chars);
+    len = getline_TextDocument(m_pTextDoc, nLineNo, buff, TEXTBUFSIZE, &off_chars);
 
     // cache the line's offset and length information
     m_uspCache[lru_index].offset = off_chars;

@@ -6,80 +6,204 @@
 
 struct _TextIterator;
 typedef struct _TextIterator TextIterator;
+struct _TextDocument;
+typedef struct _TextDocument TextDocument;
 
-class TextDocument
+TextDocument * new_TextDocument(void);
+void delete_TextDocument(
+    TextDocument * lps
+    );
+bool init_TextDocument(
+    TextDocument * lps,
+    LPTSTR filename
+    );
+bool init_TextDocument(
+    TextDocument * lps,
+    HANDLE hFile
+    );
+bool save_TextDocument(
+    TextDocument * lps,
+    LPTSTR filename
+    );
+int detect_file_format_TextDocument(
+    TextDocument * lps
+    );
+bool clear_TextDocument(
+    TextDocument * lps
+    );
+bool EmptyDoc_TextDocument(
+    TextDocument * lps
+    );
+int getchar_TextDocument(
+    TextDocument * lps,
+    ULONG offset,
+    ULONG lenbytes,
+    ULONG * pch32
+    );
+ULONG gettext_TextDocument(
+    TextDocument * lps,
+    ULONG offset,
+    ULONG lenbytes,
+    LPTSTR buf,
+    ULONG * buflen
+    );
+ULONG getdata_TextDocument(
+    TextDocument * lps,
+    ULONG offset,
+    BYTE * buf,
+    size_t len
+    );
+bool init_linebuffer_TextDocument(
+    TextDocument * lps
+    );
+ULONG linecount_TextDocument(
+    TextDocument * lps
+    );
+ULONG longestline_TextDocument(
+    TextDocument * lps,
+    int tabwidth
+    );
+bool lineinfo_from_lineno_TextDocument(
+    TextDocument * lps,
+    ULONG lineno,
+    ULONG * lineoff_chars,
+    ULONG * linelen_chars,
+    ULONG * lineoff_bytes,
+    ULONG * linelen_bytes
+    );
+bool lineinfo_from_offset_TextDocument(
+    TextDocument * lps,
+    ULONG offset_chars,
+    ULONG *lineno,
+    ULONG *lineoff_chars,
+    ULONG *linelen_chars,
+    ULONG *lineoff_bytes,
+    ULONG *linelen_bytes
+    );
+int getformat_TextDocument(
+    TextDocument * lps
+    );
+ULONG size_TextDocument(
+    TextDocument * lps
+    );
+TextIterator iterate_TextDocument(
+    TextDocument * lps,
+    ULONG offset_chars
+    );
+TextIterator iterate_line_TextDocument(
+    TextDocument * lps,
+    ULONG lineno,
+    ULONG * linestart = 0,
+    ULONG * linelen = 0
+    );
+TextIterator iterate_line_offset_TextDocument(
+    TextDocument * lps,
+    ULONG offset_chars,
+    ULONG * lineno,
+    ULONG * linestart = 0
+    );
+ULONG lineno_from_offset_TextDocument(
+    TextDocument * lps,
+    ULONG offset
+    );
+ULONG offset_from_lineno_TextDocument(
+    TextDocument * lps,
+    ULONG lineno
+    );
+ULONG getline_TextDocument(
+    TextDocument * lps,
+    ULONG nLineNo,
+    LPTSTR buf,
+    ULONG buflen,
+    ULONG * off_chars
+    );
+size_t rawdata_to_utf16_TextDocument(
+    TextDocument * lps,
+    BYTE * rawdata,
+    size_t rawlen,
+    LPTSTR utf16str,
+    size_t * utf16len
+    );
+size_t utf16_to_rawdata_TextDocument(
+    TextDocument * lps,
+    LPTSTR utf16str,
+    size_t utf16len,
+    BYTE * rawdata,
+    size_t * rawlen
+    );
+ULONG insert_raw_TextDocument(
+    TextDocument * lps,
+    ULONG offset_bytes,
+    LPTSTR text,
+    ULONG length
+    );
+ULONG replace_raw_TextDocument(
+    TextDocument * lps,
+    ULONG offset_bytes,
+    LPTSTR text,
+    ULONG length,
+    ULONG erase_chars
+    );
+ULONG erase_raw_TextDocument(
+    TextDocument * lps,
+    ULONG offset_bytes,
+    ULONG length
+    );
+ULONG count_chars_TextDocument(
+    TextDocument * lps,
+    ULONG offset_bytes,
+    ULONG length_chars
+    );
+ULONG byteoffset_to_charoffset_TextDocument(
+    TextDocument * lps,
+    ULONG offset_bytes
+    );
+ULONG charoffset_to_byteoffset_TextDocument(
+    TextDocument * lps,
+    ULONG offset_chars
+    );
+ULONG insert_text_TextDocument(
+    TextDocument * lps,
+    ULONG offset_chars,
+    LPTSTR text,
+    ULONG length
+    );
+ULONG replace_text_TextDocument(
+    TextDocument * lps,
+    ULONG offset_chars,
+    LPTSTR text,
+    ULONG length,
+    ULONG erase_len
+    );
+ULONG erase_text_TextDocument(
+    TextDocument * lps,
+    ULONG offset_chars,
+    ULONG length
+    );
+bool Undo_TextDocument(
+    TextDocument * lps,
+    ULONG *offset_start,
+    ULONG *offset_end
+    );
+bool Redo_TextDocument(
+    TextDocument * lps,
+    ULONG *offset_start,
+    ULONG *offset_end
+    );
+
+struct _TextDocument
 {
-    friend class TextView;
+    sequence * seq;
 
-public:
-    TextDocument(void);
-    ~TextDocument(void);
+    ULONG nDocLength_chars;
+    ULONG nDocLength_bytes;
 
-    bool  init(HANDLE hFile);
-    bool  init(LPTSTR filename);
+    ULONG * pLineBuf_byte;
+    ULONG * pLineBuf_char;
+    ULONG  nNumLines;
 
-    bool  clear(void);
-    bool EmptyDoc(void);
-
-    bool    Undo(ULONG *offset_start, ULONG *offset_end);
-    bool    Redo(ULONG *offset_start, ULONG *offset_end);
-
-    // UTF-16 text-editing interface
-    ULONG    insert_text(ULONG offset_chars, LPTSTR text, ULONG length);
-    ULONG    replace_text(ULONG offset_chars, LPTSTR text, ULONG length, ULONG erase_len);
-    ULONG    erase_text(ULONG offset_chars, ULONG length);
-
-    ULONG lineno_from_offset(ULONG offset);
-    ULONG offset_from_lineno(ULONG lineno);
-
-    bool  lineinfo_from_offset(ULONG offset_chars, ULONG *lineno, ULONG *lineoff_chars, ULONG *linelen_chars, ULONG *lineoff_bytes, ULONG *linelen_bytes);
-    bool  lineinfo_from_lineno(ULONG lineno, ULONG *lineoff_chars, ULONG *linelen_chars, ULONG *lineoff_bytes, ULONG *linelen_bytes);
-
-    TextIterator iterate(ULONG offset);
-    TextIterator iterate_line(ULONG lineno, ULONG *linestart = 0, ULONG *linelen = 0);
-    TextIterator iterate_line_offset(ULONG offset_chars, ULONG *lineno, ULONG *linestart = 0);
-
-    ULONG getdata(ULONG offset, BYTE *buf, size_t len);
-    ULONG getline(ULONG nLineNo, LPTSTR buf, ULONG buflen, ULONG *off_chars);
-
-    int   getformat(void);
-    ULONG linecount(void);
-    ULONG longestline(int tabwidth);
-    ULONG size(void);
-
-//private:
-
-    bool init_linebuffer(void);
-
-    ULONG charoffset_to_byteoffset(ULONG offset_chars);
-    ULONG byteoffset_to_charoffset(ULONG offset_bytes);
-
-    ULONG count_chars(ULONG offset_bytes, ULONG length_chars);
-
-    size_t utf16_to_rawdata(LPTSTR utf16str, size_t utf16len, BYTE *rawdata, size_t *rawlen);
-    size_t rawdata_to_utf16(BYTE *rawdata, size_t rawlen, LPTSTR utf16str, size_t *utf16len);
-
-    int   detect_file_format(int *headersize);
-    ULONG      gettext(ULONG offset, ULONG lenbytes, LPTSTR buf, ULONG *len);
-    int   getchar(ULONG offset, ULONG lenbytes, ULONG *pch32);
-
-    // UTF-16 text-editing interface
-    ULONG    insert_raw(ULONG offset_bytes, LPTSTR text, ULONG length);
-    ULONG    replace_raw(ULONG offset_bytes, LPTSTR text, ULONG length, ULONG erase_len);
-    ULONG    erase_raw(ULONG offset_bytes, ULONG length);
-
-
-    sequence * m_seq;
-
-    ULONG m_nDocLength_chars;
-    ULONG m_nDocLength_bytes;
-
-    ULONG * m_pLineBuf_byte;
-    ULONG * m_pLineBuf_char;
-    ULONG  m_nNumLines;
-
-    int m_nFileFormat;
-    int m_nHeaderSize;
+    int nFileFormat;
+    int nHeaderSize;
 };
 
 TextIterator * new_TextIterator(

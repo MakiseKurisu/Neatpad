@@ -21,10 +21,10 @@ LONG TextView::OpenFile(LPTSTR szFileName)
 {
     ClearFile();
 
-    if (m_pTextDoc->init(szFileName))
+    if (init_TextDocument(m_pTextDoc, szFileName))
     {
-        m_nLineCount = m_pTextDoc->linecount();
-        m_nLongestLine = m_pTextDoc->longestline(m_nTabWidthChars);
+        m_nLineCount = linecount_TextDocument(m_pTextDoc);
+        m_nLongestLine = longestline_TextDocument(m_pTextDoc, m_nTabWidthChars);
 
         m_nVScrollPos = 0;
         m_nHScrollPos = 0;
@@ -49,14 +49,14 @@ LONG TextView::ClearFile()
 {
     if (m_pTextDoc)
     {
-        m_pTextDoc->clear();
-        m_pTextDoc->EmptyDoc();
+        clear_TextDocument(m_pTextDoc);
+        EmptyDoc_TextDocument(m_pTextDoc);
     }
 
     ResetLineCache();
 
-    m_nLineCount = m_pTextDoc->linecount();
-    m_nLongestLine = m_pTextDoc->longestline(m_nTabWidthChars);
+    m_nLineCount = linecount_TextDocument(m_pTextDoc);
+    m_nLongestLine = longestline_TextDocument(m_pTextDoc, m_nTabWidthChars);
 
     m_nVScrollPos = 0;
     m_nHScrollPos = 0;

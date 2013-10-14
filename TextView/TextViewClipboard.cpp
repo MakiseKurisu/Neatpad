@@ -43,7 +43,7 @@ BOOL TextView::OnPaste()
             EnterText(szText, textlen);
 
             if (textlen > 1)
-                breakopt_sequence(m_pTextDoc->m_seq);
+                breakopt_sequence(m_pTextDoc->seq);
 
             GlobalUnlock(hMem);
 
@@ -67,7 +67,7 @@ ULONG TextView::GetText(LPTSTR szDest, ULONG nStartOffset, ULONG nLength)
 
     if (nLength > 1)
     {
-        TextIterator * itor = new_TextIterator(m_pTextDoc->iterate(nStartOffset));
+        TextIterator * itor = new_TextIterator(iterate_TextDocument(m_pTextDoc, nStartOffset));
         copied = gettext_TextIterator(itor, szDest, nLength - 1);
         delete_TextIterator(itor);
         // null-terminate

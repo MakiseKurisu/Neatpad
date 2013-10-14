@@ -117,7 +117,7 @@ TextView::TextView(HWND hwnd)
 
     //SetRect(&m_rcBorder, 2, 2, 2, 2);
 
-    m_pTextDoc = new TextDocument();
+    m_pTextDoc = new_TextDocument();
 
     m_hMarginCursor = CreateCursor(GetModuleHandle(0), 21, 5, 32, 32, XORMask, ANDMask);
 
@@ -141,7 +141,7 @@ TextView::TextView(HWND hwnd)
 TextView::~TextView()
 {
     if (m_pTextDoc)
-        delete m_pTextDoc;
+        delete_TextDocument(m_pTextDoc);
 
     DestroyCursor(m_hMarginCursor);
 
@@ -319,7 +319,7 @@ ULONG TextView::SelectionSize()
 ULONG TextView::SelectAll()
 {
     m_nSelectionStart = 0;
-    m_nSelectionEnd = m_pTextDoc->size();
+    m_nSelectionEnd = size_TextDocument(m_pTextDoc);
     m_nCursorOffset = m_nSelectionEnd;
 
     Smeg(TRUE);
@@ -464,7 +464,7 @@ LONG WINAPI TextView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
         return SetLineImage(wParam, lParam);
 
     case TXM_GETFORMAT:
-        return m_pTextDoc->getformat();
+        return getformat_TextDocument(m_pTextDoc);
 
     case TXM_GETSELSIZE:
         return SelectionSize();
