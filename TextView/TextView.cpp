@@ -66,7 +66,7 @@ TextView::TextView(HWND hwnd)
     m_nCRLFMode = TXL_CRLF;//ALL;
 
     // allocate the USPDATA cache
-    m_uspCache = new USPCACHE[USP_CACHE_SIZE];
+    m_uspCache = (USPCACHE *) malloc(sizeof(USPCACHE) * USP_CACHE_SIZE);
 
     for (int i = 0; i < USP_CACHE_SIZE; i++)
     {
@@ -147,6 +147,8 @@ TextView::~TextView()
 
     for (int i = 0; i < USP_CACHE_SIZE; i++)
         UspFree(m_uspCache[i].uspData);
+
+    free(m_uspCache);
 
     CloseThemeData(m_hTheme);
 }
