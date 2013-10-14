@@ -63,11 +63,11 @@ extern "C" {
     //    Options.c functions
     //
     void    ShowOptions(HWND hwndParent);
-    void    ApplyRegSettings();
-    void    LoadRegSettings();
-    void    SaveRegSettings();
-    void    LoadRegSysSettings();
-    void    SaveRegSysSettings();
+    void    ApplyRegSettings(void);
+    void    LoadRegSettings(void);
+    void    SaveRegSettings(void);
+    void    LoadRegSysSettings(void);
+    void    SaveRegSysSettings(void);
     BOOL    SetExplorerContextMenu(BOOL fAddToMenu);
     BOOL    SetImageFileExecutionOptions(BOOL fReplaceWithCurrentApp);
 

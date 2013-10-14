@@ -12,14 +12,14 @@ class TextDocument
     friend class TextView;
 
 public:
-    TextDocument();
-    ~TextDocument();
+    TextDocument(void);
+    ~TextDocument(void);
 
     bool  init(HANDLE hFile);
     bool  init(LPTSTR filename);
 
-    bool  clear();
-    bool EmptyDoc();
+    bool  clear(void);
+    bool EmptyDoc(void);
 
     bool    Undo(ULONG *offset_start, ULONG *offset_end);
     bool    Redo(ULONG *offset_start, ULONG *offset_end);
@@ -42,14 +42,14 @@ public:
     ULONG getdata(ULONG offset, BYTE *buf, size_t len);
     ULONG getline(ULONG nLineNo, LPTSTR buf, ULONG buflen, ULONG *off_chars);
 
-    int   getformat();
-    ULONG linecount();
+    int   getformat(void);
+    ULONG linecount(void);
     ULONG longestline(int tabwidth);
-    ULONG size();
+    ULONG size(void);
 
 //private:
 
-    bool init_linebuffer();
+    bool init_linebuffer(void);
 
     ULONG charoffset_to_byteoffset(ULONG offset_chars);
     ULONG byteoffset_to_charoffset(ULONG offset_bytes);

@@ -72,7 +72,7 @@ class TextView
 public:
 
     TextView(HWND hwnd);
-    ~TextView();
+    ~TextView(void);
 
     LONG WINAPI WndProc(UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -81,7 +81,7 @@ private:
     //
     //    Message handlers
     //
-    LONG OnPaint();
+    LONG OnPaint(void);
     LONG OnNcPaint(HRGN hrgnUpdate);
     LONG OnSetFont(HFONT hFont);
     LONG OnSize(UINT nFlags, int width, int height);
@@ -104,10 +104,10 @@ private:
     LONG OnSetFocus(HWND hwndOld);
     LONG OnKillFocus(HWND hwndNew);
 
-    BOOL OnCut();
-    BOOL OnCopy();
-    BOOL OnPaste();
-    BOOL OnClear();
+    BOOL OnCut(void);
+    BOOL OnCopy(void);
+    BOOL OnPaste(void);
+    BOOL OnClear(void);
 
 private:
 
@@ -115,15 +115,15 @@ private:
     //    Internal private functions
     //
     LONG        OpenFile(LPTSTR szFileName);
-    LONG        ClearFile();
-    void        ResetLineCache();
+    LONG        ClearFile(void);
+    void        ResetLineCache(void);
     ULONG        GetText(LPTSTR szDest, ULONG nStartOffset, ULONG nLength);
 
     //
     //    Cursor/Selection
     //
-    ULONG        SelectionSize();
-    ULONG        SelectAll();
+    ULONG        SelectionSize(void);
+    ULONG        SelectAll(void);
 
     //void        Toggle
 
@@ -131,7 +131,7 @@ private:
     //
     //    Painting support
     //
-    void        RefreshWindow();
+    void        RefreshWindow(void);
     void        PaintLine(HDC hdc, ULONG line, int x, int y, HRGN hrgnUpdate);
     void        PaintText(HDC hdc, ULONG nLineNo, int x, int y, RECT *bounds);
     int            PaintMargin(HDC hdc, ULONG line, int x, int y);
@@ -161,9 +161,9 @@ private:
     //
     int            NeatTextYOffset(USPFONT *font);
     int            TextWidth(HDC hdc, LPCTSTR lpString, int c);
-    //int        TabWidth();
-    int            LeftMarginWidth();
-    void        UpdateMarginWidth();
+    //int        TabWidth(void);
+    int            LeftMarginWidth(void);
+    void        UpdateMarginWidth(void);
     int            SetCaretWidth(int nWidth);
     BOOL        SetImageList(HIMAGELIST hImgList);
     int            SetLineImage(ULONG nLineNo, ULONG nImageIdx);
@@ -173,36 +173,36 @@ private:
     //    Caret/Cursor positioning
     //
     BOOL        MouseCoordToFilePos(int x, int y, ULONG *pnLineNo, ULONG *pnFileOffset, int *px);//, ULONG *pnLineLen=0);
-    VOID        RepositionCaret();
+    VOID        RepositionCaret(void);
     //VOID        MoveCaret(int x, int y);
     VOID        UpdateCaretXY(int x, ULONG lineno);
     VOID        UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx = 0, ULONG *outlineno = 0);
     VOID        Smeg(BOOL fAdvancing);
 
-    VOID        MoveWordPrev();
-    VOID        MoveWordNext();
-    VOID        MoveWordStart();
-    VOID        MoveWordEnd();
-    VOID        MoveCharPrev();
-    VOID        MoveCharNext();
+    VOID        MoveWordPrev(void);
+    VOID        MoveWordNext(void);
+    VOID        MoveWordStart(void);
+    VOID        MoveWordEnd(void);
+    VOID        MoveCharPrev(void);
+    VOID        MoveCharNext(void);
     VOID        MoveLineUp(int numLines);
     VOID        MoveLineDown(int numLines);
-    VOID        MovePageUp();
-    VOID        MovePageDown();
+    VOID        MovePageUp(void);
+    VOID        MovePageDown(void);
     VOID        MoveLineStart(ULONG lineNo);
     VOID        MoveLineEnd(ULONG lineNo);
-    VOID        MoveFileStart();
-    VOID        MoveFileEnd();
+    VOID        MoveFileStart(void);
+    VOID        MoveFileEnd(void);
 
     //
     //    Editing
     //    
-    BOOL        Undo();
-    BOOL        Redo();
-    BOOL        CanUndo();
-    BOOL        CanRedo();
-    BOOL        ForwardDelete();
-    BOOL        BackDelete();
+    BOOL        Undo(void);
+    BOOL        Redo(void);
+    BOOL        CanUndo(void);
+    BOOL        CanRedo(void);
+    BOOL        ForwardDelete(void);
+    BOOL        BackDelete(void);
     ULONG        EnterText(LPTSTR szText, ULONG nLength);
 
     //
@@ -210,12 +210,12 @@ private:
     //
     HRGN        ScrollRgn(int dx, int dy, bool fReturnUpdateRgn);
     void        Scroll(int dx, int dy);
-    void        ScrollToCaret();
+    void        ScrollToCaret(void);
     void        ScrollToPosition(int xpos, ULONG lineno);
-    VOID        SetupScrollbars();
-    VOID        UpdateMetrics();
-    VOID        RecalcLineHeight();
-    bool        PinToBottomCorner();
+    VOID        SetupScrollbars(void);
+    VOID        UpdateMetrics(void);
+    VOID        RecalcLineHeight(void);
+    bool        PinToBottomCorner(void);
 
     //
     //    TextView configuration
@@ -234,7 +234,7 @@ private:
     //
     //    Miscallaneous
     //
-    HMENU        CreateContextMenu();
+    HMENU        CreateContextMenu(void);
     ULONG        NotifyParent(UINT nNotifyCode, NMHDR *optional = 0);
 
 

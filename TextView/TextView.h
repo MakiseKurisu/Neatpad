@@ -18,7 +18,7 @@ extern "C" {
     //
     //    TextView API declared here
     //
-    BOOL     InitTextView();
+    BOOL     InitTextView(void);
     HWND     CreateTextView(HWND hwndParent);
     COLORREF RealizeColour(COLORREF col);
 

@@ -43,7 +43,7 @@ typedef std::vector<buffer_control *> bufferlist;
 //
 //    sequence class!
 //
-sequence * new_sequence();
+sequence * new_sequence(void);
 void delete_sequence(
     sequence * lps
     );
@@ -385,7 +385,7 @@ struct _ref
 //
 //    buffer_control
 //
-buffer_control * new_buffer_control();
+buffer_control * new_buffer_control(void);
 void delete_buffer_control(
     buffer_control * lps
     );
