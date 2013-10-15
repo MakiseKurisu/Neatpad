@@ -60,6 +60,7 @@ void delete_TextDocument(
     )
 {
     clear_TextDocument(lps);
+    delete_sequence(lps->seq);
     free(lps);
 }
 
