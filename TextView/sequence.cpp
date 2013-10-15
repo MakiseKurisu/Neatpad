@@ -106,7 +106,7 @@ bool init_sequence(
     memcpy(bc->buffer, buffer, length * sizeof(seqchar));
     bc->length = length;
 
-    span *sptr = new_span(0, length, bc->id, lps->tail, lps->head);
+    span * sptr = new_span(0, length, bc->id, lps->tail, lps->head);
     lps->head->next = sptr;
     lps->tail->prev = sptr;
 

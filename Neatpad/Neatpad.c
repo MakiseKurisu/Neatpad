@@ -745,6 +745,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int iShowC
     if (g_fSaveOnExit)
         SaveRegSettings();
 
+    DestroyTextView();
     OleUninitialize();
     ExitProcess(0);
     return 0;

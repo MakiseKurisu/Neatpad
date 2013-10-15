@@ -21,6 +21,7 @@ extern "C" {
     BOOL     InitTextView(void);
     HWND     CreateTextView(HWND hwndParent);
     COLORREF RealizeColour(COLORREF col);
+    BOOL     DestroyTextView(void);
 
 
     //

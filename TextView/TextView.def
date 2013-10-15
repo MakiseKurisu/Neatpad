@@ -3,3 +3,4 @@ EXPORTS
     CreateTextView
     InitTextView
     RealizeColour
+    DestroyTextView

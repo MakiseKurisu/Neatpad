@@ -32,6 +32,8 @@
 #pragma comment(lib, "UxTheme.lib")
 #pragma comment(lib, "UspLib.lib")
 
+HINSTANCE hInst;
+
 //
 //    Constructor for TextView class
 //
@@ -583,7 +585,7 @@ LONG WINAPI WndProc_TextView(
 //
 LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    TextView *ptv = (TextView *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    TextView * ptv = (TextView *) GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
     switch (msg)
     {
@@ -637,6 +639,14 @@ BOOL InitTextView()
 }
 
 //
+//    Unregister the TextView window class
+//
+BOOL DestroyTextView()
+{
+    return UnregisterClass(TEXTVIEW_CLASS, hInst) ? TRUE : FALSE;
+}
+
+//
 //    Create a TextView control!
 //
 HWND CreateTextView(HWND hwndParent)
@@ -660,6 +670,7 @@ BOOL WINAPI DllMain(
 {
     if (fdwReason == DLL_PROCESS_ATTACH)
     {
+        hInst = hinstDLL;
         DisableThreadLibraryCalls(hinstDLL);
     }
     return TRUE;
