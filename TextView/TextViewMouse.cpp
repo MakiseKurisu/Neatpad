@@ -22,26 +22,33 @@ bool IsKeyPressed(UINT nVirtKey);
 //
 //    Grab the keyboard input focus 
 //    
-LONG TextView::OnMouseActivate(HWND hwndTop, UINT nHitTest, UINT nMessage)
+LONG OnMouseActivate_TextView(
+    TextView * lps,
+    HWND hwndTop,
+    UINT nHitTest,
+    UINT nMessage
+    )
 {
-    SetFocus(m_hWnd);
+    SetFocus(lps->hWnd);
     return MA_ACTIVATE;
 }
 
-HMENU TextView::CreateContextMenu()
+HMENU CreateContextMenu_TextView(
+    TextView * lps
+    )
 {
     HMENU hMenu = CreatePopupMenu();
 
     // do we have a selection?
-    UINT fSelection = (m_nSelectionStart == m_nSelectionEnd) ?
+    UINT fSelection = (lps->nSelectionStart == lps->nSelectionEnd) ?
         MF_DISABLED | MF_GRAYED : MF_ENABLED;
 
     // is there text on the clipboard?
     UINT fClipboard = (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT)) ?
     MF_ENABLED : MF_GRAYED | MF_DISABLED;
 
-    UINT fCanUndo = CanUndo() ? MF_ENABLED : MF_GRAYED | MF_DISABLED;
-    UINT fCanRedo = CanRedo() ? MF_ENABLED : MF_GRAYED | MF_DISABLED;
+    UINT fCanUndo = CanUndo_TextView(lps) ? MF_ENABLED : MF_GRAYED | MF_DISABLED;
+    UINT fCanRedo = CanRedo_TextView(lps) ? MF_ENABLED : MF_GRAYED | MF_DISABLED;
 
     AppendMenu(hMenu, MF_STRING | fCanUndo, WM_UNDO, TEXT("&Undo"));
     AppendMenu(hMenu, MF_STRING | fCanRedo, TXM_REDO, TEXT("&Redo"));
@@ -64,30 +71,35 @@ HMENU TextView::CreateContextMenu()
 //
 //    Respond to right-click message
 //
-LONG TextView::OnContextMenu(HWND hwndParam, int x, int y)
+LONG OnContextMenu_TextView(
+    TextView * lps,
+    HWND hwndParam,
+    int x,
+    int y
+    )
 {
-    if (m_hUserMenu == 0)
+    if (lps->hUserMenu == 0)
     {
-        HMENU hMenu = CreateContextMenu();
-        UINT  uCmd = TrackPopupMenu(hMenu, TPM_RETURNCMD, x, y, 0, m_hWnd, 0);
+        HMENU hMenu = CreateContextMenu_TextView(lps);
+        UINT  uCmd = TrackPopupMenu(hMenu, TPM_RETURNCMD, x, y, 0, lps->hWnd, 0);
 
         if (uCmd != 0)
-            PostMessage(m_hWnd, uCmd, 0, 0);
+            PostMessage(lps->hWnd, uCmd, 0, 0);
 
         return 0;
     }
     else
     {
-        UINT uCmd = TrackPopupMenu(m_hUserMenu, TPM_RETURNCMD, x, y, 0, m_hWnd, 0);
+        UINT uCmd = TrackPopupMenu(lps->hUserMenu, TPM_RETURNCMD, x, y, 0, lps->hWnd, 0);
 
         if (uCmd != 0)
-            PostMessage(GetParent(m_hWnd), WM_COMMAND, MAKEWPARAM(uCmd, 0), (LPARAM) GetParent(m_hWnd));
+            PostMessage(GetParent(lps->hWnd), WM_COMMAND, MAKEWPARAM(uCmd, 0), (LPARAM) GetParent(lps->hWnd));
 
         return 0;
     }
-    //PostMessage(m_hWnd, WM_COMMAND, MAKEWPARAM(uCmd, 0), (LPARAM)m_hWnd);
+    //PostMessage(lps->hWnd, WM_COMMAND, MAKEWPARAM(uCmd, 0), (LPARAM)lps->hWnd);
 
-    return DefWindowProc(m_hWnd, WM_CONTEXTMENU, (WPARAM) hwndParam, MAKELONG(x, y));
+    return DefWindowProc(lps->hWnd, WM_CONTEXTMENU, (WPARAM) hwndParam, MAKELONG(x, y));
 }
 
 
@@ -96,95 +108,100 @@ LONG TextView::OnContextMenu(HWND hwndParam, int x, int y)
 //
 //  Position caret to nearest text character under mouse
 //
-LONG TextView::OnLButtonDown(UINT nFlags, int mx, int my)
+LONG OnLButtonDown_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    )
 {
     ULONG nLineNo;
     ULONG nFileOff;
 
     // regular mouse input - mouse is within 
-    if (mx >= LeftMarginWidth())
+    if (mx >= LeftMarginWidth_TextView(lps))
     {
         // map the mouse-coordinates to a real file-offset-coordinate
-        MouseCoordToFilePos(mx, my, &nLineNo, &nFileOff, &m_nCaretPosX);
-        m_nAnchorPosX = m_nCaretPosX;
+        MouseCoordToFilePos_TextView(lps, mx, my, &nLineNo, &nFileOff, &lps->nCaretPosX);
+        lps->nAnchorPosX = lps->nCaretPosX;
 
-        UpdateCaretXY(m_nCaretPosX, nLineNo);
+        UpdateCaretXY_TextView(lps, lps->nCaretPosX, nLineNo);
 
         // Any key but <shift>
         if (IsKeyPressed(VK_SHIFT) == false)
         {
             // remove any existing selection
-            InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
+            InvalidateRange_TextView(lps, lps->nSelectionStart, lps->nSelectionEnd);
 
             // reset cursor and selection offsets to the same location
-            m_nSelectionStart = nFileOff;
-            m_nSelectionEnd = nFileOff;
-            m_nCursorOffset = nFileOff;
+            lps->nSelectionStart = nFileOff;
+            lps->nSelectionEnd = nFileOff;
+            lps->nCursorOffset = nFileOff;
         }
         else
         {
             // redraw to cursor
-            InvalidateRange(m_nSelectionEnd, nFileOff);
+            InvalidateRange_TextView(lps, lps->nSelectionEnd, nFileOff);
 
             // extend selection to cursor
-            m_nSelectionEnd = nFileOff;
-            m_nCursorOffset = nFileOff;
+            lps->nSelectionEnd = nFileOff;
+            lps->nCursorOffset = nFileOff;
         }
 
         if (IsKeyPressed(VK_MENU))
         {
-            m_cpBlockStart.line = nLineNo;
-            m_cpBlockStart.xpos = m_nCaretPosX;
-            m_nSelectionType = SEL_BLOCK;
+            lps->cpBlockStart.line = nLineNo;
+            lps->cpBlockStart.xpos = lps->nCaretPosX;
+            lps->nSelectionType = SEL_BLOCK;
         }
         else
         {
-            m_nSelectionType = SEL_NORMAL;
+            lps->nSelectionType = SEL_NORMAL;
         }
 
         // set capture for mouse-move selections
-        m_nSelectionMode = IsKeyPressed(VK_MENU) ? SEL_BLOCK : SEL_NORMAL;
+        lps->nSelectionMode = IsKeyPressed(VK_MENU) ? SEL_BLOCK : SEL_NORMAL;
     }
     // mouse clicked within margin 
     else
     {
         // remove any existing selection
-        InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
+        InvalidateRange_TextView(lps, lps->nSelectionStart, lps->nSelectionEnd);
 
-        nLineNo = (my / m_nLineHeight) + m_nVScrollPos;
+        nLineNo = (my / lps->nLineHeight) + lps->nVScrollPos;
 
         //
         // if we click in the margin then jump back to start of line
         //
-        if (m_nHScrollPos != 0)
+        if (lps->nHScrollPos != 0)
         {
-            m_nHScrollPos = 0;
-            SetupScrollbars();
-            RefreshWindow();
+            lps->nHScrollPos = 0;
+            SetupScrollbars_TextView(lps);
+            RefreshWindow_TextView(lps);
         }
 
-        lineinfo_from_lineno_TextDocument(m_pTextDoc, nLineNo, &m_nSelectionStart, &m_nSelectionEnd, 0, 0);
-        m_nSelectionEnd += m_nSelectionStart;
-        m_nCursorOffset = m_nSelectionStart;
+        lineinfo_from_lineno_TextDocument(lps->pTextDoc, nLineNo, &lps->nSelectionStart, &lps->nSelectionEnd, 0, 0);
+        lps->nSelectionEnd += lps->nSelectionStart;
+        lps->nCursorOffset = lps->nSelectionStart;
 
-        m_nSelMarginOffset1 = m_nSelectionStart;
-        m_nSelMarginOffset2 = m_nSelectionEnd;
+        lps->nSelMarginOffset1 = lps->nSelectionStart;
+        lps->nSelMarginOffset2 = lps->nSelectionEnd;
 
-        InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
+        InvalidateRange_TextView(lps, lps->nSelectionStart, lps->nSelectionEnd);
 
-        UpdateCaretOffset(m_nCursorOffset, FALSE, &m_nCaretPosX, &m_nCurrentLine);
-        m_nAnchorPosX = m_nCaretPosX;
+        UpdateCaretOffset_TextView(lps, lps->nCursorOffset, FALSE, &lps->nCaretPosX, &lps->nCurrentLine);
+        lps->nAnchorPosX = lps->nCaretPosX;
 
         // set capture for mouse-move selections
-        m_nSelectionMode = SEL_MARGIN;
+        lps->nSelectionMode = SEL_MARGIN;
     }
 
-    UpdateLine(nLineNo);
+    UpdateLine_TextView(lps, nLineNo);
 
-    SetCapture(m_hWnd);
+    SetCapture(lps->hWnd);
 
-    TVNCURSORINFO ci = { { 0 }, nLineNo, 0, m_nCursorOffset };
-    NotifyParent(TVN_CURSOR_CHANGE, (NMHDR *) &ci);
+    TVNCURSORINFO ci = { { 0 }, nLineNo, 0, lps->nCursorOffset };
+    NotifyParent_TextView(lps, TVN_CURSOR_CHANGE, (NMHDR *) &ci);
     return 0;
 }
 
@@ -193,25 +210,30 @@ LONG TextView::OnLButtonDown(UINT nFlags, int mx, int my)
 //
 //    Release capture and cancel any mouse-scrolling
 //
-LONG TextView::OnLButtonUp(UINT nFlags, int mx, int my)
+LONG OnLButtonUp_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    )
 {
     // shift cursor to end of selection
-    if (m_nSelectionMode == SEL_MARGIN)
+    if (lps->nSelectionMode == SEL_MARGIN)
     {
-        m_nCursorOffset = m_nSelectionEnd;
-        UpdateCaretOffset(m_nCursorOffset, FALSE, &m_nCaretPosX, &m_nCurrentLine);
+        lps->nCursorOffset = lps->nSelectionEnd;
+        UpdateCaretOffset_TextView(lps, lps->nCursorOffset, FALSE, &lps->nCaretPosX, &lps->nCurrentLine);
     }
 
-    if (m_nSelectionMode)
+    if (lps->nSelectionMode)
     {
         // cancel the scroll-timer if it is still running
-        if (m_nScrollTimer != 0)
+        if (lps->nScrollTimer != 0)
         {
-            KillTimer(m_hWnd, m_nScrollTimer);
-            m_nScrollTimer = 0;
+            KillTimer(lps->hWnd, lps->nScrollTimer);
+            lps->nScrollTimer = 0;
         }
 
-        m_nSelectionMode = SEL_NONE;
+        lps->nSelectionMode = SEL_NONE;
         ReleaseCapture();
     }
 
@@ -223,35 +245,40 @@ LONG TextView::OnLButtonUp(UINT nFlags, int mx, int my)
 //
 //    Select the word under the mouse
 //
-LONG TextView::OnLButtonDblClick(UINT nFlags, int mx, int my)
+LONG OnLButtonDblClick_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    )
 {
     // remove any existing selection
-    InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
+    InvalidateRange_TextView(lps, lps->nSelectionStart, lps->nSelectionEnd);
 
     // regular mouse input - mouse is within scrolling viewport
-    if (mx >= LeftMarginWidth())
+    if (mx >= LeftMarginWidth_TextView(lps))
     {
         ULONG lineno, fileoff;
         int   xpos;
 
         // map the mouse-coordinates to a real file-offset-coordinate
-        MouseCoordToFilePos(mx, my, &lineno, &fileoff, &xpos);
-        m_nAnchorPosX = m_nCaretPosX;
+        MouseCoordToFilePos_TextView(lps, mx, my, &lineno, &fileoff, &xpos);
+        lps->nAnchorPosX = lps->nCaretPosX;
 
         // move selection-start to start of word
-        MoveWordStart();
-        m_nSelectionStart = m_nCursorOffset;
+        MoveWordStart_TextView(lps);
+        lps->nSelectionStart = lps->nCursorOffset;
 
         // move selection-end to end of word
-        MoveWordEnd();
-        m_nSelectionEnd = m_nCursorOffset;
+        MoveWordEnd_TextView(lps);
+        lps->nSelectionEnd = lps->nCursorOffset;
 
         // update caret position
-        InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
-        UpdateCaretOffset(m_nCursorOffset, TRUE, &m_nCaretPosX, &m_nCurrentLine);
-        m_nAnchorPosX = m_nCaretPosX;
+        InvalidateRange_TextView(lps, lps->nSelectionStart, lps->nSelectionEnd);
+        UpdateCaretOffset_TextView(lps, lps->nCursorOffset, TRUE, &lps->nCaretPosX, &lps->nCurrentLine);
+        lps->nAnchorPosX = lps->nCaretPosX;
 
-        NotifyParent(TVN_CURSOR_CHANGE);
+        NotifyParent_TextView(lps, TVN_CURSOR_CHANGE);
     }
 
     return 0;
@@ -262,9 +289,14 @@ LONG TextView::OnLButtonDblClick(UINT nFlags, int mx, int my)
 //
 //    Set the selection end-point if we are dragging the mouse
 //
-LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
+LONG OnMouseMove_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    )
 {
-    if (m_nSelectionMode)
+    if (lps->nSelectionMode)
     {
         ULONG    nLineNo, nFileOff;
         BOOL    fCurChanged = FALSE;
@@ -276,9 +308,9 @@ LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
         //    First thing we must do is switch from margin-mode to normal-mode 
         //    if the mouse strays into the main document area
         //
-        if (m_nSelectionMode == SEL_MARGIN && mx > LeftMarginWidth())
+        if (lps->nSelectionMode == SEL_MARGIN && mx > LeftMarginWidth_TextView(lps))
         {
-            m_nSelectionMode = SEL_NORMAL;
+            lps->nSelectionMode = SEL_NORMAL;
             SetCursor(LoadCursor(0, IDC_IBEAM));
         }
 
@@ -287,90 +319,90 @@ LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
         //    is inside/outside of the TextView scrolling area
         //  and stop/start a scrolling timer appropriately
         //
-        GetClientRect(m_hWnd, &rect);
+        GetClientRect(lps->hWnd, &rect);
 
         // build the scrolling area
-        rect.bottom -= rect.bottom % m_nLineHeight;
-        rect.left += LeftMarginWidth();
+        rect.bottom -= rect.bottom % lps->nLineHeight;
+        rect.left += LeftMarginWidth_TextView(lps);
 
         // If mouse is within this area, we don't need to scroll
         if (PtInRect(&rect, pt))
         {
-            if (m_nScrollTimer != 0)
+            if (lps->nScrollTimer != 0)
             {
-                KillTimer(m_hWnd, m_nScrollTimer);
-                m_nScrollTimer = 0;
+                KillTimer(lps->hWnd, lps->nScrollTimer);
+                lps->nScrollTimer = 0;
             }
         }
         // If mouse is outside window, start a timer in
         // order to generate regular scrolling intervals
         else
         {
-            if (m_nScrollTimer == 0)
+            if (lps->nScrollTimer == 0)
             {
-                m_nScrollCounter = 0;
-                m_nScrollTimer = SetTimer(m_hWnd, 1, 30, 0);
+                lps->nScrollCounter = 0;
+                lps->nScrollTimer = SetTimer(lps->hWnd, 1, 30, 0);
             }
         }
 
         // get new cursor offset+coordinates
-        MouseCoordToFilePos(mx, my, &nLineNo, &nFileOff, &m_nCaretPosX);
-        m_nAnchorPosX = m_nCaretPosX;
+        MouseCoordToFilePos_TextView(lps, mx, my, &nLineNo, &nFileOff, &lps->nCaretPosX);
+        lps->nAnchorPosX = lps->nCaretPosX;
 
-        m_cpBlockEnd.line = nLineNo;
-        m_cpBlockEnd.xpos = mx + m_nHScrollPos * m_nFontWidth - LeftMarginWidth();//m_nCaretPosX;
+        lps->cpBlockEnd.line = nLineNo;
+        lps->cpBlockEnd.xpos = mx + lps->nHScrollPos * lps->nFontWidth - LeftMarginWidth_TextView(lps); //lps->nCaretPosX;
 
 
         // redraw the old and new lines if they are different
-        UpdateLine(nLineNo);
+        UpdateLine_TextView(lps, nLineNo);
 
         // update the region of text that has changed selection state
-        fCurChanged = m_nSelectionEnd == nFileOff ? FALSE : TRUE;
-        //if(m_nSelectionEnd != nFileOff)
+        fCurChanged = lps->nSelectionEnd == nFileOff ? FALSE : TRUE;
+        //if(lps->nSelectionEnd != nFileOff)
         {
             ULONG linelen;
-            lineinfo_from_lineno_TextDocument(m_pTextDoc, nLineNo, 0, &linelen, 0, 0);
+            lineinfo_from_lineno_TextDocument(lps->pTextDoc, nLineNo, 0, &linelen, 0, 0);
 
-            m_nCursorOffset = nFileOff;
+            lps->nCursorOffset = nFileOff;
 
-            if (m_nSelectionMode == SEL_MARGIN)
+            if (lps->nSelectionMode == SEL_MARGIN)
             {
-                if (nFileOff >= m_nSelectionStart)
+                if (nFileOff >= lps->nSelectionStart)
                 {
                     nFileOff += linelen;
-                    m_nSelectionStart = m_nSelMarginOffset1;
+                    lps->nSelectionStart = lps->nSelMarginOffset1;
                 }
                 else
                 {
-                    m_nSelectionStart = m_nSelMarginOffset2;
+                    lps->nSelectionStart = lps->nSelMarginOffset2;
                 }
             }
 
             // redraw from old selection-pos to new position
-            InvalidateRange(m_nSelectionEnd, nFileOff);
+            InvalidateRange_TextView(lps, lps->nSelectionEnd, nFileOff);
 
             // adjust the cursor + selection to the new offset
-            m_nSelectionEnd = nFileOff;
+            lps->nSelectionEnd = nFileOff;
         }
 
-        if (m_nSelectionMode == SEL_BLOCK)
-            RefreshWindow();
+        if (lps->nSelectionMode == SEL_BLOCK)
+            RefreshWindow_TextView(lps);
 
-        //m_nCaretPosX = mx+m_nHScrollPos*m_nFontWidth-LeftMarginWidth();
+        //lps->nCaretPosX = mx+lps->nHScrollPos*lps->nFontWidth-LeftMarginWidth();
         // always set the caret position because we might be scrolling
-        UpdateCaretXY(m_nCaretPosX, m_nCurrentLine);
+        UpdateCaretXY_TextView(lps, lps->nCaretPosX, lps->nCurrentLine);
 
         if (fCurChanged)
         {
-            NotifyParent(TVN_CURSOR_CHANGE);
+            NotifyParent_TextView(lps, TVN_CURSOR_CHANGE);
         }
     }
     // mouse isn't being used for a selection, so set the cursor instead
     else
     {
-        if (mx < LeftMarginWidth())
+        if (mx < LeftMarginWidth_TextView(lps))
         {
-            SetCursor(m_hMarginCursor);
+            SetCursor(lps->hMarginCursor);
         }
         else
         {
@@ -388,45 +420,48 @@ LONG TextView::OnMouseMove(UINT nFlags, int mx, int my)
 //
 //    Used to create regular scrolling 
 //
-LONG TextView::OnTimer(UINT nTimerId)
+LONG OnTimer_TextView(
+    TextView * lps,
+    UINT nTimerId
+    )
 {
     int      dx = 0, dy = 0;    // scrolling vectors
     RECT  rect;
     POINT pt;
 
     // find client area, but make it an even no. of lines
-    GetClientRect(m_hWnd, &rect);
-    rect.bottom -= rect.bottom % m_nLineHeight;
-    rect.left += LeftMarginWidth();
+    GetClientRect(lps->hWnd, &rect);
+    rect.bottom -= rect.bottom % lps->nLineHeight;
+    rect.left += LeftMarginWidth_TextView(lps);
 
     // get the mouse's client-coordinates
     GetCursorPos(&pt);
-    ScreenToClient(m_hWnd, &pt);
+    ScreenToClient(lps->hWnd, &pt);
 
     //
     // scrolling up / down??
     //
     if (pt.y < rect.top)
-        dy = ScrollDir(m_nScrollCounter, pt.y - rect.top);
+        dy = ScrollDir(lps->nScrollCounter, pt.y - rect.top);
 
     else if (pt.y >= rect.bottom)
-        dy = ScrollDir(m_nScrollCounter, pt.y - rect.bottom);
+        dy = ScrollDir(lps->nScrollCounter, pt.y - rect.bottom);
 
     //
     // scrolling left / right?
     //
     if (pt.x < rect.left)
-        dx = ScrollDir(m_nScrollCounter, pt.x - rect.left);
+        dx = ScrollDir(lps->nScrollCounter, pt.x - rect.left);
 
     else if (pt.x > rect.right)
-        dx = ScrollDir(m_nScrollCounter, pt.x - rect.right);
+        dx = ScrollDir(lps->nScrollCounter, pt.x - rect.right);
 
     //
     // Scroll the window but don't update any invalid
     // areas - we will do this manually after we have 
     // repositioned the caret
     //
-    HRGN hrgnUpdate = ScrollRgn(dx, dy, true);
+    HRGN hrgnUpdate = ScrollRgn_TextView(lps, dx, dy, true);
 
     //
     // do the redraw now that the selection offsets are all 
@@ -443,20 +478,20 @@ LONG TextView::OnTimer(UINT nTimerId)
         //    get done until the next WM_MOUSEMOVE - and then it would
         //    be too late because we need to redraw *now*
         //
-        OnMouseMove(0, pt.x, pt.y);
+        OnMouseMove_TextView(lps, 0, pt.x, pt.y);
 
         // invalidate the area returned by ScrollRegion
-        InvalidateRgn(m_hWnd, hrgnUpdate, FALSE);
+        InvalidateRgn(lps->hWnd, hrgnUpdate, FALSE);
         DeleteObject(hrgnUpdate);
 
         // the next time we process WM_PAINT everything 
         // should get drawn correctly!!
-        UpdateWindow(m_hWnd);
+        UpdateWindow(lps->hWnd);
     }
 
     // keep track of how many WM_TIMERs we process because
     // we might want to skip the next one
-    m_nScrollCounter++;
+    lps->nScrollCounter++;
 
     return 0;
 }
@@ -467,11 +502,13 @@ LONG TextView::OnTimer(UINT nTimerId)
 //    Currently only uses the main font so will not support other
 //    fonts introduced by syntax highlighting
 //
-BOOL TextView::MouseCoordToFilePos(int         mx,            // [in]  mouse x-coord
-    int         my,            // [in]  mouse x-coord
-    ULONG    *pnLineNo,        // [out] line number
-    ULONG    *pnFileOffset,  // [out] zero-based file-offset (in chars)
-    int        *psnappedX        // [out] adjusted x coord of caret
+BOOL MouseCoordToFilePos_TextView(
+    TextView * lps,
+    int mx, // [in]  mouse x-coord
+    int my, // [in]  mouse x-coord
+    ULONG * pnLineNo, // [out] line number
+    ULONG * pnFileOffset, // [out] zero-based file-offset (in chars)
+    int * psnappedX  // [out] adjusted x coord of caret
     )
 {
     ULONG nLineNo;
@@ -480,11 +517,11 @@ BOOL TextView::MouseCoordToFilePos(int         mx,            // [in]  mouse x-c
     int      cp;
 
     // get scrollable area
-    GetClientRect(m_hWnd, &rect);
-    rect.bottom -= rect.bottom % m_nLineHeight;
+    GetClientRect(lps->hWnd, &rect);
+    rect.bottom -= rect.bottom % lps->nLineHeight;
 
     // take left margin into account
-    mx -= LeftMarginWidth();
+    mx -= LeftMarginWidth_TextView(lps);
 
     // clip mouse to edge of window
     if (mx < 0)                mx = 0;
@@ -493,54 +530,58 @@ BOOL TextView::MouseCoordToFilePos(int         mx,            // [in]  mouse x-c
     if (mx >= rect.right)    mx = rect.right - 1;
 
     // It's easy to find the line-number: just divide 'y' by the line-height
-    nLineNo = (my / m_nLineHeight) + m_nVScrollPos;
+    nLineNo = (my / lps->nLineHeight) + lps->nVScrollPos;
 
     // make sure we don't go outside of the document
-    if (nLineNo >= m_nLineCount)
+    if (nLineNo >= lps->nLineCount)
     {
-        nLineNo = m_nLineCount ? m_nLineCount - 1 : 0;
-        off_chars = size_TextDocument(m_pTextDoc);
+        nLineNo = lps->nLineCount ? lps->nLineCount - 1 : 0;
+        off_chars = size_TextDocument(lps->pTextDoc);
     }
 
-    mx += m_nHScrollPos * m_nFontWidth;
+    mx += lps->nHScrollPos * lps->nFontWidth;
 
     // get the USPDATA object for the selected line!!
-    USPDATA *uspData = GetUspData(0, nLineNo);
+    USPDATA * uspData = GetUspData_TextView(lps, 0, nLineNo);
 
     // convert mouse-x coordinate to a character-offset relative to start of line
     UspSnapXToOffset(uspData, mx, &mx, &cp, 0);
 
     // return coords!
-    TextIterator * itor = new_TextIterator(iterate_line_TextDocument(m_pTextDoc, nLineNo, &off_chars));
+    TextIterator * itor = new_TextIterator(iterate_line_TextDocument(lps->pTextDoc, nLineNo, &off_chars));
     *pnLineNo = nLineNo;
     *pnFileOffset = cp + off_chars;
-    *psnappedX = mx;// - m_nHScrollPos * m_nFontWidth;
+    *psnappedX = mx;// - lps->nHScrollPos * lps->nFontWidth;
     //*psnappedX        += LeftMarginWidth();
     delete_TextIterator(itor);
     return 0;
 }
 
-LONG TextView::InvalidateLine(ULONG nLineNo, bool forceAnalysis)
+LONG InvalidateLine_TextView(
+    TextView * lps,
+    ULONG nLineNo,
+    bool forceAnalysis
+    )
 {
-    if (nLineNo >= m_nVScrollPos && nLineNo <= m_nVScrollPos + m_nWindowLines)
+    if (nLineNo >= lps->nVScrollPos && nLineNo <= lps->nVScrollPos + lps->nWindowLines)
     {
         RECT rect;
 
-        GetClientRect(m_hWnd, &rect);
+        GetClientRect(lps->hWnd, &rect);
 
-        rect.top = (nLineNo - m_nVScrollPos) * m_nLineHeight;
-        rect.bottom = rect.top + m_nLineHeight;
+        rect.top = (nLineNo - lps->nVScrollPos) * lps->nLineHeight;
+        rect.bottom = rect.top + lps->nLineHeight;
 
-        InvalidateRect(m_hWnd, &rect, FALSE);
+        InvalidateRect(lps->hWnd, &rect, FALSE);
     }
 
     if (forceAnalysis)
     {
         for (int i = 0; i < USP_CACHE_SIZE; i++)
         {
-            if (nLineNo == m_uspCache[i].lineno)
+            if (nLineNo == lps->uspCache[i].lineno)
             {
-                m_uspCache[i].usage = 0;
+                lps->uspCache[i].usage = 0;
                 break;
             }
         }
@@ -551,7 +592,11 @@ LONG TextView::InvalidateLine(ULONG nLineNo, bool forceAnalysis)
 //
 //    Redraw any line which spans the specified range of text
 //
-LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
+LONG InvalidateRange_TextView(
+    TextView * lps,
+    ULONG nStart,
+    ULONG nFinish
+    )
 {
     ULONG start = min(nStart, nFinish);
     ULONG finish = max(nStart, nFinish);
@@ -573,18 +618,18 @@ LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
     //
     //    Find the start-of-line information from specified file-offset
     //
-    lineno = lineno_from_offset_TextDocument(m_pTextDoc, start);
+    lineno = lineno_from_offset_TextDocument(lps->pTextDoc, start);
 
     // clip to top of window
-    if (lineno < m_nVScrollPos)
+    if (lineno < lps->nVScrollPos)
     {
-        lineno = m_nVScrollPos;
-        copy_TextIterator(itor, iterate_line_TextDocument(m_pTextDoc, lineno, &off_chars, &len_chars));
+        lineno = lps->nVScrollPos;
+        copy_TextIterator(itor, iterate_line_TextDocument(lps->pTextDoc, lineno, &off_chars, &len_chars));
         start = off_chars;
     }
     else
     {
-        copy_TextIterator(itor, iterate_line_TextDocument(m_pTextDoc, lineno, &off_chars, &len_chars));
+        copy_TextIterator(itor, iterate_line_TextDocument(lps->pTextDoc, lineno, &off_chars, &len_chars));
     }
 
     if (!valid_TextIterator(itor) || start >= finish)
@@ -593,22 +638,22 @@ LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
         return 0;
     }
 
-    ypos = (lineno - m_nVScrollPos) * m_nLineHeight;
-    GetClientRect(m_hWnd, &client);
+    ypos = (lineno - lps->nVScrollPos) * lps->nLineHeight;
+    GetClientRect(lps->hWnd, &client);
 
     // invalidate *whole* lines. don't care about flickering anymore because
     // all output is double-buffered now, and this method is much simpler
     while (valid_TextIterator(itor) && off_chars < finish)
     {
-        SetRect(&rect, 0, ypos, client.right, ypos + m_nLineHeight);
-        rect.left -= m_nHScrollPos * m_nFontWidth;
-        rect.left += LeftMarginWidth();
+        SetRect(&rect, 0, ypos, client.right, ypos + lps->nLineHeight);
+        rect.left -= lps->nHScrollPos * lps->nFontWidth;
+        rect.left += LeftMarginWidth_TextView(lps);
 
-        InvalidateRect(m_hWnd, &rect, FALSE);
+        InvalidateRect(lps->hWnd, &rect, FALSE);
 
         // jump down to next line
-        copy_TextIterator(itor, iterate_line_TextDocument(m_pTextDoc, ++lineno, &off_chars, &len_chars));
-        ypos += m_nLineHeight;
+        copy_TextIterator(itor, iterate_line_TextDocument(lps->pTextDoc, ++lineno, &off_chars, &len_chars));
+        ypos += lps->nLineHeight;
     }
 
     delete_TextIterator(itor);
@@ -619,20 +664,24 @@ LONG TextView::InvalidateRange(ULONG nStart, ULONG nFinish)
 //    Wrapper around SetCaretPos, hides the caret when it goes
 //  off-screen (this protects against x/y wrap around due to integer overflow)
 //
-VOID TextView::MoveCaret(int x, int y)
+VOID MoveCaret_TextView(
+    TextView * lps,
+    int x,
+    int y
+    )
 {
-if(x < LeftMarginWidth() && m_fHideCaret == false)
+if(x < LeftMarginWidth() && lps->fHideCaret == false)
 {
-m_fHideCaret = true;
-HideCaret(m_hWnd);
+lps->fHideCaret = true;
+HideCaret(lps->hWnd);
 }
-else if(x >= LeftMarginWidth() && m_fHideCaret == true)
+else if(x >= LeftMarginWidth() && lps->fHideCaret == true)
 {
-m_fHideCaret = false;
-ShowCaret(m_hWnd);
+lps->fHideCaret = false;
+ShowCaret(lps->hWnd);
 }
 
-if(m_fHideCaret == false)
+if(lps->fHideCaret == false)
 SetCaretPos(x, y);
 }*/
 
@@ -640,38 +689,42 @@ SetCaretPos(x, y);
 //    x        - x-coord relative to start of line
 //    lineno    - line-number
 //
-VOID TextView::UpdateCaretXY(int xpos, ULONG lineno)
+VOID UpdateCaretXY_TextView(
+    TextView * lps,
+    int xpos,
+    ULONG lineno
+    )
 {
     bool visible = false;
 
     // convert x-coord to window-relative
-    xpos -= m_nHScrollPos * m_nFontWidth;
-    xpos += LeftMarginWidth();
+    xpos -= lps->nHScrollPos * lps->nFontWidth;
+    xpos += LeftMarginWidth_TextView(lps);
 
     // only show caret if it is visible within viewport
-    if (lineno >= m_nVScrollPos && lineno <= m_nVScrollPos + m_nWindowLines)
+    if (lineno >= lps->nVScrollPos && lineno <= lps->nVScrollPos + lps->nWindowLines)
     {
-        if (xpos >= LeftMarginWidth())
+        if (xpos >= LeftMarginWidth_TextView(lps))
             visible = true;
     }
 
     // hide caret if it was previously visible
-    if (visible == false && m_fHideCaret == false)
+    if (visible == false && lps->fHideCaret == false)
     {
-        m_fHideCaret = true;
-        HideCaret(m_hWnd);
+        lps->fHideCaret = true;
+        HideCaret(lps->hWnd);
     }
     // show caret if it was previously hidden
-    else if (visible == true && m_fHideCaret == true)
+    else if (visible == true && lps->fHideCaret == true)
     {
-        m_fHideCaret = false;
-        ShowCaret(m_hWnd);
+        lps->fHideCaret = false;
+        ShowCaret(lps->hWnd);
     }
 
     // set caret position if within window viewport
-    if (m_fHideCaret == false)
+    if (lps->fHideCaret == false)
     {
-        SetCaretPos(xpos, (lineno - m_nVScrollPos) * m_nLineHeight);
+        SetCaretPos(xpos, (lineno - lps->nVScrollPos) * lps->nLineHeight);
     }
 }
 
@@ -679,7 +732,13 @@ VOID TextView::UpdateCaretXY(int xpos, ULONG lineno)
 //    Reposition the caret based on cursor-offset
 //    return the resulting x-coord and line#
 //
-VOID TextView::UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx, ULONG *outlineno)
+VOID UpdateCaretOffset_TextView(
+    TextView * lps,
+    ULONG offset,
+    BOOL fTrailing,
+    int * outx,
+    ULONG * outlineno
+    )
 {
     ULONG        lineno = 0;
     int            xpos = 0;
@@ -687,13 +746,13 @@ VOID TextView::UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx, ULONG 
     USPDATA      * uspData;
 
     // get line information from cursor-offset
-    if (lineinfo_from_offset_TextDocument(m_pTextDoc, offset, &lineno, &off_chars, 0, 0, 0))
+    if (lineinfo_from_offset_TextDocument(lps->pTextDoc, offset, &lineno, &off_chars, 0, 0, 0))
     {
         // locate the USPDATA for this line
-        if ((uspData = GetUspData(NULL, lineno)) != 0)
+        if ((uspData = GetUspData_TextView(lps, NULL, lineno)) != 0)
         {
             // convert character-offset to x-coordinate
-            off_chars = m_nCursorOffset - off_chars;
+            off_chars = lps->nCursorOffset - off_chars;
 
             if (fTrailing && off_chars > 0)
                 UspOffsetToX(uspData, off_chars - 1, TRUE, &xpos);
@@ -701,7 +760,7 @@ VOID TextView::UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx, ULONG 
                 UspOffsetToX(uspData, off_chars, FALSE, &xpos);
 
             // update caret position
-            UpdateCaretXY(xpos, lineno);
+            UpdateCaretXY_TextView(lps, xpos, lineno);
         }
     }
 
@@ -709,23 +768,28 @@ VOID TextView::UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx, ULONG 
     if (outlineno) *outlineno = lineno;
 }
 
-VOID TextView::RepositionCaret()
+VOID RepositionCaret_TextView(
+    TextView * lps
+    )
 {
-    UpdateCaretXY(m_nCaretPosX, m_nCurrentLine);
+    UpdateCaretXY_TextView(lps, lps->nCaretPosX, lps->nCurrentLine);
 }
 
-void TextView::UpdateLine(ULONG nLineNo)
+void UpdateLine_TextView(
+    TextView * lps,
+    ULONG nLineNo
+    )
 {
     // redraw the old and new lines if they are different
-    if (m_nCurrentLine != nLineNo)
+    if (lps->nCurrentLine != nLineNo)
     {
-        if (CheckStyle(TXS_HIGHLIGHTCURLINE))
-            InvalidateLine(m_nCurrentLine, true);
+        if (CheckStyle_TextView(lps, TXS_HIGHLIGHTCURLINE))
+            InvalidateLine_TextView(lps, lps->nCurrentLine, true);
 
-        m_nCurrentLine = nLineNo;
+        lps->nCurrentLine = nLineNo;
 
-        if (CheckStyle(TXS_HIGHLIGHTCURLINE))
-            InvalidateLine(m_nCurrentLine, true);
+        if (CheckStyle_TextView(lps, TXS_HIGHLIGHTCURLINE))
+            InvalidateLine_TextView(lps, lps->nCurrentLine, true);
     }
 }
 

@@ -17,25 +17,28 @@
 //
 //    
 //
-LONG TextView::OpenFile(LPTSTR szFileName)
+LONG OpenFile_TextView(
+    TextView * lps,
+    LPTSTR szFileName
+    )
 {
-    ClearFile();
+    ClearFile_TextView(lps);
 
-    if (init_TextDocument(m_pTextDoc, szFileName))
+    if (init_TextDocument(lps->pTextDoc, szFileName))
     {
-        m_nLineCount = linecount_TextDocument(m_pTextDoc);
-        m_nLongestLine = longestline_TextDocument(m_pTextDoc, m_nTabWidthChars);
+        lps->nLineCount = linecount_TextDocument(lps->pTextDoc);
+        lps->nLongestLine = longestline_TextDocument(lps->pTextDoc, lps->nTabWidthChars);
 
-        m_nVScrollPos = 0;
-        m_nHScrollPos = 0;
+        lps->nVScrollPos = 0;
+        lps->nHScrollPos = 0;
 
-        m_nSelectionStart = 0;
-        m_nSelectionEnd = 0;
-        m_nCursorOffset = 0;
+        lps->nSelectionStart = 0;
+        lps->nSelectionEnd = 0;
+        lps->nCursorOffset = 0;
 
-        UpdateMarginWidth();
-        UpdateMetrics();
-        ResetLineCache();
+        UpdateMarginWidth_TextView(lps);
+        UpdateMetrics_TextView(lps);
+        ResetLineCache_TextView(lps);
         return TRUE;
     }
 
@@ -45,32 +48,32 @@ LONG TextView::OpenFile(LPTSTR szFileName)
 //
 //
 //
-LONG TextView::ClearFile()
+LONG ClearFile_TextView(
+    TextView * lps
+    )
 {
-    if (m_pTextDoc)
+    if (lps->pTextDoc)
     {
-        clear_TextDocument(m_pTextDoc);
-        EmptyDoc_TextDocument(m_pTextDoc);
+        clear_TextDocument(lps->pTextDoc);
+        EmptyDoc_TextDocument(lps->pTextDoc);
     }
 
-    ResetLineCache();
+    ResetLineCache_TextView(lps);
 
-    m_nLineCount = linecount_TextDocument(m_pTextDoc);
-    m_nLongestLine = longestline_TextDocument(m_pTextDoc, m_nTabWidthChars);
+    lps->nLineCount = linecount_TextDocument(lps->pTextDoc);
+    lps->nLongestLine = longestline_TextDocument(lps->pTextDoc, lps->nTabWidthChars);
 
-    m_nVScrollPos = 0;
-    m_nHScrollPos = 0;
+    lps->nVScrollPos = 0;
+    lps->nHScrollPos = 0;
 
-    m_nSelectionStart = 0;
-    m_nSelectionEnd = 0;
-    m_nCursorOffset = 0;
+    lps->nSelectionStart = 0;
+    lps->nSelectionEnd = 0;
+    lps->nCursorOffset = 0;
 
-    m_nCurrentLine = 0;
-    m_nCaretPosX = 0;
+    lps->nCurrentLine = 0;
+    lps->nCaretPosX = 0;
 
-    UpdateMetrics();
-
-
+    UpdateMetrics_TextView(lps);
 
     return TRUE;
 }

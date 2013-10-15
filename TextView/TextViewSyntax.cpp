@@ -136,7 +136,12 @@ typedef struct
 
 } SYNTAX_NODE;
 
-int TextView::SyntaxColour(LPTSTR szText, ULONG nTextLen, ATTR *attr)
+int SyntaxColour_TextView(
+    TextView * lps,
+    LPTSTR szText,
+    ULONG nTextLen,
+    ATTR * attr
+    )
 {
     TCHAR tok[128];
 

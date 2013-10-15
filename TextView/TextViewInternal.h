@@ -67,255 +67,578 @@ typedef struct
 //
 //    TextView - internal window implementation
 //
-class TextView
+struct _TextView;
+typedef struct _TextView TextView;
+
+TextView * new_TextView(
+    HWND hWnd
+    );
+void delete_TextView(
+    TextView * lps
+    );
+ULONG NotifyParent_TextView(
+    TextView * lps,
+    UINT nNotifyCode,
+    NMHDR * optional = 0
+    );
+VOID UpdateMetrics_TextView(
+    TextView * lps
+    );
+LONG OnSetFocus_TextView(
+    TextView * lps,
+    HWND hwndOld
+    );
+LONG OnKillFocus_TextView(
+    TextView * lps,
+    HWND hwndNew
+    );
+ULONG SetStyle_TextView(
+    TextView * lps,
+    ULONG uMask,
+    ULONG uStyles
+    );
+ULONG SetVar_TextView(
+    TextView * lps,
+    ULONG nVar,
+    ULONG nValue
+    );
+ULONG GetVar_TextView(
+    TextView * lps,
+    ULONG nVar
+    );
+ULONG GetStyleMask_TextView(
+    TextView * lps,
+    ULONG uMask
+    );
+bool CheckStyle_TextView(
+    TextView * lps,
+    ULONG uMask
+    );
+int SetCaretWidth_TextView(
+    TextView * lps,
+    int nWidth
+    );
+BOOL SetImageList_TextView(
+    TextView * lps,
+    HIMAGELIST hImgList
+    );
+LONG SetLongLine_TextView(
+    TextView * lps,
+    int nLength
+    );
+int SetLineImage_TextView(
+    TextView * lps,
+    ULONG nLineNo,
+    ULONG nImageIdx
+    );
+LINEINFO * GetLineInfo_TextView(
+    TextView * lps,
+    ULONG nLineNo
+    );
+ULONG SelectionSize_TextView(
+    TextView * lps
+    );
+ULONG SelectAll_TextView(
+    TextView * lps
+    );
+//TextViewFont
+int NeatTextYOffset_TextView(
+    TextView * lps,
+    USPFONT * font
+    );
+int TextWidth_TextView(
+    TextView * lps,
+    HDC hdc,
+    LPCTSTR lpString,
+    int c
+    );
+VOID RecalcLineHeight_TextView(
+    TextView * lps
+    );
+LONG SetFont_TextView(
+    TextView * lps,
+    HFONT hFont,
+    int idx
+    );
+LONG AddFont_TextView(
+    TextView * lps,
+    HFONT hFont
+    );
+LONG OnSetFont_TextView(
+    TextView * lps,
+    HFONT hFont
+    );
+LONG SetLineSpacing_TextView(
+    TextView * lps,
+    int nAbove,
+    int nBelow
+    );
+//TextViewPaint
+LONG OnNcPaint_TextView(
+    TextView * lps,
+    HRGN hrgnUpdate
+    );
+VOID RefreshWindow_TextView(
+    TextView * lps
+    );
+USPCACHE * GetUspCache_TextView(
+    TextView * lps,
+    HDC hdc,
+    ULONG nLineNo,
+    ULONG * nOffset = 0
+    );
+USPDATA * GetUspData_TextView(
+    TextView * lps,
+    HDC hdc,
+    ULONG nLineNo,
+    ULONG * nOffset = 0
+    );
+void ResetLineCache_TextView(
+    TextView * lps
+    );
+LONG OnPaint_TextView(
+    TextView * lps
+    );
+void PaintLine_TextView(
+    TextView * lps,
+    HDC hdc,
+    ULONG nLineNo,
+    int xpos,
+    int ypos,
+    HRGN hrgnUpdate
+    );
+int LeftMarginWidth_TextView(
+    TextView * lps
+    );
+void UpdateMarginWidth_TextView(
+    TextView * lps
+    );
+int PaintMargin_TextView(
+    TextView * lps,
+    HDC hdc,
+    ULONG nLineNo,
+    int xpos,
+    int ypos
+    );
+void PaintText_TextView(
+    TextView * lps,
+    HDC hdc,
+    ULONG nLineNo,
+    int xpos,
+    int ypos,
+    RECT * bounds
+    );
+int ApplySelection_TextView(
+    TextView * lps,
+    USPDATA * uspData,
+    ULONG nLine,
+    ULONG nOffset,
+    ULONG nTextLen
+    );
+int ApplyTextAttributes_TextView(
+    TextView * lps,
+    ULONG nLineNo,
+    ULONG nOffset,
+    ULONG & nColumn,
+    LPTSTR szText,
+    int nTextLen,
+    ATTR * attr
+    );
+int CRLF_size_TextView(
+    TextView * lps,
+    LPTSTR szText,
+    int nLength
+    );
+void MarkCRLF_TextView(
+    TextView * lps,
+    USPDATA * uspData,
+    LPTSTR szText,
+    int nLength,
+    ATTR * attr
+    );
+int StripCRLF_TextView(
+    TextView * lps,
+    LPTSTR szText,
+    ATTR * attr,
+    int nLength,
+    bool fAllow
+    );
+COLORREF LineColour_TextView(
+    TextView * lps,
+    ULONG nLineNo
+    );
+COLORREF LongColour_TextView(
+    TextView * lps,
+    ULONG nLineNo
+    );
+COLORREF GetColour_TextView(
+    TextView * lps,
+    UINT idx
+    );
+COLORREF SetColour_TextView(
+    TextView * lps,
+    UINT idx,
+    COLORREF rgbColour
+    );
+//TextViewScroll
+VOID SetupScrollbars_TextView(
+    TextView * lps
+    );
+bool PinToBottomCorner_TextView(
+    TextView * lps
+    );
+LONG OnSize_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int width,
+    int height
+    );
+HRGN ScrollRgn_TextView(
+    TextView * lps,
+    int dx,
+    int dy,
+    bool fReturnUpdateRgn
+    );
+VOID Scroll_TextView(
+    TextView * lps,
+    int dx,
+    int dy
+    );
+VOID ScrollToPosition_TextView(
+    TextView * lps,
+    int xpos,
+    ULONG lineno
+    );
+VOID ScrollToCaret_TextView(
+    TextView * lps
+    );
+LONG OnVScroll_TextView(
+    TextView * lps,
+    UINT nSBCode,
+    UINT nPos
+    );
+LONG OnHScroll_TextView(
+    TextView * lps,
+    UINT nSBCode,
+    UINT nPos
+    );
+LONG OnMouseWheel_TextView(
+    TextView * lps,
+    int nDelta
+    );
+//TextViewMouse
+LONG OnMouseActivate_TextView(
+    TextView * lps,
+    HWND hwndTop,
+    UINT nHitTest,
+    UINT nMessage
+    );
+HMENU CreateContextMenu_TextView(
+    TextView * lps
+    );
+LONG OnContextMenu_TextView(
+    TextView * lps,
+    HWND hwndParam,
+    int x,
+    int y
+    );
+LONG OnLButtonDown_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    );
+LONG OnLButtonUp_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    );
+LONG OnLButtonDblClick_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    );
+LONG OnMouseMove_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int mx,
+    int my
+    );
+LONG OnTimer_TextView(
+    TextView * lps,
+    UINT nTimerId
+    );
+BOOL MouseCoordToFilePos_TextView(
+    TextView * lps,
+    int mx,
+    int my,
+    ULONG * pnLineNo,
+    ULONG * pnFileOffset,
+    int * psnappedX
+    );
+LONG InvalidateLine_TextView(
+    TextView * lps,
+    ULONG nLineNo,
+    bool forceAnalysis
+    );
+LONG InvalidateRange_TextView(
+    TextView * lps,
+    ULONG nStart,
+    ULONG nFinish
+    );
+VOID MoveCaret_TextView(
+    TextView * lps,
+    int x,
+    int y
+    );
+VOID UpdateCaretXY_TextView(
+    TextView * lps,
+    int xpos,
+    ULONG lineno
+    );
+VOID UpdateCaretOffset_TextView(
+    TextView * lps,
+    ULONG offset,
+    BOOL fTrailing,
+    int * outx = 0,
+    ULONG * outlineno = 0
+    );
+VOID RepositionCaret_TextView(
+    TextView * lps
+    );
+void UpdateLine_TextView(
+    TextView * lps,
+    ULONG nLineNo
+    );
+//TextViewKeyInput
+ULONG EnterText_TextView(
+    TextView * lps,
+    LPTSTR szText,
+    ULONG nLength
+    );
+BOOL ForwardDelete_TextView(
+    TextView * lps
+    );
+BOOL BackDelete_TextView(
+    TextView * lps
+    );
+void Smeg_TextView(
+    TextView * lps,
+    BOOL fAdvancing
+    );
+BOOL Undo_TextView(
+    TextView * lps
+    );
+BOOL Redo_TextView(
+    TextView * lps
+    );
+BOOL CanUndo_TextView(
+    TextView * lps
+    );
+BOOL CanRedo_TextView(
+    TextView * lps
+    );
+LONG OnChar_TextView(
+    TextView * lps,
+    UINT nChar,
+    UINT nFlags
+    );
+ULONG EnterText_TextView(
+    TextView * lps,
+    LPTSTR szText,
+    ULONG nLength
+    );
+BOOL ForwardDelete_TextView(
+    TextView * lps
+    );
+BOOL BackDelete_TextView(
+    TextView * lps
+    );
+void Smeg_TextView(
+    TextView * lps,
+    BOOL fAdvancing
+    );
+BOOL Undo_TextView(
+    TextView * lps
+    );
+BOOL Redo_TextView(
+    TextView * lps
+    );
+BOOL CanUndo_TextView(
+    TextView * lps
+    );
+BOOL CanRedo_TextView(
+    TextView * lps
+    );
+LONG OnChar_TextView(
+    TextView * lps,
+    UINT nChar,
+    UINT nFlags
+    );
+//TextViewKeyNav
+bool GetLogAttr_TextView(
+    TextView * lps,
+    ULONG nLineNo,
+    USPCACHE * *puspCache,
+    CSCRIPT_LOGATTR * *plogAttr = 0,
+    ULONG * pnOffset = 0
+    );
+VOID MoveLineUp_TextView(
+    TextView * lps,
+    int numLines
+    );
+VOID MoveLineDown_TextView(
+    TextView * lps,
+    int numLines
+    );
+VOID MoveWordPrev_TextView(
+    TextView * lps
+    );
+VOID MoveWordNext_TextView(
+    TextView * lps
+    );
+VOID MoveWordStart_TextView(
+    TextView * lps
+    );
+VOID MoveWordEnd_TextView(
+    TextView * lps
+    );
+VOID MoveCharPrev_TextView(
+    TextView * lps
+    );
+VOID MoveCharNext_TextView(
+    TextView * lps
+    );
+VOID MoveLineStart_TextView(
+    TextView * lps,
+    ULONG lineNo
+    );
+VOID MoveLineEnd_TextView(
+    TextView * lps,
+    ULONG lineNo
+    );
+VOID MoveFileStart_TextView(
+    TextView * lps
+    );
+VOID MoveFileEnd_TextView(
+    TextView * lps
+    );
+LONG OnKeyDown_TextView(
+    TextView * lps,
+    UINT nKeyCode,
+    UINT nFlags
+    );
+//TextViewClipboard
+BOOL OnPaste_TextView(
+    TextView * lps
+    );
+ULONG GetText_TextView(
+    TextView * lps,
+    LPTSTR szDest,
+    ULONG nStartOffset,
+    ULONG nLength
+    );
+BOOL OnCopy_TextView(
+    TextView * lps
+    );
+BOOL OnCut_TextView(
+    TextView * lps
+    );
+BOOL OnClear_TextView(
+    TextView * lps
+    );
+//TextViewFile
+LONG OpenFile_TextView(
+    TextView * lps,
+    LPTSTR szFileName
+    );
+LONG ClearFile_TextView(
+    TextView * lps
+    );
+//TextViewSyntax
+int SyntaxColour_TextView(
+    TextView * lps,
+    LPTSTR szText,
+    ULONG nTextLen,
+    ATTR * attr
+    );
+struct _TextView
 {
-public:
-
-    TextView(HWND hwnd);
-    ~TextView(void);
-
-    LONG WINAPI WndProc(UINT msg, WPARAM wParam, LPARAM lParam);
-
-private:
-
-    //
-    //    Message handlers
-    //
-    LONG OnPaint(void);
-    LONG OnNcPaint(HRGN hrgnUpdate);
-    LONG OnSetFont(HFONT hFont);
-    LONG OnSize(UINT nFlags, int width, int height);
-    LONG OnVScroll(UINT nSBCode, UINT nPos);
-    LONG OnHScroll(UINT nSBCode, UINT nPos);
-    LONG OnMouseWheel(int nDelta);
-    LONG OnTimer(UINT nTimer);
-
-    LONG OnMouseActivate(HWND hwndTop, UINT nHitTest, UINT nMessage);
-    LONG OnContextMenu(HWND wParam, int x, int y);
-
-    LONG OnLButtonDown(UINT nFlags, int x, int y);
-    LONG OnLButtonUp(UINT nFlags, int x, int y);
-    LONG OnLButtonDblClick(UINT nFlags, int x, int y);
-    LONG OnMouseMove(UINT nFlags, int x, int y);
-
-    LONG OnKeyDown(UINT nKeyCode, UINT nFlags);
-    LONG OnChar(UINT nChar, UINT nFlags);
-
-    LONG OnSetFocus(HWND hwndOld);
-    LONG OnKillFocus(HWND hwndNew);
-
-    BOOL OnCut(void);
-    BOOL OnCopy(void);
-    BOOL OnPaste(void);
-    BOOL OnClear(void);
-
-private:
-
-    //
-    //    Internal private functions
-    //
-    LONG        OpenFile(LPTSTR szFileName);
-    LONG        ClearFile(void);
-    void        ResetLineCache(void);
-    ULONG        GetText(LPTSTR szDest, ULONG nStartOffset, ULONG nLength);
-
-    //
-    //    Cursor/Selection
-    //
-    ULONG        SelectionSize(void);
-    ULONG        SelectAll(void);
-
-    //void        Toggle
-
-
-    //
-    //    Painting support
-    //
-    void        RefreshWindow(void);
-    void        PaintLine(HDC hdc, ULONG line, int x, int y, HRGN hrgnUpdate);
-    void        PaintText(HDC hdc, ULONG nLineNo, int x, int y, RECT *bounds);
-    int            PaintMargin(HDC hdc, ULONG line, int x, int y);
-
-    LONG        InvalidateRange(ULONG nStart, ULONG nFinish);
-    LONG        InvalidateLine(ULONG nLineNo, bool forceAnalysis);
-    VOID        UpdateLine(ULONG nLineNo);
-
-
-    int            ApplyTextAttributes(ULONG nLineNo, ULONG offset, ULONG &nColumn, LPTSTR szText, int nTextLen, ATTR *attr);
-    int            ApplySelection(USPDATA *uspData, ULONG nLineNo, ULONG nOffset, ULONG nTextLen);
-    int            SyntaxColour(LPTSTR szText, ULONG nTextLen, ATTR *attr);
-    int            StripCRLF(LPTSTR szText, ATTR *attrList, int nLength, bool fAllow);
-    void        MarkCRLF(USPDATA *uspData, LPTSTR szText, int nLength, ATTR *attr);
-    int            CRLF_size(LPTSTR szText, int nLength);
-
-    //
-    //    Font support
-    //
-    LONG        AddFont(HFONT);
-    LONG        SetFont(HFONT, int idx);
-    LONG        SetLineSpacing(int nAbove, int nBelow);
-    LONG        SetLongLine(int nLength);
-
-    //
-    //    
-    //
-    int            NeatTextYOffset(USPFONT *font);
-    int            TextWidth(HDC hdc, LPCTSTR lpString, int c);
-    //int        TabWidth(void);
-    int            LeftMarginWidth(void);
-    void        UpdateMarginWidth(void);
-    int            SetCaretWidth(int nWidth);
-    BOOL        SetImageList(HIMAGELIST hImgList);
-    int            SetLineImage(ULONG nLineNo, ULONG nImageIdx);
-    LINEINFO *    GetLineInfo(ULONG nLineNo);
-
-    //
-    //    Caret/Cursor positioning
-    //
-    BOOL        MouseCoordToFilePos(int x, int y, ULONG *pnLineNo, ULONG *pnFileOffset, int *px);//, ULONG *pnLineLen=0);
-    VOID        RepositionCaret(void);
-    //VOID        MoveCaret(int x, int y);
-    VOID        UpdateCaretXY(int x, ULONG lineno);
-    VOID        UpdateCaretOffset(ULONG offset, BOOL fTrailing, int *outx = 0, ULONG *outlineno = 0);
-    VOID        Smeg(BOOL fAdvancing);
-
-    VOID        MoveWordPrev(void);
-    VOID        MoveWordNext(void);
-    VOID        MoveWordStart(void);
-    VOID        MoveWordEnd(void);
-    VOID        MoveCharPrev(void);
-    VOID        MoveCharNext(void);
-    VOID        MoveLineUp(int numLines);
-    VOID        MoveLineDown(int numLines);
-    VOID        MovePageUp(void);
-    VOID        MovePageDown(void);
-    VOID        MoveLineStart(ULONG lineNo);
-    VOID        MoveLineEnd(ULONG lineNo);
-    VOID        MoveFileStart(void);
-    VOID        MoveFileEnd(void);
-
-    //
-    //    Editing
-    //    
-    BOOL        Undo(void);
-    BOOL        Redo(void);
-    BOOL        CanUndo(void);
-    BOOL        CanRedo(void);
-    BOOL        ForwardDelete(void);
-    BOOL        BackDelete(void);
-    ULONG        EnterText(LPTSTR szText, ULONG nLength);
-
-    //
-    //    Scrolling
-    //
-    HRGN        ScrollRgn(int dx, int dy, bool fReturnUpdateRgn);
-    void        Scroll(int dx, int dy);
-    void        ScrollToCaret(void);
-    void        ScrollToPosition(int xpos, ULONG lineno);
-    VOID        SetupScrollbars(void);
-    VOID        UpdateMetrics(void);
-    VOID        RecalcLineHeight(void);
-    bool        PinToBottomCorner(void);
-
-    //
-    //    TextView configuration
-    //
-    ULONG        SetStyle(ULONG uMask, ULONG uStyles);
-    ULONG        SetVar(ULONG nVar, ULONG nValue);
-    ULONG        GetVar(ULONG nVar);
-    ULONG        GetStyleMask(ULONG uMask);
-    bool        CheckStyle(ULONG uMask);
-
-    COLORREF    SetColour(UINT idx, COLORREF rgbColour);
-    COLORREF    GetColour(UINT idx);
-    COLORREF    LineColour(ULONG nLineNo);
-    COLORREF    LongColour(ULONG nLineNo);
-
-    //
-    //    Miscallaneous
-    //
-    HMENU        CreateContextMenu(void);
-    ULONG        NotifyParent(UINT nNotifyCode, NMHDR *optional = 0);
-
-
-
     //
     // ------ Internal TextView State ------
     //
-
-    HWND        m_hWnd;
-    HTHEME        m_hTheme;
-    ULONG        m_uStyleFlags;
+    HWND hWnd;
+    HTHEME hTheme;
+    ULONG uStyleFlags;
 
     // File-related data
-    ULONG        m_nLineCount;
+    ULONG nLineCount;
 
     // Font-related data    
-    USPFONT        m_uspFontList[MAX_FONTS];
-    int            m_nNumFonts;
-    int            m_nFontWidth;
-    int            m_nMaxAscent;
-    int            m_nLineHeight;
-    int            m_nHeightAbove;
-    int            m_nHeightBelow;
+    USPFONT uspFontList[MAX_FONTS];
+    int nNumFonts;
+    int nFontWidth;
+    int nMaxAscent;
+    int nLineHeight;
+    int nHeightAbove;
+    int nHeightBelow;
 
     // Scrollbar-related data
-    ULONG        m_nVScrollPos;
-    ULONG        m_nVScrollMax;
-    int            m_nHScrollPos;
-    int            m_nHScrollMax;
+    ULONG nVScrollPos;
+    ULONG nVScrollMax;
+    int nHScrollPos;
+    int nHScrollMax;
 
-    int            m_nLongestLine;
-    int            m_nWindowLines;
-    int            m_nWindowColumns;
+    int nLongestLine;
+    int nWindowLines;
+    int nWindowColumns;
 
     // Cursor/Caret position 
-    ULONG        m_nCurrentLine;
-    ULONG        m_nSelectionStart;
-    ULONG        m_nSelectionEnd;
-    ULONG        m_nCursorOffset;
-    ULONG        m_nSelMarginOffset1;
-    ULONG        m_nSelMarginOffset2;
-    int            m_nCaretPosX;
-    int            m_nAnchorPosX;
+    ULONG nCurrentLine;
+    ULONG nSelectionStart;
+    ULONG nSelectionEnd;
+    ULONG nCursorOffset;
+    ULONG nSelMarginOffset1;
+    ULONG nSelMarginOffset2;
+    int nCaretPosX;
+    int nAnchorPosX;
 
-    SELMODE        m_nSelectionMode;
-    SELMODE        m_nSelectionType;
-    CURPOS        m_cpBlockStart;
-    CURPOS        m_cpBlockEnd;
-    UINT        m_nEditMode;
+    SELMODE nSelectionMode;
+    SELMODE nSelectionType;
+    CURPOS cpBlockStart;
+    CURPOS cpBlockEnd;
+    UINT nEditMode;
 
     // Display-related data
-    int            m_nTabWidthChars;
-    DWORD        m_nCaretWidth;
-    int            m_nLongLineLimit;
-    int            m_nCRLFMode;
+    int nTabWidthChars;
+    DWORD nCaretWidth;
+    int nLongLineLimit;
+    int nCRLFMode;
 
-    LINEINFO    m_LineInfo[MAX_LINE_INFO];
-    int            m_nLineInfoCount;
+    LINEINFO LineInfo[MAX_LINE_INFO];
+    int nLineInfoCount;
 
     // Margin information
-    int            m_nLinenoWidth;
-    HCURSOR        m_hMarginCursor;
-    //RECT        m_rcBorder;
+    int nLinenoWidth;
+    HCURSOR hMarginCursor;
+    //RECT rcBorder;
 
-    COLORREF    m_rgbColourList[TXC_MAX_COLOURS];
+    COLORREF rgbColourList[TXC_MAX_COLOURS];
 
     // Runtime data
-    UINT        m_nScrollTimer;
-    int            m_nScrollCounter;
-    bool        m_fHideCaret;
-    //bool        m_fTransparent;
-    HIMAGELIST    m_hImageList;
-    HMENU        m_hUserMenu;
+    UINT nScrollTimer;
+    int nScrollCounter;
+    bool fHideCaret;
+    //bool fTransparent;
+    HIMAGELIST hImageList;
+    HMENU hUserMenu;
 
     // Cache for USPDATA objects
-    USPCACHE    *m_uspCache;
-    USPDATA        *GetUspData(HDC hdc, ULONG nLineNo, ULONG *nOffset = 0);
-    USPCACHE    *GetUspCache(HDC hdc, ULONG nLineNo, ULONG *nOffset = 0);
-    bool         GetLogAttr(ULONG nLineNo, USPCACHE **puspCache, CSCRIPT_LOGATTR **plogAttr = 0, ULONG *pnOffset = 0);
+    USPCACHE * uspCache;
 
-    TextDocument *m_pTextDoc;
+    TextDocument * pTextDoc;
 };
 
 #endif

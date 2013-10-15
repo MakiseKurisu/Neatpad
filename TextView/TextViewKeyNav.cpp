@@ -33,9 +33,15 @@ bool IsKeyPressed(UINT nVirtKey)
 //
 //    Get the UspCache and logical attributes for specified line
 //
-bool TextView::GetLogAttr(ULONG nLineNo, USPCACHE **puspCache, CSCRIPT_LOGATTR **plogAttr, ULONG *pnOffset)
+bool GetLogAttr_TextView(
+    TextView * lps,
+    ULONG nLineNo,
+    USPCACHE * *puspCache,
+    CSCRIPT_LOGATTR * *plogAttr,
+    ULONG * pnOffset
+    )
 {
-    if ((*puspCache = GetUspCache(0, nLineNo, pnOffset)) == 0)
+    if ((*puspCache = GetUspCache_TextView(lps, 0, nLineNo, pnOffset)) == 0)
         return false;
 
     if (plogAttr && (*plogAttr = UspGetLogAttr((*puspCache)->uspData)) == 0)
@@ -47,7 +53,10 @@ bool TextView::GetLogAttr(ULONG nLineNo, USPCACHE **puspCache, CSCRIPT_LOGATTR *
 //
 //    Move caret up specified number of lines
 //
-VOID TextView::MoveLineUp(int numLines)
+VOID MoveLineUp_TextView(
+    TextView * lps,
+    int numLines
+    )
 {
     USPDATA            * uspData;
     ULONG              lineOffset;
@@ -55,21 +64,24 @@ VOID TextView::MoveLineUp(int numLines)
     int                  charPos;
     BOOL              trailing;
 
-    m_nCurrentLine -= min(m_nCurrentLine, (unsigned) numLines);
+    lps->nCurrentLine -= min(lps->nCurrentLine, (unsigned) numLines);
 
     // get Uniscribe data for prev line
-    uspData = GetUspData(0, m_nCurrentLine, &lineOffset);
+    uspData = GetUspData_TextView(lps, 0, lps->nCurrentLine, &lineOffset);
 
     // move up to character nearest the caret-anchor positions
-    UspXToOffset(uspData, m_nAnchorPosX, &charPos, &trailing, 0);
+    UspXToOffset(uspData, lps->nAnchorPosX, &charPos, &trailing, 0);
 
-    m_nCursorOffset = lineOffset + charPos + trailing;
+    lps->nCursorOffset = lineOffset + charPos + trailing;
 }
 
 //
 //    Move caret down specified number of lines
 //
-VOID TextView::MoveLineDown(int numLines)
+VOID MoveLineDown_TextView(
+    TextView * lps,
+    int numLines
+    )
 {
     USPDATA            * uspData;
     ULONG              lineOffset;
@@ -77,42 +89,44 @@ VOID TextView::MoveLineDown(int numLines)
     int                  charPos;
     BOOL              trailing;
 
-    m_nCurrentLine += min(m_nLineCount - m_nCurrentLine - 1, (unsigned) numLines);
+    lps->nCurrentLine += min(lps->nLineCount - lps->nCurrentLine - 1, (unsigned) numLines);
 
     // get Uniscribe data for prev line
-    uspData = GetUspData(0, m_nCurrentLine, &lineOffset);
+    uspData = GetUspData_TextView(lps, 0, lps->nCurrentLine, &lineOffset);
 
     // move down to character nearest the caret-anchor position
-    UspXToOffset(uspData, m_nAnchorPosX, &charPos, &trailing, 0);
+    UspXToOffset(uspData, lps->nAnchorPosX, &charPos, &trailing, 0);
 
-    m_nCursorOffset = lineOffset + charPos + trailing;
+    lps->nCursorOffset = lineOffset + charPos + trailing;
 }
 
 //
 //    Move to start of previous word (to the left)
 //
-VOID TextView::MoveWordPrev()
+VOID MoveWordPrev_TextView(
+    TextView * lps
+    )
 {
-    USPCACHE        * uspCache;
+    USPCACHE * uspCache;
     CSCRIPT_LOGATTR * logAttr;
-    ULONG              lineOffset;
-    int                  charPos;
+    ULONG lineOffset;
+    int charPos;
 
     // get Uniscribe data for current line
-    if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+    if (!GetLogAttr_TextView(lps, lps->nCurrentLine, &uspCache, &logAttr, &lineOffset))
         return;
 
     // move 1 character to left
-    charPos = m_nCursorOffset - lineOffset - 1;
+    charPos = lps->nCursorOffset - lineOffset - 1;
 
     // skip to end of *previous* line if necessary
     if (charPos < 0)
     {
         charPos = 0;
 
-        if (m_nCurrentLine > 0)
+        if (lps->nCurrentLine > 0)
         {
-            MoveLineEnd(m_nCurrentLine - 1);
+            MoveLineEnd_TextView(lps, lps->nCurrentLine - 1);
             return;
         }
     }
@@ -128,13 +142,15 @@ VOID TextView::MoveWordPrev()
             break;
     }
 
-    m_nCursorOffset = lineOffset + charPos;
+    lps->nCursorOffset = lineOffset + charPos;
 }
 
 //
 //    Move to start of next word
 //
-VOID TextView::MoveWordNext()
+VOID MoveWordNext_TextView(
+    TextView * lps
+    )
 {
     USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
@@ -142,16 +158,16 @@ VOID TextView::MoveWordNext()
     int                  charPos;
 
     // get Uniscribe data for current line
-    if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+    if (!GetLogAttr_TextView(lps, lps->nCurrentLine, &uspCache, &logAttr, &lineOffset))
         return;
 
-    charPos = m_nCursorOffset - lineOffset;
+    charPos = lps->nCursorOffset - lineOffset;
 
     // if already at end-of-line, skip to next line
     if (charPos == uspCache->length_CRLF)
     {
-        if (m_nCurrentLine + 1 < m_nLineCount)
-            MoveLineStart(m_nCurrentLine + 1);
+        if (lps->nCurrentLine + 1 < lps->nLineCount)
+            MoveLineStart_TextView(lps, lps->nCurrentLine + 1);
 
         return;
     }
@@ -171,13 +187,15 @@ VOID TextView::MoveWordNext()
     while (charPos < uspCache->length_CRLF && logAttr[charPos].fWhiteSpace)
         charPos++;
 
-    m_nCursorOffset = lineOffset + charPos;
+    lps->nCursorOffset = lineOffset + charPos;
 }
 
 //
 //    Move to start of current word
 //
-VOID TextView::MoveWordStart()
+VOID MoveWordStart_TextView(
+    TextView * lps
+    )
 {
     USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
@@ -185,21 +203,23 @@ VOID TextView::MoveWordStart()
     int                  charPos;
 
     // get Uniscribe data for current line
-    if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+    if (!GetLogAttr_TextView(lps, lps->nCurrentLine, &uspCache, &logAttr, &lineOffset))
         return;
 
-    charPos = m_nCursorOffset - lineOffset;
+    charPos = lps->nCursorOffset - lineOffset;
 
     while (charPos > 0 && !logAttr[charPos - 1].fWhiteSpace)
         charPos--;
 
-    m_nCursorOffset = lineOffset + charPos;
+    lps->nCursorOffset = lineOffset + charPos;
 }
 
 //
 //    Move to end of current word
 //
-VOID TextView::MoveWordEnd()
+VOID MoveWordEnd_TextView(
+    TextView * lps
+    )
 {
     USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
@@ -207,21 +227,23 @@ VOID TextView::MoveWordEnd()
     int                  charPos;
 
     // get Uniscribe data for current line
-    if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+    if (!GetLogAttr_TextView(lps, lps->nCurrentLine, &uspCache, &logAttr, &lineOffset))
         return;
 
-    charPos = m_nCursorOffset - lineOffset;
+    charPos = lps->nCursorOffset - lineOffset;
 
     while (charPos < uspCache->length_CRLF && !logAttr[charPos].fWhiteSpace)
         charPos++;
 
-    m_nCursorOffset = lineOffset + charPos;
+    lps->nCursorOffset = lineOffset + charPos;
 }
 
 //
 //    Move to previous character
 //
-VOID TextView::MoveCharPrev()
+VOID MoveCharPrev_TextView(
+    TextView * lps
+    )
 {
     USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
@@ -229,10 +251,10 @@ VOID TextView::MoveCharPrev()
     int                  charPos;
 
     // get Uniscribe data for current line
-    if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+    if (!GetLogAttr_TextView(lps, lps->nCurrentLine, &uspCache, &logAttr, &lineOffset))
         return;
 
-    charPos = m_nCursorOffset - lineOffset;
+    charPos = lps->nCursorOffset - lineOffset;
 
     // find the previous valid character-position
     for (--charPos; charPos >= 0; charPos--)
@@ -246,21 +268,23 @@ VOID TextView::MoveCharPrev()
     {
         charPos = 0;
 
-        if (m_nCurrentLine > 0)
+        if (lps->nCurrentLine > 0)
         {
-            MoveLineEnd(m_nCurrentLine - 1);
+            MoveLineEnd_TextView(lps, lps->nCurrentLine - 1);
             return;
         }
     }
 
     // update cursor position
-    m_nCursorOffset = lineOffset + charPos;
+    lps->nCursorOffset = lineOffset + charPos;
 }
 
 //
 //    Move to next character
 //
-VOID TextView::MoveCharNext()
+VOID MoveCharNext_TextView(
+    TextView * lps
+    )
 {
     USPCACHE        * uspCache;
     CSCRIPT_LOGATTR * logAttr;
@@ -268,10 +292,10 @@ VOID TextView::MoveCharNext()
     int                  charPos;
 
     // get Uniscribe data for specified line
-    if (!GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+    if (!GetLogAttr_TextView(lps, lps->nCurrentLine, &uspCache, &logAttr, &lineOffset))
         return;
 
-    charPos = m_nCursorOffset - lineOffset;
+    charPos = lps->nCursorOffset - lineOffset;
 
     // find the next valid character-position
     for (++charPos; charPos <= uspCache->length_CRLF; charPos++)
@@ -283,20 +307,23 @@ VOID TextView::MoveCharNext()
     // skip to beginning of next line if we hit the CR/LF
     if (charPos > uspCache->length_CRLF)
     {
-        if (m_nCurrentLine + 1 < m_nLineCount)
-            MoveLineStart(m_nCurrentLine + 1);
+        if (lps->nCurrentLine + 1 < lps->nLineCount)
+            MoveLineStart_TextView(lps, lps->nCurrentLine + 1);
     }
     // otherwise advance the character-position
     else
     {
-        m_nCursorOffset = lineOffset + charPos;
+        lps->nCursorOffset = lineOffset + charPos;
     }
 }
 
 //
 //    Move to start of specified line
 //
-VOID TextView::MoveLineStart(ULONG lineNo)
+VOID MoveLineStart_TextView(
+    TextView * lps,
+    ULONG lineNo
+    )
 {
     ULONG              lineOffset;
     USPCACHE        * uspCache;
@@ -304,59 +331,70 @@ VOID TextView::MoveLineStart(ULONG lineNo)
     int                  charPos;
 
     // get Uniscribe data for current line
-    if (!GetLogAttr(lineNo, &uspCache, &logAttr, &lineOffset))
+    if (!GetLogAttr_TextView(lps, lineNo, &uspCache, &logAttr, &lineOffset))
         return;
 
-    charPos = m_nCursorOffset - lineOffset;
+    charPos = lps->nCursorOffset - lineOffset;
 
     // if already at start of line, skip *forwards* past any whitespace
-    if (m_nCursorOffset == lineOffset)
+    if (lps->nCursorOffset == lineOffset)
     {
         // skip whitespace
-        while (logAttr[m_nCursorOffset - lineOffset].fWhiteSpace)
-            m_nCursorOffset++;
+        while (logAttr[lps->nCursorOffset - lineOffset].fWhiteSpace)
+            lps->nCursorOffset++;
     }
     // if not at start, goto start
     else
     {
-        m_nCursorOffset = lineOffset;
+        lps->nCursorOffset = lineOffset;
     }
 }
 
 //
 //    Move to end of specified line
 //
-VOID TextView::MoveLineEnd(ULONG lineNo)
+VOID MoveLineEnd_TextView(
+    TextView * lps,
+    ULONG lineNo
+    )
 {
     USPCACHE *uspCache;
 
-    if ((uspCache = GetUspCache(0, lineNo)) == 0)
+    if ((uspCache = GetUspCache_TextView(lps, 0, lineNo)) == 0)
         return;
 
-    m_nCursorOffset = uspCache->offset + uspCache->length_CRLF;
+    lps->nCursorOffset = uspCache->offset + uspCache->length_CRLF;
 }
 
 //
 //    Move to start of file
 //
-VOID TextView::MoveFileStart()
+VOID MoveFileStart_TextView(
+    TextView * lps
+    )
 {
-    m_nCursorOffset = 0;
+    lps->nCursorOffset = 0;
 }
 
 //
 //    Move to end of file
 //
-VOID TextView::MoveFileEnd()
+VOID MoveFileEnd_TextView(
+    TextView * lps
+    )
 {
-    m_nCursorOffset = size_TextDocument(m_pTextDoc);
+    lps->nCursorOffset = size_TextDocument(lps->pTextDoc);
 }
 
 
 //
 //    Process keyboard-navigation keys
 //
-LONG TextView::OnKeyDown(UINT nKeyCode, UINT nFlags)
+LONG OnKeyDown_TextView(
+    TextView * lps,
+    UINT nKeyCode,
+    UINT nFlags
+    )
 {
     bool fCtrlDown = IsKeyPressed(VK_CONTROL);
     bool fShiftDown = IsKeyPressed(VK_SHIFT);
@@ -374,16 +412,16 @@ LONG TextView::OnKeyDown(UINT nKeyCode, UINT nFlags)
         // CTRL+Z undo
     case 'z': case 'Z':
 
-        if (fCtrlDown && Undo())
-            NotifyParent(TVN_CHANGED);
+        if (fCtrlDown && Undo_TextView(lps))
+            NotifyParent_TextView(lps, TVN_CHANGED);
 
         return 0;
 
         // CTRL+Y redo
     case 'y': case 'Y':
 
-        if (fCtrlDown && Redo())
-            NotifyParent(TVN_CHANGED);
+        if (fCtrlDown && Redo_TextView(lps))
+            NotifyParent_TextView(lps, TVN_CHANGED);
 
         return 0;
 
@@ -392,93 +430,135 @@ LONG TextView::OnKeyDown(UINT nKeyCode, UINT nFlags)
 
         if (fCtrlDown)
         {
-            OnCopy();
-            NotifyParent(TVN_CHANGED);
+            OnCopy_TextView(lps);
+            NotifyParent_TextView(lps, TVN_CHANGED);
         }
         else if (fShiftDown)
         {
-            OnPaste();
-            NotifyParent(TVN_CHANGED);
+            OnPaste_TextView(lps);
+            NotifyParent_TextView(lps, TVN_CHANGED);
         }
         else
         {
-            if (m_nEditMode == MODE_INSERT)
-                m_nEditMode = MODE_OVERWRITE;
+            if (lps->nEditMode == MODE_INSERT)
+                lps->nEditMode = MODE_OVERWRITE;
 
-            else if (m_nEditMode == MODE_OVERWRITE)
-                m_nEditMode = MODE_INSERT;
+            else if (lps->nEditMode == MODE_OVERWRITE)
+                lps->nEditMode = MODE_INSERT;
 
-            NotifyParent(TVN_EDITMODE_CHANGE);
+            NotifyParent_TextView(lps, TVN_EDITMODE_CHANGE);
         }
 
         return 0;
 
     case VK_DELETE:
 
-        if (m_nEditMode != MODE_READONLY)
+        if (lps->nEditMode != MODE_READONLY)
         {
             if (fShiftDown)
-                OnCut();
+                OnCut_TextView(lps);
             else
-                ForwardDelete();
+                ForwardDelete_TextView(lps);
 
-            NotifyParent(TVN_CHANGED);
+            NotifyParent_TextView(lps, TVN_CHANGED);
         }
         return 0;
 
     case VK_BACK:
 
-        if (m_nEditMode != MODE_READONLY)
+        if (lps->nEditMode != MODE_READONLY)
         {
-            BackDelete();
+            BackDelete_TextView(lps);
             fAdvancing = FALSE;
 
-            NotifyParent(TVN_CHANGED);
+            NotifyParent_TextView(lps, TVN_CHANGED);
         }
         return 0;
 
     case VK_LEFT:
 
-        if (fCtrlDown)    MoveWordPrev();
-        else            MoveCharPrev();
+        if (fCtrlDown)
+        {
+            MoveWordPrev_TextView(lps);
+        }
+        else
+        {
+            MoveCharPrev_TextView(lps);
+        }
 
         fAdvancing = FALSE;
         break;
 
     case VK_RIGHT:
 
-        if (fCtrlDown)    MoveWordNext();
-        else            MoveCharNext();
+        if (fCtrlDown)
+        {
+            MoveWordNext_TextView(lps);
+        }
+        else
+        {
+            MoveCharNext_TextView(lps);
+        }
 
         fAdvancing = TRUE;
         break;
 
     case VK_UP:
-        if (fCtrlDown)    Scroll(0, -1);
-        else            MoveLineUp(1);
+        if (fCtrlDown)
+        {
+            Scroll_TextView(lps, 0, -1);
+        }
+        else
+        {
+            MoveLineUp_TextView(lps, 1);
+        }
         break;
 
     case VK_DOWN:
-        if (fCtrlDown)    Scroll(0, 1);
-        else            MoveLineDown(1);
+        if (fCtrlDown)
+        {
+            Scroll_TextView(lps, 0, 1);
+        }
+        else
+        {
+            MoveLineDown_TextView(lps, 1);
+        }
         break;
 
     case VK_PRIOR:
-        if (!fCtrlDown)    MoveLineUp(m_nWindowLines);
+        if (!fCtrlDown)
+        {
+            MoveLineUp_TextView(lps, lps->nWindowLines);
+        }
         break;
 
     case VK_NEXT:
-        if (!fCtrlDown)    MoveLineDown(m_nWindowLines);
+        if (!fCtrlDown)
+        {
+            MoveLineDown_TextView(lps, lps->nWindowLines);
+        }
         break;
 
     case VK_HOME:
-        if (fCtrlDown)    MoveFileStart();
-        else            MoveLineStart(m_nCurrentLine);
+        if (fCtrlDown)
+        {
+            MoveFileStart_TextView(lps);
+        }
+        else
+        {
+            MoveLineStart_TextView(lps, lps->nCurrentLine);
+        }
         break;
 
     case VK_END:
-        if (fCtrlDown)    MoveFileEnd();
-        else            MoveLineEnd(m_nCurrentLine);
+        if (fCtrlDown)
+        {
+            MoveFileEnd_TextView(lps);
+        }
+        else
+        {
+            MoveLineEnd_TextView(lps, lps->nCurrentLine);
+        }
         break;
 
     default:
@@ -488,38 +568,42 @@ LONG TextView::OnKeyDown(UINT nKeyCode, UINT nFlags)
     // Extend selection if <shift> is down
     if (fShiftDown)
     {
-        InvalidateRange(m_nSelectionEnd, m_nCursorOffset);
-        m_nSelectionEnd = m_nCursorOffset;
+        InvalidateRange_TextView(lps, lps->nSelectionEnd, lps->nCursorOffset);
+        lps->nSelectionEnd = lps->nCursorOffset;
     }
     // Otherwise clear the selection
     else
     {
-        if (m_nSelectionStart != m_nSelectionEnd)
-            InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
+        if (lps->nSelectionStart != lps->nSelectionEnd)
+        {
+            InvalidateRange_TextView(lps, lps->nSelectionStart, lps->nSelectionEnd);
+        }
 
-        m_nSelectionEnd = m_nCursorOffset;
-        m_nSelectionStart = m_nCursorOffset;
+        lps->nSelectionEnd = lps->nCursorOffset;
+        lps->nSelectionStart = lps->nCursorOffset;
     }
 
     // update caret-location (xpos, line#) from the offset
-    UpdateCaretOffset(m_nCursorOffset, fAdvancing, &m_nCaretPosX, &m_nCurrentLine);
+    UpdateCaretOffset_TextView(lps, lps->nCursorOffset, fAdvancing, &lps->nCaretPosX, &lps->nCurrentLine);
 
     // maintain the caret 'anchor' position *except* for up/down actions
     if (nKeyCode != VK_UP && nKeyCode != VK_DOWN)
     {
-        m_nAnchorPosX = m_nCaretPosX;
+        lps->nAnchorPosX = lps->nCaretPosX;
 
         // scroll as necessary to keep caret within viewport
-        ScrollToPosition(m_nCaretPosX, m_nCurrentLine);
+        ScrollToPosition_TextView(lps, lps->nCaretPosX, lps->nCurrentLine);
     }
     else
     {
         // scroll as necessary to keep caret within viewport
         if (!fCtrlDown)
-            ScrollToPosition(m_nCaretPosX, m_nCurrentLine);
+        {
+            ScrollToPosition_TextView(lps, lps->nCaretPosX, lps->nCurrentLine);
+        }
     }
 
-    NotifyParent(TVN_CURSOR_CHANGE);
+    NotifyParent_TextView(lps, TVN_CURSOR_CHANGE);
 
     return 0;
 }

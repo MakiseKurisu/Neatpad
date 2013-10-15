@@ -35,129 +35,153 @@
 //
 //    Constructor for TextView class
 //
-TextView::TextView(HWND hwnd)
+TextView * new_TextView(
+    HWND hWnd
+    )
 {
-    m_hWnd = hwnd;
+    TextView * lps = (TextView *) malloc(sizeof(TextView));
 
-    m_hTheme = OpenThemeData(hwnd, L"edit");
-
-    // Font-related data
-    m_nNumFonts = 1;
-    m_nHeightAbove = 0;
-    m_nHeightBelow = 0;
-
-    // File-related data
-    m_nLineCount = 0;
-    m_nLongestLine = 0;
-
-
-    // Scrollbar related data
-    m_nVScrollPos = 0;
-    m_nHScrollPos = 0;
-    m_nVScrollMax = 0;
-    m_nHScrollMax = 0;
-
-    // Display-related data
-    m_nTabWidthChars = 4;
-    m_uStyleFlags = 0;
-    m_nCaretWidth = 0;
-    m_nLongLineLimit = 80;
-    m_nLineInfoCount = 0;
-    m_nCRLFMode = TXL_CRLF;//ALL;
-
-    // allocate the USPDATA cache
-    m_uspCache = (USPCACHE *) malloc(sizeof(USPCACHE) * USP_CACHE_SIZE);
-
-    for (int i = 0; i < USP_CACHE_SIZE; i++)
+    if (lps)
     {
-        m_uspCache[i].usage = 0;
-        m_uspCache[i].lineno = 0;
-        m_uspCache[i].uspData = UspAllocate();
+        memset(lps, 0, sizeof(*lps));
+
+        lps->hWnd = hWnd;
+
+        lps->hTheme = OpenThemeData(hWnd, L"edit");
+
+        // Font-related data
+        lps->nNumFonts = 1;
+        lps->nHeightAbove = 0;
+        lps->nHeightBelow = 0;
+
+        // File-related data
+        lps->nLineCount = 0;
+        lps->nLongestLine = 0;
+
+
+        // Scrollbar related data
+        lps->nVScrollPos = 0;
+        lps->nHScrollPos = 0;
+        lps->nVScrollMax = 0;
+        lps->nHScrollMax = 0;
+
+        // Display-related data
+        lps->nTabWidthChars = 4;
+        lps->uStyleFlags = 0;
+        lps->nCaretWidth = 0;
+        lps->nLongLineLimit = 80;
+        lps->nLineInfoCount = 0;
+        lps->nCRLFMode = TXL_CRLF;  //ALL;
+
+        // allocate the USPDATA cache
+        lps->uspCache = (USPCACHE *) malloc(sizeof(USPCACHE) * USP_CACHE_SIZE);
+
+        for (int i = 0; i < USP_CACHE_SIZE; i++)
+        {
+            lps->uspCache[i].usage = 0;
+            lps->uspCache[i].lineno = 0;
+            lps->uspCache[i].uspData = UspAllocate();
+        }
+
+        SystemParametersInfo(SPI_GETCARETWIDTH, 0, &lps->nCaretWidth, 0);
+
+        if (lps->nCaretWidth == 0)
+        {
+            lps->nCaretWidth = 2;
+        }
+
+        // Default display colours
+        lps->rgbColourList[TXC_FOREGROUND] = SYSCOL(COLOR_WINDOWTEXT);
+        lps->rgbColourList[TXC_BACKGROUND] = SYSCOL(COLOR_WINDOW);          // RGB(34,54,106)
+        lps->rgbColourList[TXC_HIGHLIGHTTEXT] = SYSCOL(COLOR_HIGHLIGHTTEXT);
+        lps->rgbColourList[TXC_HIGHLIGHT] = SYSCOL(COLOR_HIGHLIGHT);
+        lps->rgbColourList[TXC_HIGHLIGHTTEXT2] = SYSCOL(COLOR_WINDOWTEXT);  //INACTIVECAPTIONTEXT);
+        lps->rgbColourList[TXC_HIGHLIGHT2] = SYSCOL(COLOR_3DFACE);          //INACTIVECAPTION);
+        lps->rgbColourList[TXC_SELMARGIN1] = SYSCOL(COLOR_3DFACE);
+        lps->rgbColourList[TXC_SELMARGIN2] = SYSCOL(COLOR_3DHIGHLIGHT);
+        lps->rgbColourList[TXC_LINENUMBERTEXT] = SYSCOL(COLOR_3DSHADOW);
+        lps->rgbColourList[TXC_LINENUMBER] = SYSCOL(COLOR_3DFACE);
+        lps->rgbColourList[TXC_LONGLINETEXT] = SYSCOL(COLOR_3DSHADOW);
+        lps->rgbColourList[TXC_LONGLINE] = SYSCOL(COLOR_3DFACE);
+        lps->rgbColourList[TXC_CURRENTLINETEXT] = SYSCOL(COLOR_WINDOWTEXT);
+        lps->rgbColourList[TXC_CURRENTLINE] = RGB(230, 240, 255);
+
+
+        // Runtime data
+        lps->nSelectionMode = SEL_NONE;
+        lps->nEditMode = MODE_INSERT;
+        lps->nScrollTimer = 0;
+        lps->fHideCaret = false;
+        lps->hUserMenu = 0;
+        lps->hImageList = 0;
+
+        lps->nSelectionStart = 0;
+        lps->nSelectionEnd = 0;
+        lps->nSelectionType = SEL_NONE;
+        lps->nCursorOffset = 0;
+        lps->nCurrentLine = 0;
+
+        lps->nLinenoWidth = 0;
+        lps->nCaretPosX = 0;
+        lps->nAnchorPosX = 0;
+
+        //SetRect(&lps->rcBorder, 2, 2, 2, 2);
+
+        lps->pTextDoc = new_TextDocument();
+
+        lps->hMarginCursor = CreateCursor(GetModuleHandle(0), 21, 5, 32, 32, XORMask, ANDMask);
+
+        //
+        //    The TextView state must be fully initialized before we
+        //    start calling member-functions
+        //
+
+        memset(lps->uspFontList, 0, sizeof(lps->uspFontList));
+
+        // Set the default font
+        OnSetFont_TextView(lps, (HFONT) GetStockObject(ANSI_FIXED_FONT));
+
+        UpdateMetrics_TextView(lps);
+        UpdateMarginWidth_TextView(lps);
     }
 
-    SystemParametersInfo(SPI_GETCARETWIDTH, 0, &m_nCaretWidth, 0);
-
-    if (m_nCaretWidth == 0)
-        m_nCaretWidth = 2;
-
-    // Default display colours
-    m_rgbColourList[TXC_FOREGROUND] = SYSCOL(COLOR_WINDOWTEXT);
-    m_rgbColourList[TXC_BACKGROUND] = SYSCOL(COLOR_WINDOW);            // RGB(34,54,106)
-    m_rgbColourList[TXC_HIGHLIGHTTEXT] = SYSCOL(COLOR_HIGHLIGHTTEXT);
-    m_rgbColourList[TXC_HIGHLIGHT] = SYSCOL(COLOR_HIGHLIGHT);
-    m_rgbColourList[TXC_HIGHLIGHTTEXT2] = SYSCOL(COLOR_WINDOWTEXT);//INACTIVECAPTIONTEXT);
-    m_rgbColourList[TXC_HIGHLIGHT2] = SYSCOL(COLOR_3DFACE);//INACTIVECAPTION);
-    m_rgbColourList[TXC_SELMARGIN1] = SYSCOL(COLOR_3DFACE);
-    m_rgbColourList[TXC_SELMARGIN2] = SYSCOL(COLOR_3DHIGHLIGHT);
-    m_rgbColourList[TXC_LINENUMBERTEXT] = SYSCOL(COLOR_3DSHADOW);
-    m_rgbColourList[TXC_LINENUMBER] = SYSCOL(COLOR_3DFACE);
-    m_rgbColourList[TXC_LONGLINETEXT] = SYSCOL(COLOR_3DSHADOW);
-    m_rgbColourList[TXC_LONGLINE] = SYSCOL(COLOR_3DFACE);
-    m_rgbColourList[TXC_CURRENTLINETEXT] = SYSCOL(COLOR_WINDOWTEXT);
-    m_rgbColourList[TXC_CURRENTLINE] = RGB(230, 240, 255);
-
-
-    // Runtime data
-    m_nSelectionMode = SEL_NONE;
-    m_nEditMode = MODE_INSERT;
-    m_nScrollTimer = 0;
-    m_fHideCaret = false;
-    m_hUserMenu = 0;
-    m_hImageList = 0;
-
-    m_nSelectionStart = 0;
-    m_nSelectionEnd = 0;
-    m_nSelectionType = SEL_NONE;
-    m_nCursorOffset = 0;
-    m_nCurrentLine = 0;
-
-    m_nLinenoWidth = 0;
-    m_nCaretPosX = 0;
-    m_nAnchorPosX = 0;
-
-    //SetRect(&m_rcBorder, 2, 2, 2, 2);
-
-    m_pTextDoc = new_TextDocument();
-
-    m_hMarginCursor = CreateCursor(GetModuleHandle(0), 21, 5, 32, 32, XORMask, ANDMask);
-
-    //
-    //    The TextView state must be fully initialized before we
-    //    start calling member-functions
-    //
-
-    memset(m_uspFontList, 0, sizeof(m_uspFontList));
-
-    // Set the default font
-    OnSetFont((HFONT) GetStockObject(ANSI_FIXED_FONT));
-
-    UpdateMetrics();
-    UpdateMarginWidth();
+    return lps;
 }
 
 //
 //    Destructor for TextView class
 //
-TextView::~TextView()
+void delete_TextView(
+    TextView * lps
+    )
 {
-    if (m_pTextDoc)
-        delete_TextDocument(m_pTextDoc);
+    if (lps->pTextDoc)
+    {
+        delete_TextDocument(lps->pTextDoc);
+    }
 
-    DestroyCursor(m_hMarginCursor);
+    DestroyCursor(lps->hMarginCursor);
 
     for (int i = 0; i < USP_CACHE_SIZE; i++)
-        UspFree(m_uspCache[i].uspData);
+    {
+        UspFree(lps->uspCache[i].uspData);
+    }
+    free(lps->uspCache);
 
-    free(m_uspCache);
+    CloseThemeData(lps->hTheme);
 
-    CloseThemeData(m_hTheme);
+    free(lps);
 }
 
-ULONG TextView::NotifyParent(UINT nNotifyCode, NMHDR *optional)
+ULONG NotifyParent_TextView(
+    TextView * lps,
+    UINT nNotifyCode,
+    NMHDR * optional
+    )
 {
-    UINT  nCtrlId = GetWindowLong(m_hWnd, GWL_ID);
-    NMHDR nmhdr = { m_hWnd, nCtrlId, nNotifyCode };
-    NMHDR *nmptr = &nmhdr;
+    UINT nCtrlId = GetWindowLong(lps->hWnd, GWL_ID);
+    NMHDR nmhdr = { lps->hWnd, nCtrlId, nNotifyCode };
+    NMHDR * nmptr = &nmhdr;
 
     if (optional)
     {
@@ -165,98 +189,132 @@ ULONG TextView::NotifyParent(UINT nNotifyCode, NMHDR *optional)
         *nmptr = nmhdr;
     }
 
-    return SendMessage(GetParent(m_hWnd), WM_NOTIFY, (WPARAM) nCtrlId, (LPARAM) nmptr);
+    return SendMessage(GetParent(lps->hWnd), WM_NOTIFY, (WPARAM) nCtrlId, (LPARAM) nmptr);
 }
 
-VOID TextView::UpdateMetrics()
+VOID UpdateMetrics_TextView(
+    TextView * lps
+    )
 {
     RECT rect;
-    GetClientRect(m_hWnd, &rect);
+    GetClientRect(lps->hWnd, &rect);
 
-    OnSize(0, rect.right, rect.bottom);
-    RefreshWindow();
+    OnSize_TextView(lps, 0, rect.right, rect.bottom);
+    RefreshWindow_TextView(lps);
 
-    RepositionCaret();
+    RepositionCaret_TextView(lps);
 }
 
-LONG TextView::OnSetFocus(HWND hwndOld)
+LONG OnSetFocus_TextView(
+    TextView * lps,
+    HWND hwndOld
+    )
 {
-    CreateCaret(m_hWnd, (HBITMAP) NULL, m_nCaretWidth, m_nLineHeight);
-    RepositionCaret();
+    CreateCaret(lps->hWnd, (HBITMAP) NULL, lps->nCaretWidth, lps->nLineHeight);
+    RepositionCaret_TextView(lps);
 
-    ShowCaret(m_hWnd);
-    RefreshWindow();
+    ShowCaret(lps->hWnd);
+    RefreshWindow_TextView(lps);
     return 0;
 }
 
-LONG TextView::OnKillFocus(HWND hwndNew)
+LONG OnKillFocus_TextView(
+    TextView * lps,
+    HWND hwndNew
+    )
 {
     // if we are making a selection when we lost focus then
     // stop the selection logic
-    if (m_nSelectionMode != SEL_NONE)
+    if (lps->nSelectionMode != SEL_NONE)
     {
-        OnLButtonUp(0, 0, 0);
+        OnLButtonUp_TextView(lps, 0, 0, 0);
     }
 
-    HideCaret(m_hWnd);
+    HideCaret(lps->hWnd);
     DestroyCaret();
-    RefreshWindow();
+    RefreshWindow_TextView(lps);
     return 0;
 }
 
-ULONG TextView::SetStyle(ULONG uMask, ULONG uStyles)
+ULONG SetStyle_TextView(
+    TextView * lps,
+    ULONG uMask,
+    ULONG uStyles
+    )
 {
-    ULONG oldstyle = m_uStyleFlags;
+    ULONG oldstyle = lps->uStyleFlags;
 
-    m_uStyleFlags = (m_uStyleFlags & ~uMask) | uStyles;
+    lps->uStyleFlags = (lps->uStyleFlags & ~uMask) | uStyles;
 
-    ResetLineCache();
+    ResetLineCache_TextView(lps);
 
     // update display here
-    UpdateMetrics();
-    RefreshWindow();
+    UpdateMetrics_TextView(lps);
+    RefreshWindow_TextView(lps);
 
     return oldstyle;
 }
 
-ULONG TextView::SetVar(ULONG nVar, ULONG nValue)
+ULONG SetVar_TextView(
+    TextView * lps,
+    ULONG nVar,
+    ULONG nValue
+    )
 {
     return 0;//oldval;
 }
 
-ULONG TextView::GetVar(ULONG nVar)
+ULONG GetVar_TextView(
+    TextView * lps,
+    ULONG nVar
+    )
 {
     return 0;
 }
 
-ULONG TextView::GetStyleMask(ULONG uMask)
+ULONG GetStyleMask_TextView(
+    TextView * lps,
+    ULONG uMask
+    )
 {
-    return m_uStyleFlags & uMask;
+    return lps->uStyleFlags & uMask;
 }
 
-bool TextView::CheckStyle(ULONG uMask)
+bool CheckStyle_TextView(
+    TextView * lps,
+    ULONG uMask
+    )
 {
-    return (m_uStyleFlags & uMask) ? true : false;
+    return (lps->uStyleFlags & uMask) ? true : false;
 }
 
-int TextView::SetCaretWidth(int nWidth)
+int SetCaretWidth_TextView(
+    TextView * lps,
+    int nWidth
+    )
 {
-    int oldwidth = m_nCaretWidth;
-    m_nCaretWidth = nWidth;
+    int oldwidth = lps->nCaretWidth;
+    lps->nCaretWidth = nWidth;
 
     return oldwidth;
 }
 
-BOOL TextView::SetImageList(HIMAGELIST hImgList)
+BOOL SetImageList_TextView(
+    TextView * lps,
+    HIMAGELIST hImgList
+    )
 {
-    m_hImageList = hImgList;
+    lps->hImageList = hImgList;
     return TRUE;
 }
 
-LONG TextView::SetLongLine(int nLength)
+LONG SetLongLine_TextView(
+    TextView * lps,
+    int nLength
+    )
 {
-    int oldlen = m_nLongLineLimit;
-    m_nLongLineLimit = nLength;
+    int oldlen = lps->nLongLineLimit;
+    lps->nLongLineLimit = nLength;
     return oldlen;
 }
 
@@ -270,9 +328,13 @@ int CompareLineInfo(LINEINFO *elem1, LINEINFO *elem2)
         return 0;
 }
 
-int TextView::SetLineImage(ULONG nLineNo, ULONG nImageIdx)
+int SetLineImage_TextView(
+    TextView * lps,
+    ULONG nLineNo,
+    ULONG nImageIdx
+    )
 {
-    LINEINFO *linfo = GetLineInfo(nLineNo);
+    LINEINFO *linfo = GetLineInfo_TextView(lps, nLineNo);
 
     // if already a line with an image
     if (linfo)
@@ -281,14 +343,14 @@ int TextView::SetLineImage(ULONG nLineNo, ULONG nImageIdx)
     }
     else
     {
-        linfo = &m_LineInfo[m_nLineInfoCount++];
+        linfo = &lps->LineInfo[lps->nLineInfoCount++];
         linfo->nLineNo = nLineNo;
         linfo->nImageIdx = nImageIdx;
 
         // sort the array
         qsort(
-            m_LineInfo,
-            m_nLineInfoCount,
+            lps->LineInfo,
+            lps->nLineInfoCount,
             sizeof(LINEINFO),
             (COMPAREPROC) CompareLineInfo
             );
@@ -297,42 +359,54 @@ int TextView::SetLineImage(ULONG nLineNo, ULONG nImageIdx)
     return 0;
 }
 
-LINEINFO* TextView::GetLineInfo(ULONG nLineNo)
+LINEINFO * GetLineInfo_TextView(
+    TextView * lps,
+    ULONG nLineNo
+    )
 {
     LINEINFO key = { nLineNo, 0 };
 
     // perform the binary search
     return (LINEINFO *) bsearch(
         &key,
-        m_LineInfo,
-        m_nLineInfoCount,
+        lps->LineInfo,
+        lps->nLineInfoCount,
         sizeof(LINEINFO),
         (COMPAREPROC) CompareLineInfo
         );
 }
 
-ULONG TextView::SelectionSize()
+ULONG SelectionSize_TextView(
+    TextView * lps
+    )
 {
-    ULONG s1 = min(m_nSelectionStart, m_nSelectionEnd);
-    ULONG s2 = max(m_nSelectionStart, m_nSelectionEnd);
+    ULONG s1 = min(lps->nSelectionStart, lps->nSelectionEnd);
+    ULONG s2 = max(lps->nSelectionStart, lps->nSelectionEnd);
     return s2 - s1;
 }
 
-ULONG TextView::SelectAll()
+ULONG SelectAll_TextView(
+    TextView * lps
+    )
 {
-    m_nSelectionStart = 0;
-    m_nSelectionEnd = size_TextDocument(m_pTextDoc);
-    m_nCursorOffset = m_nSelectionEnd;
+    lps->nSelectionStart = 0;
+    lps->nSelectionEnd = size_TextDocument(lps->pTextDoc);
+    lps->nCursorOffset = lps->nSelectionEnd;
 
-    Smeg(TRUE);
-    RefreshWindow();
+    Smeg_TextView(lps, TRUE);
+    RefreshWindow_TextView(lps);
     return 0;
 }
 
 //
 //    Public memberfunction 
 //
-LONG WINAPI TextView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
+LONG WINAPI WndProc_TextView(
+    TextView * lps,
+    UINT msg,
+    WPARAM wParam,
+    LPARAM lParam
+    )
 {
     switch (msg)
     {
@@ -342,72 +416,72 @@ LONG WINAPI TextView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
 
         // Need to custom-draw the border for XP/Vista themes
     case WM_NCPAINT:
-        return OnNcPaint((HRGN) wParam);
+        return OnNcPaint_TextView(lps, (HRGN) wParam);
 
     case WM_PAINT:
-        return OnPaint();
+        return OnPaint_TextView(lps);
 
         // Set a new font 
     case WM_SETFONT:
-        return OnSetFont((HFONT) wParam);
+        return OnSetFont_TextView(lps, (HFONT) wParam);
 
     case WM_SIZE:
-        return OnSize(wParam, LOWORD(lParam), HIWORD(lParam));
+        return OnSize_TextView(lps, wParam, LOWORD(lParam), HIWORD(lParam));
 
     case WM_VSCROLL:
-        return OnVScroll(LOWORD(wParam), HIWORD(wParam));
+        return OnVScroll_TextView(lps, LOWORD(wParam), HIWORD(wParam));
 
     case WM_HSCROLL:
-        return OnHScroll(LOWORD(wParam), HIWORD(wParam));
+        return OnHScroll_TextView(lps, LOWORD(wParam), HIWORD(wParam));
 
     case WM_MOUSEACTIVATE:
-        return OnMouseActivate((HWND) wParam, LOWORD(lParam), HIWORD(lParam));
+        return OnMouseActivate_TextView(lps, (HWND) wParam, LOWORD(lParam), HIWORD(lParam));
 
     case WM_CONTEXTMENU:
-        return OnContextMenu((HWND) wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
+        return OnContextMenu_TextView(lps, (HWND) wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
 
     case WM_MOUSEWHEEL:
-        return OnMouseWheel((short) HIWORD(wParam));
+        return OnMouseWheel_TextView(lps, (short) HIWORD(wParam));
 
     case WM_SETFOCUS:
-        return OnSetFocus((HWND) wParam);
+        return OnSetFocus_TextView(lps, (HWND) wParam);
 
     case WM_KILLFOCUS:
-        return OnKillFocus((HWND) wParam);
+        return OnKillFocus_TextView(lps, (HWND) wParam);
 
         // make sure we get arrow-keys, enter, tab, etc when hosted inside a dialog
     case WM_GETDLGCODE:
         return DLGC_WANTALLKEYS;
 
     case WM_LBUTTONDOWN:
-        return OnLButtonDown(wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
+        return OnLButtonDown_TextView(lps, wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
 
     case WM_LBUTTONUP:
-        return OnLButtonUp(wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
+        return OnLButtonUp_TextView(lps, wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
 
     case WM_LBUTTONDBLCLK:
-        return OnLButtonDblClick(wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
+        return OnLButtonDblClick_TextView(lps, wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
 
     case WM_MOUSEMOVE:
-        return OnMouseMove(wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
+        return OnMouseMove_TextView(lps, wParam, (short) LOWORD(lParam), (short) HIWORD(lParam));
 
     case WM_KEYDOWN:
-        return OnKeyDown(wParam, lParam);
+        return OnKeyDown_TextView(lps, wParam, lParam);
 
     case WM_UNDO: case TXM_UNDO: case EM_UNDO:
-        return Undo();
+        return Undo_TextView(lps);
 
     case TXM_REDO: case EM_REDO:
-        return Redo();
+        return Redo_TextView(lps);
 
     case TXM_CANUNDO: case EM_CANUNDO:
-        return CanUndo();
+        return CanUndo_TextView(lps);
 
     case TXM_CANREDO: case EM_CANREDO:
-        return CanRedo();
+        return CanRedo_TextView(lps);
 
     case WM_CHAR:
-        return OnChar(wParam, lParam);
+        return OnChar_TextView(lps, wParam, lParam);
 
     case WM_SETCURSOR:
 
@@ -417,91 +491,91 @@ LONG WINAPI TextView::WndProc(UINT msg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_COPY:
-        return OnCopy();
+        return OnCopy_TextView(lps);
 
     case WM_CUT:
-        return OnCut();
+        return OnCut_TextView(lps);
 
     case WM_PASTE:
-        return OnPaste();
+        return OnPaste_TextView(lps);
 
     case WM_CLEAR:
-        return OnClear();
+        return OnClear_TextView(lps);
 
     case WM_GETTEXT:
         return 0;
 
     case WM_TIMER:
-        return OnTimer(wParam);
+        return OnTimer_TextView(lps, wParam);
 
         //
     case TXM_OPENFILE:
-        return OpenFile((LPTSTR ) lParam);
+        return OpenFile_TextView(lps, (LPTSTR) lParam);
 
     case TXM_CLEAR:
-        return ClearFile();
+        return ClearFile_TextView(lps);
 
     case TXM_SETLINESPACING:
-        return SetLineSpacing(wParam, lParam);
+        return SetLineSpacing_TextView(lps, wParam, lParam);
 
     case TXM_ADDFONT:
-        return AddFont((HFONT) wParam);
+        return AddFont_TextView(lps, (HFONT) wParam);
 
     case TXM_SETCOLOR:
-        return SetColour(wParam, lParam);
+        return SetColour_TextView(lps, wParam, lParam);
 
     case TXM_SETSTYLE:
-        return SetStyle(wParam, lParam);
+        return SetStyle_TextView(lps, wParam, lParam);
 
     case TXM_SETCARETWIDTH:
-        return SetCaretWidth(wParam);
+        return SetCaretWidth_TextView(lps, wParam);
 
     case TXM_SETIMAGELIST:
-        return SetImageList((HIMAGELIST) wParam);
+        return SetImageList_TextView(lps, (HIMAGELIST) wParam);
 
     case TXM_SETLONGLINE:
-        return SetLongLine(lParam);
+        return SetLongLine_TextView(lps, lParam);
 
     case TXM_SETLINEIMAGE:
-        return SetLineImage(wParam, lParam);
+        return SetLineImage_TextView(lps, wParam, lParam);
 
     case TXM_GETFORMAT:
-        return getformat_TextDocument(m_pTextDoc);
+        return getformat_TextDocument(lps->pTextDoc);
 
     case TXM_GETSELSIZE:
-        return SelectionSize();
+        return SelectionSize_TextView(lps);
 
     case TXM_SETSELALL:
-        return SelectAll();
+        return SelectAll_TextView(lps);
 
     case TXM_GETCURPOS:
-        return m_nCursorOffset;
+        return lps->nCursorOffset;
 
     case TXM_GETCURLINE:
-        return m_nCurrentLine;
+        return lps->nCurrentLine;
 
     case TXM_GETCURCOL:
         ULONG nOffset;
-        GetUspData(0, m_nCurrentLine, &nOffset);
-        return m_nCursorOffset - nOffset;
+        GetUspData_TextView(lps, 0, lps->nCurrentLine, &nOffset);
+        return lps->nCursorOffset - nOffset;
 
     case TXM_GETEDITMODE:
-        return m_nEditMode;
+        return lps->nEditMode;
 
     case TXM_SETEDITMODE:
-        lParam = m_nEditMode;
-        m_nEditMode = wParam;
+        lParam = lps->nEditMode;
+        lps->nEditMode = wParam;
         return lParam;
 
     case TXM_SETCONTEXTMENU:
-        m_hUserMenu = (HMENU) wParam;
+        lps->hUserMenu = (HMENU) wParam;
         return 0;
 
     default:
         break;
     }
 
-    return DefWindowProc(m_hWnd, msg, wParam, lParam);
+    return DefWindowProc(lps->hWnd, msg, wParam, lParam);
 }
 
 //
@@ -517,7 +591,7 @@ LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
         // and store pointer to it in our extra-window-bytes
     case WM_NCCREATE:
 
-        if ((ptv = new TextView(hwnd)) == 0)
+        if ((ptv = new_TextView(hwnd)) == 0)
             return FALSE;
 
         SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG) ptv);
@@ -525,14 +599,14 @@ LRESULT WINAPI TextViewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 
         // Last message received by any window - delete the TextView object
     case WM_NCDESTROY:
-        delete ptv;
+        delete_TextView(ptv);
         SetWindowLongPtr(hwnd, 0, 0);
         return 0;
 
         // Pass everything to the TextView window procedure
     default:
         if (ptv)
-            return ptv->WndProc(msg, wParam, lParam);
+            return WndProc_TextView(ptv, msg, wParam, lParam);
         else
             return 0;
     }

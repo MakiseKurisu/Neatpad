@@ -15,14 +15,22 @@
 #include "TextViewInternal.h"
 
 //
-//    TextView::
+//  TextView::
 //
-int TextView::NeatTextYOffset(USPFONT *font)
+int NeatTextYOffset_TextView(
+    TextView * lps,
+    USPFONT * font
+    )
 {
-    return m_nMaxAscent + m_nHeightAbove - font->tm.tmAscent;
+    return lps->nMaxAscent + lps->nHeightAbove - font->tm.tmAscent;
 }
 
-int TextView::TextWidth(HDC hdc, LPCTSTR lpString, int c)
+int TextWidth_TextView(
+    TextView * lps,
+    HDC hdc,
+    LPCTSTR lpString,
+    int c
+    )
 {
     SIZE stSize;
     if (c == -1)
@@ -36,56 +44,62 @@ int TextView::TextWidth(HDC hdc, LPCTSTR lpString, int c)
 //
 //    Update the lineheight based on current font settings
 //
-VOID TextView::RecalcLineHeight()
+VOID RecalcLineHeight_TextView(
+    TextView * lps
+    )
 {
-    m_nLineHeight = 0;
-    m_nMaxAscent = 0;
+    lps->nLineHeight = 0;
+    lps->nMaxAscent = 0;
 
     // find the tallest font in the TextView
-    for (int i = 0; i < m_nNumFonts; i++)
+    for (int i = 0; i < lps->nNumFonts; i++)
     {
         // always include a font's external-leading
-        int fontheight = m_uspFontList[i].tm.tmHeight +
-            m_uspFontList[i].tm.tmExternalLeading;
+        int fontheight = lps->uspFontList[i].tm.tmHeight +
+            lps->uspFontList[i].tm.tmExternalLeading;
 
-        m_nLineHeight = max(m_nLineHeight, fontheight);
-        m_nMaxAscent = max(m_nMaxAscent, m_uspFontList[i].tm.tmAscent);
+        lps->nLineHeight = max(lps->nLineHeight, fontheight);
+        lps->nMaxAscent = max(lps->nMaxAscent, lps->uspFontList[i].tm.tmAscent);
     }
 
     // add on the above+below spacings
-    m_nLineHeight += m_nHeightAbove + m_nHeightBelow;
+    lps->nLineHeight += lps->nHeightAbove + lps->nHeightBelow;
 
     // force caret resize if we've got the focus
-    if (GetFocus() == m_hWnd)
+    if (GetFocus() == lps->hWnd)
     {
-        OnKillFocus(0);
-        OnSetFocus(0);
+        OnKillFocus_TextView(lps, 0);
+        OnSetFocus_TextView(lps, 0);
     }
 }
 
 //
 //    Set a font for the TextView
 //
-LONG TextView::SetFont(HFONT hFont, int idx)
+LONG SetFont_TextView(
+    TextView * lps,
+    HFONT hFont,
+    int idx
+    )
 {
-    USPFONT *uspFont = &m_uspFontList[idx];
+    USPFONT *uspFont = &lps->uspFontList[idx];
 
     // need a DC to query font data
-    HDC hdc = GetDC(m_hWnd);
+    HDC hdc = GetDC(lps->hWnd);
 
     // Initialize the font for USPLIB
     UspFreeFont(uspFont);
     UspInitFont(uspFont, hdc, hFont);
 
-    ReleaseDC(m_hWnd, hdc);
+    ReleaseDC(lps->hWnd, hdc);
 
     // calculate new line metrics
-    m_nFontWidth = m_uspFontList[0].tm.tmAveCharWidth;
+    lps->nFontWidth = lps->uspFontList[0].tm.tmAveCharWidth;
 
-    RecalcLineHeight();
-    UpdateMarginWidth();
+    RecalcLineHeight_TextView(lps);
+    UpdateMarginWidth_TextView(lps);
 
-    ResetLineCache();
+    ResetLineCache_TextView(lps);
 
     return 0;
 }
@@ -93,12 +107,15 @@ LONG TextView::SetFont(HFONT hFont, int idx)
 //
 //    Add a secondary font to the TextView
 //
-LONG TextView::AddFont(HFONT hFont)
+LONG AddFont_TextView(
+    TextView * lps,
+    HFONT hFont
+    )
 {
-    int idx = m_nNumFonts++;
+    int idx = lps->nNumFonts++;
 
-    SetFont(hFont, idx);
-    UpdateMetrics();
+    SetFont_TextView(lps, hFont, idx);
+    UpdateMetrics_TextView(lps);
 
     return 0;
 }
@@ -106,11 +123,14 @@ LONG TextView::AddFont(HFONT hFont)
 //
 //    WM_SETFONT handler: set a new default font
 //
-LONG TextView::OnSetFont(HFONT hFont)
+LONG OnSetFont_TextView(
+    TextView * lps,
+    HFONT hFont
+    )
 {
     // default font is always #0
-    SetFont(hFont, 0);
-    UpdateMetrics();
+    SetFont_TextView(lps, hFont, 0);
+    UpdateMetrics_TextView(lps);
 
     return 0;
 }
@@ -119,10 +139,14 @@ LONG TextView::OnSetFont(HFONT hFont)
 //    Set spacing (in pixels) above and below each line - 
 //  this is in addition to the external-leading of a font
 //
-LONG TextView::SetLineSpacing(int nAbove, int nBelow)
+LONG SetLineSpacing_TextView(
+    TextView * lps,
+    int nAbove,
+    int nBelow
+    )
 {
-    m_nHeightAbove = nAbove;
-    m_nHeightBelow = nBelow;
-    RecalcLineHeight();
+    lps->nHeightAbove = nAbove;
+    lps->nHeightBelow = nBelow;
+    RecalcLineHeight_TextView(lps);
     return TRUE;
 }

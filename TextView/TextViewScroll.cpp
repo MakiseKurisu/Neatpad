@@ -19,7 +19,9 @@ bool IsKeyPressed(UINT nVirtKey);
 //
 //    Set scrollbar positions and range
 //
-VOID TextView::SetupScrollbars()
+VOID SetupScrollbars_TextView(
+    TextView * lps
+    )
 {
     SCROLLINFO si = { sizeof(si) };
 
@@ -28,46 +30,48 @@ VOID TextView::SetupScrollbars()
     //
     //    Vertical scrollbar
     //
-    si.nPos = m_nVScrollPos;        // scrollbar thumb position
-    si.nPage = m_nWindowLines;        // number of lines in a page
+    si.nPos = lps->nVScrollPos;        // scrollbar thumb position
+    si.nPage = lps->nWindowLines;        // number of lines in a page
     si.nMin = 0;
-    si.nMax = m_nLineCount - 1;    // total number of lines in file
+    si.nMax = lps->nLineCount - 1;    // total number of lines in file
 
-    SetScrollInfo(m_hWnd, SB_VERT, &si, TRUE);
+    SetScrollInfo(lps->hWnd, SB_VERT, &si, TRUE);
 
     //
     //    Horizontal scrollbar
     //
-    si.nPos = m_nHScrollPos;        // scrollbar thumb position
-    si.nPage = m_nWindowColumns;    // number of lines in a page
+    si.nPos = lps->nHScrollPos;        // scrollbar thumb position
+    si.nPage = lps->nWindowColumns;    // number of lines in a page
     si.nMin = 0;
-    si.nMax = m_nLongestLine - 1;    // total number of lines in file
+    si.nMax = lps->nLongestLine - 1;    // total number of lines in file
 
-    SetScrollInfo(m_hWnd, SB_HORZ, &si, TRUE);
+    SetScrollInfo(lps->hWnd, SB_HORZ, &si, TRUE);
 
     // adjust our interpretation of the max scrollbar range to make
     // range-checking easier. The scrollbars don't use these values, they
     // are for our own use.
-    m_nVScrollMax = m_nLineCount - m_nWindowLines;
-    m_nHScrollMax = m_nLongestLine - m_nWindowColumns;
+    lps->nVScrollMax = lps->nLineCount - lps->nWindowLines;
+    lps->nHScrollMax = lps->nLongestLine - lps->nWindowColumns;
 }
 
 //
 //    Ensure that we never scroll off the end of the file
 //
-bool TextView::PinToBottomCorner()
+bool PinToBottomCorner_TextView(
+    TextView * lps
+    )
 {
     bool repos = false;
 
-    if (m_nHScrollPos + m_nWindowColumns > m_nLongestLine)
+    if (lps->nHScrollPos + lps->nWindowColumns > lps->nLongestLine)
     {
-        m_nHScrollPos = m_nLongestLine - m_nWindowColumns;
+        lps->nHScrollPos = lps->nLongestLine - lps->nWindowColumns;
         repos = true;
     }
 
-    if (m_nVScrollPos + m_nWindowLines > m_nLineCount)
+    if (lps->nVScrollPos + lps->nWindowLines > lps->nLineCount)
     {
-        m_nVScrollPos = m_nLineCount - m_nWindowLines;
+        lps->nVScrollPos = lps->nLineCount - lps->nWindowLines;
         repos = true;
     }
 
@@ -77,20 +81,25 @@ bool TextView::PinToBottomCorner()
 //
 //    The window has changed size - update the scrollbars
 //
-LONG TextView::OnSize(UINT nFlags, int width, int height)
+LONG OnSize_TextView(
+    TextView * lps,
+    UINT nFlags,
+    int width,
+    int height
+    )
 {
-    int margin = LeftMarginWidth();
+    int margin = LeftMarginWidth_TextView(lps);
 
-    m_nWindowLines = min((unsigned) height / m_nLineHeight, m_nLineCount);
-    m_nWindowColumns = min((width - margin) / m_nFontWidth, m_nLongestLine);
+    lps->nWindowLines = min((unsigned) height / lps->nLineHeight, lps->nLineCount);
+    lps->nWindowColumns = min((width - margin) / lps->nFontWidth, lps->nLongestLine);
 
-    if (PinToBottomCorner())
+    if (PinToBottomCorner_TextView(lps))
     {
-        RefreshWindow();
-        RepositionCaret();
+        RefreshWindow_TextView(lps);
+        RepositionCaret_TextView(lps);
     }
 
-    SetupScrollbars();
+    SetupScrollbars_TextView(lps);
 
     return 0;
 }
@@ -104,11 +113,16 @@ LONG TextView::OnSize(UINT nFlags, int width, int height)
 //
 //  Otherwise ScrollRgn returns NULL and updates the entire window 
 //
-HRGN TextView::ScrollRgn(int dx, int dy, bool fReturnUpdateRgn)
+HRGN ScrollRgn_TextView(
+    TextView * lps,
+    int dx,
+    int dy,
+    bool fReturnUpdateRgn
+    )
 {
     RECT clip;
 
-    GetClientRect(m_hWnd, &clip);
+    GetClientRect(lps->hWnd, &clip);
 
     //
     // make sure that dx,dy don't scroll us past the edge of the document!
@@ -117,63 +131,63 @@ HRGN TextView::ScrollRgn(int dx, int dy, bool fReturnUpdateRgn)
     // scroll up
     if (dy < 0)
     {
-        dy = -(int) min((ULONG) -dy, m_nVScrollPos);
-        clip.top = -dy * m_nLineHeight;
+        dy = -(int) min((ULONG) -dy, lps->nVScrollPos);
+        clip.top = -dy * lps->nLineHeight;
     }
     // scroll down
     else if (dy > 0)
     {
-        dy = min((ULONG) dy, m_nVScrollMax - m_nVScrollPos);
-        clip.bottom = (m_nWindowLines - dy) * m_nLineHeight;
+        dy = min((ULONG) dy, lps->nVScrollMax - lps->nVScrollPos);
+        clip.bottom = (lps->nWindowLines - dy) * lps->nLineHeight;
     }
 
 
     // scroll left
     if (dx < 0)
     {
-        dx = -(int) min(-dx, m_nHScrollPos);
-        clip.left = -dx * m_nFontWidth * 4;
+        dx = -(int) min(-dx, lps->nHScrollPos);
+        clip.left = -dx * lps->nFontWidth * 4;
     }
     // scroll right
     else if (dx > 0)
     {
-        dx = min((unsigned) dx, (unsigned) m_nHScrollMax - m_nHScrollPos);
-        clip.right = (m_nWindowColumns - dx - 4) * m_nFontWidth;
+        dx = min((unsigned) dx, (unsigned) lps->nHScrollMax - lps->nHScrollPos);
+        clip.right = (lps->nWindowColumns - dx - 4) * lps->nFontWidth;
     }
 
     // adjust the scrollbar thumb position
-    m_nHScrollPos += dx;
-    m_nVScrollPos += dy;
+    lps->nHScrollPos += dx;
+    lps->nVScrollPos += dy;
 
     // ignore clipping rectangle if its a whole-window scroll
     if (fReturnUpdateRgn == false)
-        GetClientRect(m_hWnd, &clip);
+        GetClientRect(lps->hWnd, &clip);
 
     // take margin into account
-    clip.left += LeftMarginWidth();
+    clip.left += LeftMarginWidth_TextView(lps);
 
     // perform the scroll
     if (dx != 0 || dy != 0)
     {
         // do the scroll!
         ScrollWindowEx(
-            m_hWnd,
-            -dx * m_nFontWidth,                    // scale up to pixel coords
-            -dy * m_nLineHeight,
-            NULL,                                // scroll entire window
-            &clip,                                // clip the non-scrolling part
+            lps->hWnd,
+            -dx * lps->nFontWidth,      // scale up to pixel coords
+            -dy * lps->nLineHeight,
+            NULL,                       // scroll entire window
+            &clip,                      // clip the non-scrolling part
             0,
             0,
             SW_INVALIDATE
             );
 
-        SetupScrollbars();
+        SetupScrollbars_TextView(lps);
 
         if (fReturnUpdateRgn)
         {
             RECT client;
 
-            GetClientRect(m_hWnd, &client);
+            GetClientRect(lps->hWnd, &client);
 
             //clip.left -= LeftMarginWidth();
 
@@ -192,10 +206,10 @@ HRGN TextView::ScrollRgn(int dx, int dy, bool fReturnUpdateRgn)
 
     if (dy != 0)
     {
-        GetClientRect(m_hWnd, &clip);
-        clip.right = LeftMarginWidth();
-        //ScrollWindow(m_hWnd, 0, -dy * m_nLineHeight, 0, &clip);
-        InvalidateRect(m_hWnd, &clip, 0);
+        GetClientRect(lps->hWnd, &clip);
+        clip.right = LeftMarginWidth_TextView(lps);
+        //ScrollWindow(lps->hWnd, 0, -dy * lps->nLineHeight, 0, &clip);
+        InvalidateRect(lps->hWnd, &clip, 0);
     }
 
     return NULL;
@@ -204,63 +218,73 @@ HRGN TextView::ScrollRgn(int dx, int dy, bool fReturnUpdateRgn)
 //
 //    Scroll viewport in specified direction
 //
-VOID TextView::Scroll(int dx, int dy)
+VOID Scroll_TextView(
+    TextView * lps,
+    int dx,
+    int dy
+    )
 {
     // do a "normal" scroll - don't worry about invalid regions,
     // just scroll the whole window 
-    ScrollRgn(dx, dy, false);
+    ScrollRgn_TextView(lps, dx, dy, false);
 }
 
 //
 //    Ensure that the specified file-location is visible within
 //  the window-viewport, Scrolling the viewport as necessary
 //
-VOID TextView::ScrollToPosition(int xpos, ULONG lineno)
+VOID ScrollToPosition_TextView(
+    TextView * lps,
+    int xpos,
+    ULONG lineno
+    )
 {
     bool fRefresh = false;
     RECT rect;
-    int  marginWidth = LeftMarginWidth();
+    int  marginWidth = LeftMarginWidth_TextView(lps);
 
-    GetClientRect(m_hWnd, &rect);
+    GetClientRect(lps->hWnd, &rect);
 
-    xpos -= m_nHScrollPos * m_nFontWidth;
+    xpos -= lps->nHScrollPos * lps->nFontWidth;
     xpos += marginWidth;
 
     if (xpos < marginWidth)
     {
-        m_nHScrollPos -= (marginWidth - xpos) / m_nFontWidth;
+        lps->nHScrollPos -= (marginWidth - xpos) / lps->nFontWidth;
         fRefresh = true;
     }
 
     if (xpos >= rect.right)
     {
-        m_nHScrollPos += (xpos - rect.right) / m_nFontWidth + 1;
+        lps->nHScrollPos += (xpos - rect.right) / lps->nFontWidth + 1;
         fRefresh = true;
     }
 
-    if (lineno < m_nVScrollPos)
+    if (lineno < lps->nVScrollPos)
     {
-        m_nVScrollPos = lineno;
+        lps->nVScrollPos = lineno;
         fRefresh = true;
     }
-    else if (lineno > m_nVScrollPos + m_nWindowLines - 1)
+    else if (lineno > lps->nVScrollPos + lps->nWindowLines - 1)
     {
-        m_nVScrollPos = lineno - m_nWindowLines + 1;
+        lps->nVScrollPos = lineno - lps->nWindowLines + 1;
         fRefresh = true;
     }
 
 
     if (fRefresh)
     {
-        SetupScrollbars();
-        RefreshWindow();
-        RepositionCaret();
+        SetupScrollbars_TextView(lps);
+        RefreshWindow_TextView(lps);
+        RepositionCaret_TextView(lps);
     }
 }
 
-VOID TextView::ScrollToCaret()
+VOID ScrollToCaret_TextView(
+    TextView * lps
+    )
 {
-    ScrollToPosition(m_nCaretPosX, m_nCurrentLine);
+    ScrollToPosition_TextView(lps, lps->nCaretPosX, lps->nCurrentLine);
 }
 
 LONG GetTrackPos32(HWND hwnd, int nBar)
@@ -273,51 +297,55 @@ LONG GetTrackPos32(HWND hwnd, int nBar)
 //
 //    Vertical scrollbar support
 //
-LONG TextView::OnVScroll(UINT nSBCode, UINT nPos)
+LONG OnVScroll_TextView(
+    TextView * lps,
+    UINT nSBCode,
+    UINT nPos
+    )
 {
-    ULONG oldpos = m_nVScrollPos;
+    ULONG oldpos = lps->nVScrollPos;
 
     switch (nSBCode)
     {
     case SB_TOP:
-        m_nVScrollPos = 0;
-        RefreshWindow();
+        lps->nVScrollPos = 0;
+        RefreshWindow_TextView(lps);
         break;
 
     case SB_BOTTOM:
-        m_nVScrollPos = m_nVScrollMax;
-        RefreshWindow();
+        lps->nVScrollPos = lps->nVScrollMax;
+        RefreshWindow_TextView(lps);
         break;
 
     case SB_LINEUP:
-        Scroll(0, -1);
+        Scroll_TextView(lps, 0, -1);
         break;
 
     case SB_LINEDOWN:
-        Scroll(0, 1);
+        Scroll_TextView(lps, 0, 1);
         break;
 
     case SB_PAGEDOWN:
-        Scroll(0, m_nWindowLines);
+        Scroll_TextView(lps, 0, lps->nWindowLines);
         break;
 
     case SB_PAGEUP:
-        Scroll(0, -m_nWindowLines);
+        Scroll_TextView(lps, 0, -lps->nWindowLines);
         break;
 
     case SB_THUMBPOSITION:
     case SB_THUMBTRACK:
 
-        m_nVScrollPos = GetTrackPos32(m_hWnd, SB_VERT);
-        RefreshWindow();
+        lps->nVScrollPos = GetTrackPos32(lps->hWnd, SB_VERT);
+        RefreshWindow_TextView(lps);
 
         break;
     }
 
-    if (oldpos != m_nVScrollPos)
+    if (oldpos != lps->nVScrollPos)
     {
-        SetupScrollbars();
-        RepositionCaret();
+        SetupScrollbars_TextView(lps);
+        RepositionCaret_TextView(lps);
     }
 
 
@@ -327,58 +355,65 @@ LONG TextView::OnVScroll(UINT nSBCode, UINT nPos)
 //
 //    Horizontal scrollbar support
 //
-LONG TextView::OnHScroll(UINT nSBCode, UINT nPos)
+LONG OnHScroll_TextView(
+    TextView * lps,
+    UINT nSBCode,
+    UINT nPos
+    )
 {
-    int oldpos = m_nHScrollPos;
+    int oldpos = lps->nHScrollPos;
 
     switch (nSBCode)
     {
     case SB_LEFT:
-        m_nHScrollPos = 0;
-        RefreshWindow();
+        lps->nHScrollPos = 0;
+        RefreshWindow_TextView(lps);
         break;
 
     case SB_RIGHT:
-        m_nHScrollPos = m_nHScrollMax;
-        RefreshWindow();
+        lps->nHScrollPos = lps->nHScrollMax;
+        RefreshWindow_TextView(lps);
         break;
 
     case SB_LINELEFT:
-        Scroll(-1, 0);
+        Scroll_TextView(lps, -1, 0);
         break;
 
     case SB_LINERIGHT:
-        Scroll(1, 0);
+        Scroll_TextView(lps, 1, 0);
         break;
 
     case SB_PAGELEFT:
-        Scroll(-m_nWindowColumns, 0);
+        Scroll_TextView(lps, -lps->nWindowColumns, 0);
         break;
 
     case SB_PAGERIGHT:
-        Scroll(m_nWindowColumns, 0);
+        Scroll_TextView(lps, lps->nWindowColumns, 0);
         break;
 
     case SB_THUMBPOSITION:
     case SB_THUMBTRACK:
 
-        m_nHScrollPos = GetTrackPos32(m_hWnd, SB_HORZ);
-        RefreshWindow();
+        lps->nHScrollPos = GetTrackPos32(lps->hWnd, SB_HORZ);
+        RefreshWindow_TextView(lps);
         break;
     }
 
-    if (oldpos != m_nHScrollPos)
+    if (oldpos != lps->nHScrollPos)
     {
-        SetupScrollbars();
-        RepositionCaret();
+        SetupScrollbars_TextView(lps);
+        RepositionCaret_TextView(lps);
     }
 
     return 0;
 }
 
-LONG TextView::OnMouseWheel(int nDelta)
+LONG OnMouseWheel_TextView(
+    TextView * lps,
+    int nDelta
+    )
 {
-#ifndef    SPI_GETWHEELSCROLLLINES    
+#ifndef SPI_GETWHEELSCROLLLINES    
 #define SPI_GETWHEELSCROLLLINES   104
 #endif
 
@@ -391,8 +426,8 @@ LONG TextView::OnMouseWheel(int nDelta)
         if (nScrollLines <= 1)
             nScrollLines = 3;
 
-        Scroll(0, (-nDelta / 120) * nScrollLines);
-        RepositionCaret();
+        Scroll_TextView(lps, 0, (-nDelta / 120) * nScrollLines);
+        RepositionCaret_TextView(lps);
     }
 
     return 0;

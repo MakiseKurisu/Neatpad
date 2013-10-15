@@ -25,14 +25,16 @@
 //
 //    Paste any CF_TEXT/CF_UNICODE text from the clipboard
 //
-BOOL TextView::OnPaste()
+BOOL OnPaste_TextView(
+    TextView * lps
+    )
 {
     BOOL success = FALSE;
 
-    if (m_nEditMode == MODE_READONLY)
+    if (lps->nEditMode == MODE_READONLY)
         return FALSE;
 
-    if (OpenClipboard(m_hWnd))
+    if (OpenClipboard(lps->hWnd))
     {
         HANDLE hMem = GetClipboardData(CF_TCHARTEXT);
         LPTSTR szText = (LPTSTR) GlobalLock(hMem);
@@ -40,10 +42,10 @@ BOOL TextView::OnPaste()
         if (szText)
         {
             ULONG textlen = lstrlen(szText);
-            EnterText(szText, textlen);
+            EnterText_TextView(lps, szText, textlen);
 
             if (textlen > 1)
-                breakopt_sequence(m_pTextDoc->seq);
+                breakopt_sequence(lps->pTextDoc->seq);
 
             GlobalUnlock(hMem);
 
@@ -61,13 +63,18 @@ BOOL TextView::OnPaste()
 //    szDest must be big enough to hold nLength characters
 //    nLength includes the terminating NULL
 //
-ULONG TextView::GetText(LPTSTR szDest, ULONG nStartOffset, ULONG nLength)
+ULONG GetText_TextView(
+    TextView * lps,
+    LPTSTR szDest,
+    ULONG nStartOffset,
+    ULONG nLength
+    )
 {
     ULONG copied = 0;
 
     if (nLength > 1)
     {
-        TextIterator * itor = new_TextIterator(iterate_TextDocument(m_pTextDoc, nStartOffset));
+        TextIterator * itor = new_TextIterator(iterate_TextDocument(lps->pTextDoc, nStartOffset));
         copied = gettext_TextIterator(itor, szDest, nLength - 1);
         delete_TextIterator(itor);
         // null-terminate
@@ -80,16 +87,18 @@ ULONG TextView::GetText(LPTSTR szDest, ULONG nStartOffset, ULONG nLength)
 //
 //    Copy the currently selected text to the clipboard as CF_TEXT/CF_UNICODE
 //
-BOOL TextView::OnCopy()
+BOOL OnCopy_TextView(
+    TextView * lps
+    )
 {
-    ULONG    selstart = min(m_nSelectionStart, m_nSelectionEnd);
-    ULONG    sellen = SelectionSize();
+    ULONG    selstart = min(lps->nSelectionStart, lps->nSelectionEnd);
+    ULONG    sellen = SelectionSize_TextView(lps);
     BOOL    success = FALSE;
 
     if (sellen == 0)
         return FALSE;
 
-    if (OpenClipboard(m_hWnd))
+    if (OpenClipboard(lps->hWnd))
     {
         HANDLE hMem;
         TCHAR  *ptr;
@@ -100,7 +109,7 @@ BOOL TextView::OnCopy()
             {
                 EmptyClipboard();
 
-                GetText(ptr, selstart, sellen + 1);
+                GetText_TextView(lps, ptr, selstart, sellen + 1);
 
                 SetClipboardData(CF_TCHARTEXT, hMem);
                 success = TRUE;
@@ -118,18 +127,20 @@ BOOL TextView::OnCopy()
 //
 //    Remove current selection and copy to the clipboard
 //
-BOOL TextView::OnCut()
+BOOL OnCut_TextView(
+    TextView * lps
+    )
 {
     BOOL success = FALSE;
 
-    if (m_nEditMode == MODE_READONLY)
+    if (lps->nEditMode == MODE_READONLY)
         return FALSE;
 
-    if (SelectionSize() > 0)
+    if (SelectionSize_TextView(lps) > 0)
     {
         // copy selected text to clipboard then erase current selection
-        success = OnCopy();
-        success = success && ForwardDelete();
+        success = OnCopy_TextView(lps);
+        success = success && ForwardDelete_TextView(lps);
     }
 
     return success;
@@ -138,16 +149,18 @@ BOOL TextView::OnCut()
 //
 //    Remove the current selection
 //
-BOOL TextView::OnClear()
+BOOL OnClear_TextView(
+    TextView * lps
+    )
 {
     BOOL success = FALSE;
 
-    if (m_nEditMode == MODE_READONLY)
+    if (lps->nEditMode == MODE_READONLY)
         return FALSE;
 
-    if (SelectionSize() > 0)
+    if (SelectionSize_TextView(lps) > 0)
     {
-        ForwardDelete();
+        ForwardDelete_TextView(lps);
         success = TRUE;
     }
 
