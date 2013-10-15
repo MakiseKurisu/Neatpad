@@ -216,7 +216,15 @@ bool EmptyDoc_TextDocument(
 
     // this is not robust. it's just to get the thing
     // up-and-running until I write a proper line-buffer mananger
+    if (lps->pLineBuf_byte)
+    {
+        free(lps->pLineBuf_byte);
+    }
     lps->pLineBuf_byte = (ULONG *) malloc(sizeof(ULONG) * 0x1000);
+    if (lps->pLineBuf_char)
+    {
+        free(lps->pLineBuf_char);
+    }
     lps->pLineBuf_char = (ULONG *) malloc(sizeof(ULONG) * 0x1000);
 
     lps->pLineBuf_byte[0] = 0;
@@ -434,10 +442,18 @@ bool init_linebuffer_TextDocument(
     ULONG buflen = lps->nDocLength_bytes - lps->nHeaderSize;
 
     // allocate the line-buffer for storing each line's BYTE offset
+    if (lps->pLineBuf_byte)
+    {
+        free(lps->pLineBuf_byte);
+    }
     if ((lps->pLineBuf_byte = (ULONG *) malloc(sizeof(ULONG) * (buflen + 1))) == 0)
         return false;
 
     // allocate the line-buffer for storing each line's CHARACTER offset
+    if (lps->pLineBuf_char)
+    {
+        free(lps->pLineBuf_char);
+    }
     if ((lps->pLineBuf_char = (ULONG *) malloc(sizeof(ULONG) * (buflen + 1))) == 0)
         return false;
 
@@ -660,7 +676,7 @@ ULONG size_TextDocument(
     return lps->nDocLength_bytes;
 }
 
-TextIterator iterate_TextDocument(
+TextIterator * iterate_TextDocument(
     TextDocument * lps,
     ULONG offset_chars
     )
@@ -671,14 +687,14 @@ TextIterator iterate_TextDocument(
     //if(!lineinfo_frolps->offset(offset_chars, 0, linelen, &offset_bytes, &length_bytes))
     //    return TextIterator();
 
-    return *new_TextIterator(off_bytes, len_bytes, lps);
+    return new_TextIterator(off_bytes, len_bytes, lps);
 }
 
 
 //
 //
 //
-TextIterator iterate_line_TextDocument(
+TextIterator * iterate_line_TextDocument(
     TextDocument * lps,
     ULONG lineno,
     ULONG * linestart,
@@ -689,12 +705,12 @@ TextIterator iterate_line_TextDocument(
     ULONG length_bytes;
 
     if (!lineinfo_from_lineno_TextDocument(lps, lineno, linestart, linelen, &offset_bytes, &length_bytes))
-        return *new_TextIterator();
+        return new_TextIterator();
 
-    return *new_TextIterator(offset_bytes, length_bytes, lps);
+    return new_TextIterator(offset_bytes, length_bytes, lps);
 }
 
-TextIterator iterate_line_offset_TextDocument(
+TextIterator * iterate_line_offset_TextDocument(
     TextDocument * lps,
     ULONG offset_chars,
     ULONG * lineno,
@@ -705,9 +721,9 @@ TextIterator iterate_line_offset_TextDocument(
     ULONG length_bytes;
 
     if (!lineinfo_from_offset_TextDocument(lps, offset_chars, lineno, linestart, 0, &offset_bytes, &length_bytes))
-        return *new_TextIterator();
+        return new_TextIterator();
 
-    return *new_TextIterator(offset_bytes, length_bytes, lps);
+    return new_TextIterator(offset_bytes, length_bytes, lps);
 }
 
 ULONG lineno_from_offset_TextDocument(

@@ -86,17 +86,17 @@ int getformat_TextDocument(
 ULONG size_TextDocument(
     TextDocument * lps
     );
-TextIterator iterate_TextDocument(
+TextIterator * iterate_TextDocument(
     TextDocument * lps,
     ULONG offset_chars
     );
-TextIterator iterate_line_TextDocument(
+TextIterator * iterate_line_TextDocument(
     TextDocument * lps,
     ULONG lineno,
     ULONG * linestart = 0,
     ULONG * linelen = 0
     );
-TextIterator iterate_line_offset_TextDocument(
+TextIterator * iterate_line_offset_TextDocument(
     TextDocument * lps,
     ULONG offset_chars,
     ULONG * lineno,

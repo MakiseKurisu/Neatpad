@@ -520,7 +520,6 @@ bool insert_worker_sequence(
     span * sptr;
     size_w spanindex;
     size_t modbuf_offset;
-    span_range * newspans = new_span_range();
     size_w insoffset;
 
     if (index > lps->sequence_length)
@@ -556,6 +555,7 @@ bool insert_worker_sequence(
     // general-case #1: inserting at a span boundary?
     else if (insoffset == 0)
     {
+        span_range * newspans = new_span_range();
         //
         // Create a new undo event; because we are inserting at a span
         // boundary there are no spans to replace, so use a "span boundary"
@@ -568,10 +568,13 @@ bool insert_worker_sequence(
 
         // link the span into the sequence
         swap_span_range(oldspans, newspans);
+
+        delete_span_range(newspans);
     }
     // general-case #2: inserting in the middle of a span
     else
     {
+        span_range * newspans = new_span_range();
         //
         // Create a new undo event and add the span
         // that we will be "splitting" in half
@@ -589,6 +592,8 @@ bool insert_worker_sequence(
         append_span_range(newspans, new_span(sptr->offset + insoffset, sptr->length - insoffset, sptr->buffer));
 
         swap_span_range(oldspans, newspans);
+
+        delete_span_range(newspans);
     }
 
     lps->sequence_length += length;

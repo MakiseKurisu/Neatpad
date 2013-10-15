@@ -856,6 +856,7 @@ VOID WINAPI UspFree(USPDATA *uspData)
         // free the logical character-buffers
         free(uspData->clusterList);
         free(uspData->attrList);
+        free(uspData->breakList);
 
         // free the control structure
         free(uspData);

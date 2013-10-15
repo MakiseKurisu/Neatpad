@@ -548,11 +548,11 @@ BOOL MouseCoordToFilePos_TextView(
     UspSnapXToOffset(uspData, mx, &mx, &cp, 0);
 
     // return coords!
-    TextIterator * itor = new_TextIterator(iterate_line_TextDocument(lps->pTextDoc, nLineNo, &off_chars));
+    TextIterator * itor = iterate_line_TextDocument(lps->pTextDoc, nLineNo, &off_chars);
     *pnLineNo = nLineNo;
     *pnFileOffset = cp + off_chars;
     *psnappedX = mx;// - lps->nHScrollPos * lps->nFontWidth;
-    //*psnappedX        += LeftMarginWidth();
+    //*psnappedX += LeftMarginWidth();
     delete_TextIterator(itor);
     return 0;
 }
@@ -604,7 +604,7 @@ LONG InvalidateRange_TextView(
     int   ypos;
     RECT  rect;
     RECT  client;
-    TextIterator * itor = new_TextIterator();
+    TextIterator * itor;
 
     // information about current line:
     ULONG lineno;
@@ -624,12 +624,12 @@ LONG InvalidateRange_TextView(
     if (lineno < lps->nVScrollPos)
     {
         lineno = lps->nVScrollPos;
-        copy_TextIterator(itor, iterate_line_TextDocument(lps->pTextDoc, lineno, &off_chars, &len_chars));
+        itor = iterate_line_TextDocument(lps->pTextDoc, lineno, &off_chars, &len_chars);
         start = off_chars;
     }
     else
     {
-        copy_TextIterator(itor, iterate_line_TextDocument(lps->pTextDoc, lineno, &off_chars, &len_chars));
+        itor = iterate_line_TextDocument(lps->pTextDoc, lineno, &off_chars, &len_chars);
     }
 
     if (!valid_TextIterator(itor) || start >= finish)
@@ -652,7 +652,7 @@ LONG InvalidateRange_TextView(
         InvalidateRect(lps->hWnd, &rect, FALSE);
 
         // jump down to next line
-        copy_TextIterator(itor, iterate_line_TextDocument(lps->pTextDoc, ++lineno, &off_chars, &len_chars));
+        itor = iterate_line_TextDocument(lps->pTextDoc, ++lineno, &off_chars, &len_chars);
         ypos += lps->nLineHeight;
     }
 

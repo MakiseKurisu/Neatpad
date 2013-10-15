@@ -74,7 +74,7 @@ ULONG GetText_TextView(
 
     if (nLength > 1)
     {
-        TextIterator * itor = new_TextIterator(iterate_TextDocument(lps->pTextDoc, nStartOffset));
+        TextIterator * itor = iterate_TextDocument(lps->pTextDoc, nStartOffset);
         copied = gettext_TextIterator(itor, szDest, nLength - 1);
         delete_TextIterator(itor);
         // null-terminate
