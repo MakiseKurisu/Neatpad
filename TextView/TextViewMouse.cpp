@@ -652,6 +652,7 @@ LONG InvalidateRange_TextView(
         InvalidateRect(lps->hWnd, &rect, FALSE);
 
         // jump down to next line
+        delete_TextIterator(itor);
         itor = iterate_line_TextDocument(lps->pTextDoc, ++lineno, &off_chars, &len_chars);
         ypos += lps->nLineHeight;
     }

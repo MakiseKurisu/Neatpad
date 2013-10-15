@@ -219,11 +219,13 @@ bool EmptyDoc_TextDocument(
     if (lps->pLineBuf_byte)
     {
         free(lps->pLineBuf_byte);
+        lps->pLineBuf_byte = 0;
     }
     lps->pLineBuf_byte = (ULONG *) malloc(sizeof(ULONG) * 0x1000);
     if (lps->pLineBuf_char)
     {
         free(lps->pLineBuf_char);
+        lps->pLineBuf_char = 0;
     }
     lps->pLineBuf_char = (ULONG *) malloc(sizeof(ULONG) * 0x1000);
 
@@ -445,6 +447,7 @@ bool init_linebuffer_TextDocument(
     if (lps->pLineBuf_byte)
     {
         free(lps->pLineBuf_byte);
+        lps->pLineBuf_byte = 0;
     }
     if ((lps->pLineBuf_byte = (ULONG *) malloc(sizeof(ULONG) * (buflen + 1))) == 0)
         return false;
@@ -453,6 +456,7 @@ bool init_linebuffer_TextDocument(
     if (lps->pLineBuf_char)
     {
         free(lps->pLineBuf_char);
+        lps->pLineBuf_char = 0;
     }
     if ((lps->pLineBuf_char = (ULONG *) malloc(sizeof(ULONG) * (buflen + 1))) == 0)
         return false;

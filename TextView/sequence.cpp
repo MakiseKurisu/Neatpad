@@ -669,8 +669,6 @@ bool erase_worker_sequence(
     )
 {
     span * sptr;
-    span_range * oldspans = new_span_range();
-    span_range * newspans = new_span_range();
     span_range * event;
     size_w spanindex;
     size_w remoffset;
@@ -764,6 +762,9 @@ bool erase_worker_sequence(
     //
     //    general-case 2+3
     //
+    span_range * oldspans = new_span_range();
+    span_range * newspans = new_span_range();
+
     clear_eventstack(lps->redostack);
 
     // does the deletion *start* mid-way through a span?
@@ -822,6 +823,9 @@ bool erase_worker_sequence(
         append_span_range(event, oldspans);
     else
         prepend_span_range(event, oldspans);
+
+    delete_span_range(oldspans);
+    delete_span_range(newspans);
 
     return true;
 }
@@ -1034,7 +1038,7 @@ size_w render_sequence(
 {
     size_w spanoffset = 0;
     size_w total = 0;
-    span  *sptr;
+    span * sptr;
 
     // find span to start rendering at
     if ((sptr = spanfromindex_sequence(lps, index, &spanoffset)) == 0)
