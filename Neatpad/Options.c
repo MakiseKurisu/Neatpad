@@ -158,7 +158,7 @@ BOOL SetImageFileExecutionOptions(BOOL fReplaceWithCurrentApp)
     return TRUE;
 }
 
-void LoadRegSettings()
+VOID LoadRegSettings()
 {
     HKEY hKey, hColKey;
 
@@ -209,7 +209,7 @@ void LoadRegSettings()
     RegCloseKey(hKey);
 }
 
-void LoadRegSysSettings()
+VOID LoadRegSysSettings()
 {
     HKEY hKey;
 
@@ -219,7 +219,7 @@ void LoadRegSysSettings()
     RegCloseKey(hKey);
 }
 
-void SaveRegSysSettings()
+VOID SaveRegSysSettings()
 {
     HKEY hKey;
 
@@ -229,7 +229,7 @@ void SaveRegSysSettings()
     RegCloseKey(hKey);
 }
 
-void SaveRegSettings()
+VOID SaveRegSettings()
 {
     HKEY hKey, hColKey;
 
@@ -283,7 +283,7 @@ void SaveRegSettings()
     RegCloseKey(hKey);
 }
 
-void ApplyRegSettings()
+VOID ApplyRegSettings()
 {
     int i;
 
@@ -319,7 +319,7 @@ void ApplyRegSettings()
     //SetImageFileExecutionOptions(g_fReplaceNotepad);
 }
 
-void ShowOptions(HWND hwndParent)
+VOID ShowOptions(HWND hwndParent)
 {
     PROPSHEETHEADER psh = { sizeof(psh) };
     PROPSHEETPAGE   psp[3] = { { sizeof(psp[0]) },

@@ -34,14 +34,14 @@
 ITEM_RUN *GetItemRun(USPDATA *uspData, int visualIdx);
 
 // UspCtrl.c
-void    InitCtrlChar(HDC hdc, USPFONT *uspFont);
-void    PaintCtrlCharRun(USPDATA *uspData, USPFONT *uspFont, ITEM_RUN *itemRun, HDC hdc, int xpos, int ypos);
+VOID    InitCtrlChar(HDC hdc, USPFONT *uspFont);
+VOID    PaintCtrlCharRun(USPDATA *uspData, USPFONT *uspFont, ITEM_RUN *itemRun, HDC hdc, int xpos, int ypos);
 
 //
 //    Locate the glyph-index positions for the specified logical character positions
 //
 static
-void GetGlyphClusterIndices(
+VOID GetGlyphClusterIndices(
 ITEM_RUN    * itemRun,
 WORD        * clusterList,
 int              clusterIdx1,
@@ -69,7 +69,7 @@ int            * glyphIdx2
 //    the rectangle's position may need to be mirrored within the run before output
 //
 static
-void PaintRectBG(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, int xpos, RECT *rect, ATTR *attr)
+VOID PaintRectBG(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, int xpos, RECT *rect, ATTR *attr)
 {
     RECT rc = *rect;
 
@@ -99,7 +99,7 @@ void PaintRectBG(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, int xpos, RECT *r
 //    Paint a single run's background
 //
 static
-void PaintItemRunBackground(
+VOID PaintItemRunBackground(
 USPDATA        * uspData,
 ITEM_RUN    * itemRun,
 HDC              hdc,
@@ -111,7 +111,11 @@ RECT        * bounds
 {
     int i, lasti;
 
-    RECT rect = { xpos, ypos, xpos, ypos + lineHeight };
+    RECT rect;
+    rect.left = xpos;
+    rect.top = ypos;
+    rect.right = xpos;
+    rect.bottom = ypos + lineHeight;
 
     WORD  * clusterList = uspData->clusterList + itemRun->charPos;
     ATTR  * attrList = uspData->attrList + itemRun->charPos;
@@ -175,7 +179,7 @@ RECT        * bounds
 //    Paint the entire line's background
 //
 static
-void PaintBackground(
+VOID PaintBackground(
 USPDATA   * uspData,
 HDC            hdc,
 int            xpos,
@@ -230,7 +234,7 @@ RECT      * bounds
 //    a single colour
 //
 static
-void PaintItemRunForeground(
+VOID PaintItemRunForeground(
 USPDATA        * uspData,
 USPFONT        * uspFont,
 ITEM_RUN    * itemRun,
@@ -499,7 +503,7 @@ int WINAPI UspTextOut(
 //
 //    Set the colours used for drawing text-selection
 //
-void WINAPI UspSetSelColor(
+VOID WINAPI UspSetSelColor(
     USPDATA        * uspData,
     COLORREF      fg,
     COLORREF      bg
@@ -516,7 +520,7 @@ void WINAPI UspSetSelColor(
 //    do a DeleteObject on the HFONT. That is, caller is responsible for
 //    managing the lifetime of the HFONT
 //
-void WINAPI UspInitFont(
+VOID WINAPI UspInitFont(
     USPFONT        * uspFont,
     HDC              hdc,
     HFONT          hFont
@@ -538,7 +542,7 @@ void WINAPI UspInitFont(
 //
 //    Free the font resources
 //
-void WINAPI UspFreeFont(
+VOID WINAPI UspFreeFont(
     USPFONT        * uspFont
     )
 {

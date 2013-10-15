@@ -52,7 +52,9 @@ DWORD WINAPI ChangeNotifyThread(NOTIFY_DATA *pnd)
 
     do
     {
-        HANDLE hEventList[2] = { hChange, pnd->hQuitEvent };
+        HANDLE hEventList[2];
+        hEventList[0] = hChange;
+        hEventList[1] = pnd->hQuitEvent;
 
         if ((dwResult = WaitForMultipleObjects(1, hEventList, FALSE, INFINITE)) == WAIT_OBJECT_0)
         {
@@ -294,7 +296,7 @@ BOOL DoOpenFile(HWND hwndMain, LPTSTR szFileName, LPTSTR szFileTitle)
     }
 }
 
-void NeatpadOpenFile(HWND hwnd, LPTSTR szFile)
+VOID NeatpadOpenFile(HWND hwnd, LPTSTR szFile)
 {
     LPTSTR name;
 
@@ -312,7 +314,7 @@ void NeatpadOpenFile(HWND hwnd, LPTSTR szFile)
 //
 //    How to process WM_DROPFILES
 //
-void HandleDropFiles(HWND hwnd, HDROP hDrop)
+VOID HandleDropFiles(HWND hwnd, HDROP hDrop)
 {
     TCHAR buf[MAX_PATH];
 

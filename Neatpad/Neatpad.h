@@ -55,19 +55,19 @@ extern "C" {
     //
     //    Global functions
     //
-    void    SetWindowFileName(HWND hwnd, LPTSTR szFileName, BOOL fModified);
+    VOID    SetWindowFileName(HWND hwnd, LPTSTR szFileName, BOOL fModified);
     HFONT   EasyCreateFont(int nPointSize, BOOL fBold, DWORD dwQuality, LPTSTR szFace);
     HDC     ShowPrintDlg(HWND hwndParent);
 
     //
     //    Options.c functions
     //
-    void    ShowOptions(HWND hwndParent);
-    void    ApplyRegSettings(void);
-    void    LoadRegSettings(void);
-    void    SaveRegSettings(void);
-    void    LoadRegSysSettings(void);
-    void    SaveRegSysSettings(void);
+    VOID    ShowOptions(HWND hwndParent);
+    VOID    ApplyRegSettings(VOID);
+    VOID    LoadRegSettings(VOID);
+    VOID    SaveRegSettings(VOID);
+    VOID    LoadRegSysSettings(VOID);
+    VOID    SaveRegSysSettings(VOID);
     BOOL    SetExplorerContextMenu(BOOL fAddToMenu);
     BOOL    SetImageFileExecutionOptions(BOOL fReplaceWithCurrentApp);
 
@@ -79,8 +79,8 @@ extern "C" {
     BOOL DoSaveFile(HWND hwndMain, LPTSTR szFileName, LPTSTR szFileTitle);
     BOOL ShowOpenFileDlg(HWND hwnd, LPTSTR pstrFileName, LPTSTR pstrTitleName);
     BOOL ShowSaveFileDlg(HWND hwnd, LPTSTR pstrFileName, LPTSTR pstrTitleName);
-    void HandleDropFiles(HWND hwnd, HDROP hDrop);
-    void NeatpadOpenFile(HWND hwnd, LPTSTR szFile);
+    VOID HandleDropFiles(HWND hwnd, HDROP hDrop);
+    VOID NeatpadOpenFile(HWND hwnd, LPTSTR szFile);
 
     //
     //    NeatUtils.c functions
@@ -92,7 +92,7 @@ extern "C" {
     BOOL CheckMenuCommand(HMENU hMenu, int nCommandId, BOOL fChecked);
     BOOL EnableMenuCommand(HMENU hmenu, int nCommandId, BOOL fEnable);
     BOOL EnableDlgItem(HWND hDlg, UINT nCommandId, BOOL fEnable);
-    void CenterWindow(HWND hwnd);
+    VOID CenterWindow(HWND hwnd);
     BOOL EnableDialogTheme(HWND hwnd);
 
 
@@ -113,9 +113,9 @@ extern "C" {
     //    Toolbars.c functions
     //
     HWND CreateStatusBar(HWND hwndParent);
-    void SetStatusBarParts(HWND hwndSB);
+    VOID SetStatusBarParts(HWND hwndSB);
     int  StatusBarMenuSelect(HWND hwnd, HWND hwndSB, WPARAM wParam, LPARAM lParam);
-    void SetStatusBarText(HWND hwndSB, UINT nPart, UINT uStyle, LPTSTR fmt, ...);
+    VOID SetStatusBarText(HWND hwndSB, UINT nPart, UINT uStyle, LPTSTR fmt, ...);
 
 #ifdef __cplusplus
 }

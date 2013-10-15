@@ -36,7 +36,7 @@ bool Init(LPTSTR buf, int len)
     return true;
 }
 
-void Machine(LPTSTR str, int len, int initialState)
+VOID Machine(LPTSTR str, int len, int initialState)
 {
     State machine [] =
     {

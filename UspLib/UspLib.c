@@ -382,7 +382,7 @@ int            visualToLogicalList []
 //    Unused but left just in-case I need it again
 //
 static
-void ReverseClusterRun(WORD *sourceList, WORD *destList, int runLen)
+VOID ReverseClusterRun(WORD *sourceList, WORD *destList, int runLen)
 {
 int i, lasti;
 
@@ -545,7 +545,7 @@ BOOL ShapeAndPlaceItemRun(USPDATA *uspData, ITEM_RUN *itemRun, HDC hdc, WCHAR *w
 //  runs share the same selection-state
 //
 static
-void IdentifyRunSelections(USPDATA *uspData, ITEM_RUN *itemRun)
+VOID IdentifyRunSelections(USPDATA *uspData, ITEM_RUN *itemRun)
 {
     int c;
     int numsel = 0;

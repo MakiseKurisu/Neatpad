@@ -202,7 +202,7 @@ BOOL BackDelete_TextView(
     return TRUE;
 }
 
-void Smeg_TextView(
+VOID Smeg_TextView(
     TextView * lps,
     BOOL fAdvancing
     )

@@ -118,7 +118,7 @@ LPTSTR gettok(LPTSTR ptr, LPTSTR buf, int buflen)
     return ptr;
 }
 
-void xSetStyle(ATTR *attr, ULONG nPos, ULONG nLen, COLORREF fg, COLORREF bg, int bold = 0)
+VOID xSetStyle(ATTR *attr, ULONG nPos, ULONG nLen, COLORREF fg, COLORREF bg, int bold = 0)
 {
     for (ULONG i = nPos; i < nPos + nLen; i++)
     {

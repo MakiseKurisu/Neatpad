@@ -18,10 +18,10 @@ extern "C" {
     //
     //    TextView API declared here
     //
-    BOOL     InitTextView(void);
+    BOOL     InitTextView(VOID);
     HWND     CreateTextView(HWND hwndParent);
     COLORREF RealizeColour(COLORREF col);
-    BOOL     DestroyTextView(void);
+    BOOL     DestroyTextView(VOID);
 
 
     //

@@ -158,7 +158,7 @@ int CALLBACK EnumFontNames(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD
 //
 //    Initialize the font-list by enumeration all system fonts
 //
-void FillFontComboList(HWND hwndCombo)
+VOID FillFontComboList(HWND hwndCombo)
 {
     HDC        hdc = GetDC(hwndCombo);
     LOGFONT lf;
@@ -185,7 +185,7 @@ void FillFontComboList(HWND hwndCombo)
 //    Could be used to fill a ListView with a list
 //    of file-types and their associated icons
 //
-void FillFileTypeList(HWND hwnd)
+VOID FillFileTypeList(HWND hwnd)
 {
 LVITEM lvi = { LVIF_TEXT|LVIF_IMAGE };
 SHFILEINFO shfi = { 0 };
@@ -214,7 +214,7 @@ ListView_InsertItem(hwnd, &lvi);
 }
 }*/
 
-void SetComboItemHeight(HWND hwndCombo, int nMinHeight)
+VOID SetComboItemHeight(HWND hwndCombo, int nMinHeight)
 {
     TEXTMETRIC    tm;
     HDC            hdc = GetDC(hwndCombo);
@@ -234,7 +234,7 @@ void SetComboItemHeight(HWND hwndCombo, int nMinHeight)
 //
 //    Draw a colour rectangle with border
 //
-void PaintFrameRect(HDC hdc, RECT *rect, COLORREF border, COLORREF fill)
+VOID PaintFrameRect(HDC hdc, RECT *rect, COLORREF border, COLORREF fill)
 {
     HBRUSH   hbrFill = CreateSolidBrush(fill);
     HBRUSH   hbrBorder = CreateSolidBrush(border);
@@ -248,7 +248,7 @@ void PaintFrameRect(HDC hdc, RECT *rect, COLORREF border, COLORREF fill)
     DeleteObject(hbrBorder);
 }
 
-void DrawItem_DefaultColours(DRAWITEMSTRUCT *dis)
+VOID DrawItem_DefaultColours(DRAWITEMSTRUCT *dis)
 {
     if (dis->itemState & ODS_DISABLED)
     {
@@ -464,12 +464,10 @@ int CALLBACK EnumFontSizes(ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, DWORD
 
         return 1;
     }
-
-    return 1;
 }
 
 
-void InitSizeList(HWND hwnd)
+VOID InitSizeList(HWND hwnd)
 {
     LOGFONT lf = { 0 };
     HDC hdc = GetDC(hwnd);
@@ -544,21 +542,21 @@ LONG CALLBACK PreviewWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return CallWindowProc(oldPreviewProc, hwnd, msg, wParam, lParam);
 }
 
-void AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx, LPTSTR szName)
+VOID AddColourListItem(HWND hwnd, UINT uItem, int fgIdx, int bgIdx, LPTSTR szName)
 {
     HWND hwndCtrl = GetDlgItem(hwnd, uItem);
     int idx = SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LONG) szName);
     SendMessage(hwndCtrl, LB_SETITEMDATA, idx, MAKELONG(fgIdx, bgIdx));
 }
 
-void AddColourComboItem(HWND hwnd, UINT uItem, COLORREF col, LPTSTR szName)
+VOID AddColourComboItem(HWND hwnd, UINT uItem, COLORREF col, LPTSTR szName)
 {
     HWND hwndCtrl = GetDlgItem(hwnd, uItem);
     int idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LONG) szName);
     SendMessage(hwndCtrl, CB_SETITEMDATA, idx, col);
 }
 
-void UpdatePreviewPane(HWND hwnd)
+VOID UpdatePreviewPane(HWND hwnd)
 {
     TCHAR szFaceName[200];
     int idx = SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETCURSEL, 0, 0);
@@ -621,7 +619,7 @@ BOOL PickColour(HWND hwndParent, COLORREF *col, COLORREF *custCol)
 //
 //
 //
-void SelectColorInList(HWND hwnd, UINT uComboIdx, short itemIdx)
+VOID SelectColorInList(HWND hwnd, UINT uComboIdx, short itemIdx)
 {
     HWND hwndCombo = GetDlgItem(hwnd, uComboIdx);
     int  i;

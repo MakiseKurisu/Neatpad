@@ -202,7 +202,7 @@ int CtrlCharWidth(USPFONT *uspFont, HDC hdc, ULONG chValue)
 }
 
 
-void InitCtrlChar(HDC hdc, USPFONT *uspFont)
+VOID InitCtrlChar(HDC hdc, USPFONT *uspFont)
 {
     int x, y;
 
@@ -269,7 +269,7 @@ void InitCtrlChar(HDC hdc, USPFONT *uspFont)
 }
 
 static
-void PaintRect(HDC hdc, RECT *rect, COLORREF fill)
+VOID PaintRect(HDC hdc, RECT *rect, COLORREF fill)
 {
     fill = SetBkColor(hdc, fill);
     ExtTextOut(hdc, 0, 0, ETO_OPAQUE, rect, 0, 0, 0);
@@ -325,7 +325,7 @@ int PaintCtrlChar(USPFONT *uspFont, HDC hdc, int xpos, int ypos, ULONG chValue, 
 //
 //    Note there is only 1 control-character per run so the loop below isn't really necessary
 //
-void PaintCtrlCharRun(USPDATA *uspData, USPFONT *uspFont, ITEM_RUN *itemRun, HDC hdc, int xpos, int ypos)
+VOID PaintCtrlCharRun(USPDATA *uspData, USPFONT *uspFont, ITEM_RUN *itemRun, HDC hdc, int xpos, int ypos)
 {
     int i;
 

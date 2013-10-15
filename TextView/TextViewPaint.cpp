@@ -14,9 +14,9 @@
 #include "TextView.h"
 #include "TextViewInternal.h"
 
-void    PaintRect(HDC hdc, int x, int y, int width, int height, COLORREF fill);
-void    PaintRect(HDC hdc, RECT *rect, COLORREF fill);
-void    DrawCheckedRect(HDC hdc, RECT *rect, COLORREF fg, COLORREF bg);
+VOID    PaintRect(HDC hdc, int x, int y, int width, int height, COLORREF fill);
+VOID    PaintRect(HDC hdc, RECT *rect, COLORREF fill);
+VOID    DrawCheckedRect(HDC hdc, RECT *rect, COLORREF fg, COLORREF bg);
 
 extern "C" COLORREF MixRGB(COLORREF, COLORREF);
 
@@ -168,7 +168,7 @@ USPDATA * GetUspData_TextView(
 //
 //    Invalidate every entry in the cache so we can start afresh
 //
-void ResetLineCache_TextView(
+VOID ResetLineCache_TextView(
     TextView * lps
     )
 {
@@ -257,7 +257,7 @@ LONG OnPaint_TextView(
 //
 //    Draw the specified line (including margins etc) to the specified location
 //
-void PaintLine_TextView(
+VOID PaintLine_TextView(
     TextView * lps,
     HDC hdc,
     ULONG nLineNo,
@@ -352,7 +352,7 @@ int LeftMarginWidth_TextView(
 //    This must be called whenever the number of lines changes
 //  (probably easier to call it when the file-size changes)
 //
-void UpdateMarginWidth_TextView(
+VOID UpdateMarginWidth_TextView(
     TextView * lps
     )
 {
@@ -480,7 +480,7 @@ int PaintMargin_TextView(
 //
 //    Draw a line of text into the specified device-context
 //
-void PaintText_TextView(
+VOID PaintText_TextView(
     TextView * lps,
     HDC hdc,
     ULONG nLineNo,
@@ -645,7 +645,7 @@ int ApplyTextAttributes_TextView(
     return nTextLen;
 }
 
-void PaintRect(HDC hdc, int x, int y, int width, int height, COLORREF fill)
+VOID PaintRect(HDC hdc, int x, int y, int width, int height, COLORREF fill)
 {
     RECT rect = { x, y, x + width, y + height };
 
@@ -654,7 +654,7 @@ void PaintRect(HDC hdc, int x, int y, int width, int height, COLORREF fill)
     SetBkColor(hdc, fill);
 }
 
-void PaintRect(HDC hdc, RECT *rect, COLORREF fill)
+VOID PaintRect(HDC hdc, RECT *rect, COLORREF fill)
 {
     fill = SetBkColor(hdc, fill);
     ExtTextOut(hdc, 0, 0, ETO_OPAQUE, rect, 0, 0, 0);
@@ -685,7 +685,7 @@ int CRLF_size_TextView(
     return 0;
 }
 
-void MarkCRLF_TextView(
+VOID MarkCRLF_TextView(
     TextView * lps,
     USPDATA * uspData,
     LPTSTR szText,
@@ -881,7 +881,7 @@ COLORREF SetColour_TextView(
 //    Paint a checkered rectangle, with each alternate
 //    pixel being assigned a different colour
 //
-void DrawCheckedRect(HDC hdc, RECT *rect, COLORREF fg, COLORREF bg)
+VOID DrawCheckedRect(HDC hdc, RECT *rect, COLORREF fg, COLORREF bg)
 {
     static WORD wCheckPat[8] =
     {

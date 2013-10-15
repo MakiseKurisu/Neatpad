@@ -67,7 +67,7 @@ BOOL CALLBACK FindHexDlg(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 
-void AddSearchTabs(HWND hwnd)
+VOID AddSearchTabs(HWND hwnd)
 {
     TCITEM tcitem;
     RECT rect;
@@ -252,14 +252,14 @@ HWND ShowFindDlg(HWND hwndParent, UINT nPage)
 }
 
 /*
-void AddBlankSpace(HWND hwndTB, int width)
+VOID AddBlankSpace(HWND hwndTB, int width)
 {
 TBBUTTON tbb = { width, 0, TBSTATE_ENABLED, TBSTYLE_SEP, 0, 0,0, 0 };
 SendMessage(hwndTB, TB_ADDBUTTONS,  1, (LPARAM) &tbb);
 }
 
 
-void AddButton(HWND hwndTB, UINT uCmdId, UINT uImageIdx, UINT uStyle, LPTSTR szText)
+VOID AddButton(HWND hwndTB, UINT uCmdId, UINT uImageIdx, UINT uStyle, LPTSTR szText)
 {
 //uStyle |= BTNS_SHOWTEXT;
 TBBUTTON tbb = { uImageIdx, uCmdId, TBSTATE_ENABLED, uStyle|BTNS_SHOWTEXT, 0, 0,0, (INT_PTR)szText };

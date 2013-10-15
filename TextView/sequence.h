@@ -34,7 +34,7 @@ struct _buffer_control;
 typedef struct _buffer_control buffer_control;
 
 typedef std::vector<span_range *> eventstack;
-void clear_eventstack(
+VOID clear_eventstack(
     eventstack * dest
     );
 
@@ -43,8 +43,8 @@ typedef std::vector<buffer_control *> bufferlist;
 //
 //    sequence class!
 //
-sequence * new_sequence(void);
-void delete_sequence(
+sequence * new_sequence(VOID);
+VOID delete_sequence(
     sequence * lps
     );
 bool init_sequence(
@@ -83,7 +83,7 @@ span * spanfromindex_sequence(
     size_w index,
     size_w * spanindex = 0
     );
-void restore_spanrange_sequence(
+VOID restore_spanrange_sequence(
     sequence * lps,
     span_range * range,
     bool undo_or_redo
@@ -105,10 +105,10 @@ bool canundo_sequence(
 bool canredo_sequence(
     sequence * lps
     );
-void group_sequence(
+VOID group_sequence(
     sequence * lps
     );
-void ungroup_sequence(
+VOID ungroup_sequence(
     sequence * lps
     );
 size_w size_sequence(
@@ -125,7 +125,7 @@ span_range * stackback_sequence(
     eventstack * source,
     size_t idx
     );
-void record_action_sequence(
+VOID record_action_sequence(
     sequence * lps,
     action act,
     size_w index
@@ -153,7 +153,7 @@ bool insert_sequence(
     size_w index,
     const seqchar val
     );
-void deletefromsequence_sequence(
+VOID deletefromsequence_sequence(
     sequence * lps,
     span* * psptr
     );
@@ -223,7 +223,7 @@ size_w event_index_sequence(
 size_w event_length_sequence(
     sequence * lps
     );
-void breakopt_sequence(
+VOID breakopt_sequence(
     sequence * lps
     );
 struct _sequence
@@ -289,7 +289,7 @@ span * new_span(
     span * nx = 0,
     span * pr = 0
     );
-void delete_span(
+VOID delete_span(
     span * lps
     );
 struct _span
@@ -320,30 +320,30 @@ span_range * new_span_range(
     bool qs = false,
     size_t id = 0
     );
-void delete_span_range(
+VOID delete_span_range(
     span_range * lps
     );
-void free_span_range(
+VOID free_span_range(
     span_range * lps
     );
-void append_span_range(
+VOID append_span_range(
     span_range * lps,
     span * sptr
     );
-void append_span_range(
+VOID append_span_range(
     span_range * lps,
     span_range * range
     );
-void prepend_span_range(
+VOID prepend_span_range(
     span_range * lps,
     span_range * range
     );
-void spanboundary_span_range(
+VOID spanboundary_span_range(
     span_range * lps,
     span * before,
     span * after
     );
-void swap_span_range(
+VOID swap_span_range(
     span_range * src,
     span_range * dest
     );
@@ -373,7 +373,7 @@ ref * new_ref(
     sequence * seq,
     size_w index
     );
-void delete_ref(
+VOID delete_ref(
     ref * lps
     );
 struct _ref
@@ -385,8 +385,8 @@ struct _ref
 //
 //    buffer_control
 //
-buffer_control * new_buffer_control(void);
-void delete_buffer_control(
+buffer_control * new_buffer_control(VOID);
+VOID delete_buffer_control(
     buffer_control * lps
     );
 struct _buffer_control

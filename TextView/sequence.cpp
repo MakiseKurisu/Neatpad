@@ -14,7 +14,7 @@
 #include "sequence.h"
 
 
-void clear_eventstack(
+VOID clear_eventstack(
     eventstack * dest
     )
 {
@@ -54,7 +54,7 @@ sequence * new_sequence()
     return lps;
 }
 
-void delete_sequence(
+VOID delete_sequence(
     sequence * lps
     )
 {
@@ -260,7 +260,7 @@ span * spanfromindex_sequence(
     return 0;
 }
 
-void restore_spanrange_sequence(
+VOID restore_spanrange_sequence(
     sequence * lps,
     span_range * range,
     bool undo_or_redo
@@ -416,7 +416,7 @@ bool canredo_sequence(
 //    Group repeated actions on the sequence (insert/erase etc)
 //    into a single 'undoable' action
 //
-void group_sequence(
+VOID group_sequence(
     sequence * lps
     )
 {
@@ -432,7 +432,7 @@ void group_sequence(
 //
 //    Close the grouping
 //
-void ungroup_sequence(
+VOID ungroup_sequence(
     sequence * lps
     )
 {
@@ -487,7 +487,7 @@ span_range * stackback_sequence(
     }
 }
 
-void record_action_sequence(
+VOID record_action_sequence(
     sequence * lps,
     action act,
     size_w index
@@ -644,7 +644,7 @@ bool insert_sequence(
 //
 //    Remove + delete the specified *span* from the sequence
 //
-void deletefromsequence_sequence(
+VOID deletefromsequence_sequence(
     sequence * lps,
     span* * psptr
     )
@@ -1116,7 +1116,7 @@ size_w event_length_sequence(
 //    Prevent subsequent operations from being optimized (coalesced) 
 //  with the last.
 //
-void breakopt_sequence(
+VOID breakopt_sequence(
     sequence * lps
     )
 {
@@ -1150,7 +1150,7 @@ span * new_span(
     return lps;
 }
 
-void delete_span(
+VOID delete_span(
     span * lps
     )
 {
@@ -1186,7 +1186,7 @@ span_range * new_span_range(
     return lps;
 }
 
-void delete_span_range(
+VOID delete_span_range(
     span_range * lps
     )
 {
@@ -1194,7 +1194,7 @@ void delete_span_range(
 }
 
 // separate 'destruction' used when appropriate
-void free_span_range(
+VOID free_span_range(
     span_range * lps
     )
 {
@@ -1212,7 +1212,7 @@ void free_span_range(
 }
 
 // add a span into the range
-void append_span_range(
+VOID append_span_range(
     span_range * lps,
     span * sptr
     )
@@ -1237,7 +1237,7 @@ void append_span_range(
 }
 
 // join two span-ranges together
-void append_span_range(
+VOID append_span_range(
     span_range * lps,
     span_range * range
     )
@@ -1260,7 +1260,7 @@ void append_span_range(
 }
 
 // join two span-ranges together. used only for 'back-delete'
-void prepend_span_range(
+VOID prepend_span_range(
     span_range * lps,
     span_range * range
     )
@@ -1285,7 +1285,7 @@ void prepend_span_range(
 // An 'empty' range is represented by storing pointers to the
 // spans ***either side*** of the span-boundary position. Input is
 // always the span following the boundary.
-void spanboundary_span_range(
+VOID spanboundary_span_range(
     span_range * lps,
     span * before,
     span * after
@@ -1296,7 +1296,7 @@ void spanboundary_span_range(
     lps->boundary = true;
 }
 
-void swap_span_range(
+VOID swap_span_range(
     span_range * src,
     span_range * dest
     )
@@ -1346,7 +1346,7 @@ ref * new_ref(
     return lps;
 }
 
-void delete_ref(
+VOID delete_ref(
     ref * lps
     )
 {
@@ -1365,7 +1365,7 @@ buffer_control * new_buffer_control()
     return lps;
 }
 
-void delete_buffer_control(
+VOID delete_buffer_control(
     buffer_control * lps
     )
 {

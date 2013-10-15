@@ -44,7 +44,7 @@ int StatusBarMenuSelect(HWND hwnd, HWND hwndSB, WPARAM wParam, LPARAM lParam)
 //    Create each menubar pane. Must be called whenever the statusbar changes size,
 //  so call each time the main-window gets a WM_SIZE
 //
-void SetStatusBarParts(HWND hwndSB)
+VOID SetStatusBarParts(HWND hwndSB)
 {
     RECT    r;
     HWND    hwndParent = GetParent(hwndSB);
@@ -65,7 +65,7 @@ void SetStatusBarParts(HWND hwndSB)
 //
 //    sprintf-style wrapper for setting statubar pane text
 //
-void SetStatusBarText(HWND hwndSB, UINT nPart, UINT uStyle, LPTSTR fmt, ...)
+VOID SetStatusBarText(HWND hwndSB, UINT nPart, UINT uStyle, LPTSTR fmt, ...)
 {
     TCHAR tmpbuf[100];
     va_list argp;

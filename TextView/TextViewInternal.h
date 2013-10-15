@@ -47,7 +47,7 @@ typedef struct
 
 } LINEINFO, *LPLINEINFO;
 
-typedef int(__cdecl * COMPAREPROC) (const void *, const void *);
+typedef int(__cdecl * COMPAREPROC) (const VOID *, const VOID *);
 
 // maximum number of lines that we can hold info for at one time
 #define MAX_LINE_INFO   128    
@@ -73,7 +73,7 @@ typedef struct _TextView TextView;
 TextView * new_TextView(
     HWND hWnd
     );
-void delete_TextView(
+VOID delete_TextView(
     TextView * lps
     );
 ULONG NotifyParent_TextView(
@@ -193,13 +193,13 @@ USPDATA * GetUspData_TextView(
     ULONG nLineNo,
     ULONG * nOffset = 0
     );
-void ResetLineCache_TextView(
+VOID ResetLineCache_TextView(
     TextView * lps
     );
 LONG OnPaint_TextView(
     TextView * lps
     );
-void PaintLine_TextView(
+VOID PaintLine_TextView(
     TextView * lps,
     HDC hdc,
     ULONG nLineNo,
@@ -210,7 +210,7 @@ void PaintLine_TextView(
 int LeftMarginWidth_TextView(
     TextView * lps
     );
-void UpdateMarginWidth_TextView(
+VOID UpdateMarginWidth_TextView(
     TextView * lps
     );
 int PaintMargin_TextView(
@@ -220,7 +220,7 @@ int PaintMargin_TextView(
     int xpos,
     int ypos
     );
-void PaintText_TextView(
+VOID PaintText_TextView(
     TextView * lps,
     HDC hdc,
     ULONG nLineNo,
@@ -249,7 +249,7 @@ int CRLF_size_TextView(
     LPTSTR szText,
     int nLength
     );
-void MarkCRLF_TextView(
+VOID MarkCRLF_TextView(
     TextView * lps,
     USPDATA * uspData,
     LPTSTR szText,
@@ -408,7 +408,7 @@ VOID UpdateCaretOffset_TextView(
 VOID RepositionCaret_TextView(
     TextView * lps
     );
-void UpdateLine_TextView(
+VOID UpdateLine_TextView(
     TextView * lps,
     ULONG nLineNo
     );
@@ -424,7 +424,7 @@ BOOL ForwardDelete_TextView(
 BOOL BackDelete_TextView(
     TextView * lps
     );
-void Smeg_TextView(
+VOID Smeg_TextView(
     TextView * lps,
     BOOL fAdvancing
     );
@@ -456,7 +456,7 @@ BOOL ForwardDelete_TextView(
 BOOL BackDelete_TextView(
     TextView * lps
     );
-void Smeg_TextView(
+VOID Smeg_TextView(
     TextView * lps,
     BOOL fAdvancing
     );

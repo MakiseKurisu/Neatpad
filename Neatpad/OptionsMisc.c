@@ -52,7 +52,7 @@ BOOL ElevateToAdmin(HWND hwnd, BOOL fChecked1, BOOL fChecked2)//LPTSTR szParams)
     return success;
 }
 
-void ApplyAdminSettings(HWND hwnd)
+VOID ApplyAdminSettings(HWND hwnd)
 {
     BOOL fChecked1;
     BOOL fChecked2;

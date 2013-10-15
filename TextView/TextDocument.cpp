@@ -28,7 +28,7 @@ struct _BOM_LOOKUP BOMLOOK [] =
 //
 //    TextDocument constructor
 //
-TextDocument * new_TextDocument(void)
+TextDocument * new_TextDocument(VOID)
 {
     TextDocument * lps = (TextDocument *) malloc(sizeof(TextDocument));
 
@@ -55,7 +55,7 @@ TextDocument * new_TextDocument(void)
 //
 //    TextDocument destructor
 //
-void delete_TextDocument(
+VOID delete_TextDocument(
     TextDocument * lps
     )
 {
@@ -1210,7 +1210,7 @@ TextIterator * copy_TextIterator(
     return lps;
 }
 
-void delete_TextIterator(
+VOID delete_TextIterator(
     TextIterator * lps
     )
 {

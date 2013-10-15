@@ -69,7 +69,7 @@ BOOL EnableDlgItem(HWND hDlg, UINT nCommandId, BOOL fEnable)
 //
 //    Ensure that the specified window is on a visible monitor
 //
-void ForceVisibleDisplay(HWND hwnd)
+VOID ForceVisibleDisplay(HWND hwnd)
 {
     RECT        rect;
     HMODULE        hUser32;
@@ -292,7 +292,7 @@ int RectHeight(RECT *rect)
 //
 //    Center the specified window relative to it's parent
 //    
-void CenterWindow(HWND hwnd)
+VOID CenterWindow(HWND hwnd)
 {
     HWND hwndParent = GetParent(hwnd);
     RECT rcChild;

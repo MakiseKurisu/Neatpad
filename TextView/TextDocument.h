@@ -9,8 +9,8 @@ typedef struct _TextIterator TextIterator;
 struct _TextDocument;
 typedef struct _TextDocument TextDocument;
 
-TextDocument * new_TextDocument(void);
-void delete_TextDocument(
+TextDocument * new_TextDocument(VOID);
+VOID delete_TextDocument(
     TextDocument * lps
     );
 bool init_TextDocument(
@@ -218,7 +218,7 @@ TextIterator * copy_TextIterator(
     TextIterator * lps,
     const TextIterator & ti
     );
-void delete_TextIterator(
+VOID delete_TextIterator(
     TextIterator * lps
     );
 ULONG gettext_TextIterator(

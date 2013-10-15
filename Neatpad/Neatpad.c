@@ -45,7 +45,7 @@ HINSTANCE    g_hResourceModule;
 //
 //    Set the main window filename
 //
-void SetWindowFileName(HWND hwnd, LPTSTR szFileName, BOOL fModified)
+VOID SetWindowFileName(HWND hwnd, LPTSTR szFileName, BOOL fModified)
 {
     TCHAR ach[MAX_PATH + sizeof(g_szAppName) +4];
     TCHAR mod[4] = TEXT("");
@@ -143,7 +143,7 @@ LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 //
 //    Display the About dialog-box
 //
-void ShowAboutDlg(HWND hwndParent)
+VOID ShowAboutDlg(HWND hwndParent)
 {
     DialogBoxParam(0, MAKEINTRESOURCE(IDD_ABOUT), hwndParent, AboutDlgProc, 0);
     //DialogBoxWithFont(0, MAKEINTRESOURCE(IDD_ABOUT), hwndParent, AboutDlgProc, 0, TEXT("MetaCondNormal-Roman"), 9);//TEXT("Bell MT Bold"));
@@ -521,7 +521,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 //
 //    Register main window class
 //
-void InitMainWnd()
+VOID InitMainWnd()
 {
     WNDCLASSEX wcx;
     HANDLE hInst = GetModuleHandle(0);

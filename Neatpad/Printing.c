@@ -23,7 +23,12 @@ int GetPrinterWidth(HDC hdcPrn);
 
 HDC ShowPrintDlg(HWND hwndParent)
 {
-    PRINTDLGEX    pdlgx = { sizeof(pdlgx), hwndParent, g_hDevMode, g_hDevNames };
+    PRINTDLGEX pdlgx;
+    memset(&pdlgx, 0, sizeof(pdlgx));
+    pdlgx.lStructSize = sizeof(pdlgx);
+    pdlgx.hwndOwner = hwndParent;
+    pdlgx.hDevMode = g_hDevMode;
+    pdlgx.hDevNames = g_hDevNames;
     pdlgx.Flags = PD_RETURNDC | PD_NOPAGENUMS | PD_NOCURRENTPAGE | PD_NOWARNING | PD_HIDEPRINTTOFILE;
     pdlgx.nStartPage = START_PAGE_GENERAL;
 

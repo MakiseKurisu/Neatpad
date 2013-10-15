@@ -776,7 +776,7 @@ VOID RepositionCaret_TextView(
     UpdateCaretXY_TextView(lps, lps->nCaretPosX, lps->nCurrentLine);
 }
 
-void UpdateLine_TextView(
+VOID UpdateLine_TextView(
     TextView * lps,
     ULONG nLineNo
     )

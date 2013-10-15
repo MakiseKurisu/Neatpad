@@ -153,7 +153,7 @@ TextView * new_TextView(
 //
 //    Destructor for TextView class
 //
-void delete_TextView(
+VOID delete_TextView(
     TextView * lps
     )
 {
